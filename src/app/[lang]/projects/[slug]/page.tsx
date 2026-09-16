@@ -30,6 +30,8 @@ import { formatBdt } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 /**
  * One development.
  *
@@ -43,18 +45,6 @@ import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
  * property pages. Same decision at a different stage — the parts that answer
  * "where is it and who do I call" should not be two implementations that drift.
  */
-/**
- * No pre-built params.
- *
- * The set of developments lives in the database and changes whenever the desk
- * adds or retires one, so it is not knowable at build time. Each page renders
- * on its first request and is cached from then on; a save drops that cache
- * through the `projects` tag.
- */
-export function generateStaticParams() {
-  return [] as { lang: Locale; slug: string }[];
-}
-
 export async function generateMetadata({
   params,
 }: {
