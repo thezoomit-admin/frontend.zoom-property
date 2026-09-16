@@ -16,12 +16,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import {
-  properties,
   propertyBySlug,
   similarProperties,
 } from "@/data/properties";
 import { localeAlternates } from "@/i18n/alternates";
-import { LOCALES, type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { getPropertyBySlug } from "@/server/features/properties";
@@ -31,11 +30,14 @@ import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, propertySchema } from "@/lib/seo";
 import { ContactCta } from "@/components/common/contact-cta";
 
+export const dynamic = "force-dynamic";
+
 /**
  * One listing.
  *
- * Every property in every locale is prerendered: the data is a static array, so
- * rendering these on demand would buy nothing and cost the first visitor.
+ * Listings live in the CMS and can be added or retired at any time. Each
+ * detail route therefore renders on demand and uses the API cache tag for
+ * revalidation, avoiding stale demo routes in production builds.
  *
  * The page answers, in order, the questions a buyer here actually asks — what
  * does it cost, what does it look like, how big is it, are the papers clean,
@@ -43,12 +45,6 @@ import { ContactCta } from "@/components/common/contact-cta";
  * to the last one should never be a scroll away, and drops under the content on
  * tablet and narrower, where a 320px column beside the specs is worse than none.
  */
-export function generateStaticParams() {
-  return LOCALES.flatMap((lang) =>
-    properties.map((property) => ({ lang, slug: property.slug })),
-  );
-}
-
 export async function generateMetadata({
   params,
 }: {
