@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,8 +21,8 @@ import {
 import { cn } from "@/lib/utils";
 
 const LOCALE_FLAGS: Record<Locale, string> = {
-  bn: "🇧🇩",
-  en: "🇬🇧",
+  bn: "/flags/bd.svg",
+  en: "/flags/gb.svg",
 };
 
 /**
@@ -61,9 +62,13 @@ export function LanguageSwitcher({
             : "text-foreground hover:bg-muted",
         )}
       >
-        <span aria-hidden="true" className="text-base leading-none">
-          {LOCALE_FLAGS[locale]}
-        </span>
+        <Image
+          src={LOCALE_FLAGS[locale]}
+          alt=""
+          width={20}
+          height={14}
+          className="rounded-sm"
+        />
         <span className="hidden sm:inline">{LOCALE_LABELS[locale].native}</span>
         <Icon name="chevronDown" size="xs" />
       </DropdownMenuTrigger>
@@ -81,9 +86,13 @@ export function LanguageSwitcher({
               )}
             >
               <span className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-base leading-none">
-                  {LOCALE_FLAGS[code]}
-                </span>
+                <Image
+                  src={LOCALE_FLAGS[code]}
+                  alt=""
+                  width={20}
+                  height={14}
+                  className="rounded-sm"
+                />
                 {LOCALE_LABELS[code].native}
               </span>
               {code === locale ? <Icon name="check" size="xs" /> : null}
