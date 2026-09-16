@@ -19,6 +19,11 @@ import {
 } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
+const LOCALE_FLAGS: Record<Locale, string> = {
+  bn: "🇧🇩",
+  en: "🇬🇧",
+};
+
 /**
  * Language switcher.
  *
@@ -56,7 +61,9 @@ export function LanguageSwitcher({
             : "text-foreground hover:bg-muted",
         )}
       >
-        <Icon name="language" size="sm" />
+        <span aria-hidden="true" className="text-base leading-none">
+          {LOCALE_FLAGS[locale]}
+        </span>
         <span className="hidden sm:inline">{LOCALE_LABELS[locale].native}</span>
         <Icon name="chevronDown" size="xs" />
       </DropdownMenuTrigger>
@@ -73,7 +80,12 @@ export function LanguageSwitcher({
                 code === locale && "font-semibold",
               )}
             >
-              {LOCALE_LABELS[code].native}
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true" className="text-base leading-none">
+                  {LOCALE_FLAGS[code]}
+                </span>
+                {LOCALE_LABELS[code].native}
+              </span>
               {code === locale ? <Icon name="check" size="xs" /> : null}
             </Link>
           </DropdownMenuItem>
