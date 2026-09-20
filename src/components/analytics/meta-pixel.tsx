@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
   interface Window {
@@ -18,6 +18,7 @@ const detailPath = /^\/(?:bn|en)\/(properties|projects)\/([^/?#]+)$/;
 
 export function MetaPixel({ pixelId }: MetaPixelProps) {
   const pathname = usePathname();
+  const previousPathname = useRef<string | null>(null);
 
   useEffect(() => {
     if (!pixelId) return;
@@ -30,7 +31,8 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         return;
       }
 
-      window.fbq("track", "PageView");
+      const isInitialPageLoad = previousPathname.current === null;
+      previousPathname.current = pathname;
 
       const match = pathname.match(detailPath);
       if (match) {
@@ -39,6 +41,10 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
           content_ids: [slug],
           content_type: type === "properties" ? "property" : "project",
         });
+      }
+
+      if (!isInitialPageLoad) {
+        window.fbq("track", "PageView");
       }
     };
 
@@ -80,6 +86,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
         (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '${pixelId}');
+        fbq('track', 'PageView');
       `}
     </Script>
   );
