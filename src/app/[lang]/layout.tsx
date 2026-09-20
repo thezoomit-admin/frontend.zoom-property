@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { fontVariables } from "../fonts";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -88,6 +89,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
         />
       </head>
       <body suppressHydrationWarning className="flex min-h-dvh flex-col bg-background text-foreground">
+        <MetaPixel pixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID} />
         {/* Site-wide entities. Page-level schemas reference these by @id. */}
         <JsonLd schema={organizationSchema(socialProfiles(dict.contact.social))} />
         <JsonLd schema={websiteSchema()} />
