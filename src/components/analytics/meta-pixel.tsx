@@ -14,15 +14,15 @@ interface MetaPixelProps {
   pixelId?: string;
 }
 
+const DEFAULT_PIXEL_ID = "1692325388536464";
 const detailPath = /^\/(?:bn|en)\/(properties|projects)\/([^/?#]+)$/;
 
 export function MetaPixel({ pixelId }: MetaPixelProps) {
   const pathname = usePathname();
   const previousPathname = useRef<string | null>(null);
+  const activePixelId = pixelId || DEFAULT_PIXEL_ID;
 
   useEffect(() => {
-    if (!pixelId) return;
-
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
 
     const trackCurrentPage = () => {
@@ -52,11 +52,9 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
     return () => {
       if (retryTimer) clearTimeout(retryTimer);
     };
-  }, [pathname, pixelId]);
+  }, [pathname]);
 
   useEffect(() => {
-    if (!pixelId) return;
-
     const handleClick = (event: MouseEvent) => {
       const anchor = (event.target as Element | null)?.closest("a");
       if (!anchor) return;
@@ -71,9 +69,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
 
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, [pixelId]);
-
-  if (!pixelId) return null;
+  }, []);
 
   return (
     <Script id="meta-pixel" strategy="afterInteractive">
@@ -85,7 +81,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
         s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
         (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '${pixelId}');
+        fbq('init', '${activePixelId}');
         fbq('track', 'PageView');
       `}
     </Script>
