@@ -20,18 +20,32 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!pixelId || !window.fbq) return;
+    if (!pixelId) return;
 
-    window.fbq("track", "PageView");
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const match = pathname.match(detailPath);
-    if (match) {
-      const [, type, slug] = match;
-      window.fbq("track", "ViewContent", {
-        content_ids: [slug],
-        content_type: type === "properties" ? "property" : "project",
-      });
-    }
+    const trackCurrentPage = () => {
+      if (!window.fbq) {
+        retryTimer = setTimeout(trackCurrentPage, 50);
+        return;
+      }
+
+      window.fbq("track", "PageView");
+
+      const match = pathname.match(detailPath);
+      if (match) {
+        const [, type, slug] = match;
+        window.fbq("track", "ViewContent", {
+          content_ids: [slug],
+          content_type: type === "properties" ? "property" : "project",
+        });
+      }
+    };
+
+    trackCurrentPage();
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer);
+    };
   }, [pathname, pixelId]);
 
   useEffect(() => {
