@@ -30,7 +30,7 @@ export function MetaPixel({ pixelId }: MetaPixelProps) {
         retryTimer = setTimeout(trackCurrentPage, 50);
         return;
       }
-
+// main tracking push here
       const isInitialPageLoad = previousPathname.current === null;
       previousPathname.current = pathname;
 

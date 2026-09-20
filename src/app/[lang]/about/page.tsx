@@ -30,11 +30,6 @@ export async function generateMetadata(): Promise<Metadata> {
  * prose, numbers, a process, a history and photographs, and running all five
  * through the same card grid is how an About page becomes a wall nobody
  * finishes:
- *
- *   1  Story      asymmetric split, prose beside an offset image pair
- *   2  Figures    full-bleed charcoal band, the one dark stop on the page
- *   3  Vetting    two-column, a divided list against a sticky heading
- *   4  Milestones a horizontal run of dated markers
  *   5  Gallery    an image grid, and the only section that is all picture
  *
  * The order alternates weight as well as layout — read, count, read, scan,
