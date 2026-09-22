@@ -43,9 +43,8 @@ export async function SiteFooter() {
   // The project column is whatever is published, not a list typed in here:
   // a footer that still advertises a delivered project is worse than one with
   // a shorter column. Four, because that is what the column has room for.
-  const [dict, locale, projects] = await Promise.all([
+  const [dict, projects] = await Promise.all([
     getDictionary(),
-    getLocale(),
     getProjects({ isFooter: true, limit: 6, sort: "order" }),
   ]);
   const footerProjects = projects
