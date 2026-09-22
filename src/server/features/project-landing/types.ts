@@ -1,4 +1,4 @@
-import type { ApiMedia } from "../../base-api";
+import type { ApiMedia } from "../../base-api/types";
 
 export const LANDING_SECTIONS = [
   "hero",

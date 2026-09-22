@@ -9,7 +9,6 @@ export const contentType = "image/png";
 export async function landingOgResponse(path: string, lang: string) {
   const locale: Locale = isLocale(lang) && lang === "bn" ? "bn" : "en";
   const landing = await getLandingByPath(path, locale);
-  const bn = locale === "bn";
   const title = landing?.hero.title || landing?.projectName || "Zoom Property";
   const location = landing?.hero.location || "";
   const badge = landing?.hero.badge || "";
@@ -112,15 +111,11 @@ export async function landingOgResponse(path: string, lang: string) {
           <div style={{ display: "flex", gap: 28, fontSize: 24, color: "#e8eee6" }}>
             {stats.length
               ? stats.map((stat) => (
-                  <div key={stat.label} style={{ display: "flex" }}>
-                    {stat.value} {stat.label}
+                  <div key={`${stat.value}-${stat.label}`} style={{ display: "flex" }}>
+                    {[stat.value, stat.label].filter(Boolean).join(" ")}
                   </div>
                 ))
-              : (
-                  <div style={{ display: "flex" }}>
-                    {bn ? "প্রকল্প ল্যান্ডিং" : "Project landing"}
-                  </div>
-                )}
+              : null}
           </div>
           {phones ? (
             <div

@@ -84,7 +84,7 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
         <LandingStickyCta
           phone={landing.phone}
           whatsapp={landing.whatsapp}
-          bookLabel={landing.cta.primary}
+          bookLabel={landing.cta.primary || landing.navEnquire}
           callLabel={landing.cta.call}
           whatsappLabel={landing.cta.whatsapp}
           showBook={show("enquire")}
