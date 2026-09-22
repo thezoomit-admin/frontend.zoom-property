@@ -17,11 +17,26 @@ const SERVER_URL = (
   "http://localhost:5008"
 ).replace(/\/+$/, "");
 
+/** Live media bucket. Retire stale pub-* hosts that 404 every key. */
+const R2_PUBLIC_FALLBACK = "https://pub-fe014e73b16347aab5e799483354b483.r2.dev";
+const STALE_R2_HOSTS = new Set(["pub-5b52277bf86041a0b4872bee7a979553.r2.dev"]);
+
+const rewriteStaleR2Url = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    if (!STALE_R2_HOSTS.has(parsed.hostname.toLowerCase())) return url;
+    const key = parsed.pathname.replace(/^\/+/, "");
+    return key ? `${R2_PUBLIC_FALLBACK}/${key}` : R2_PUBLIC_FALLBACK;
+  } catch {
+    return url;
+  }
+};
+
 export function resolveImageSrc(src: string | null | undefined): string {
   if (!src) return "";
   if (typeof src !== "string") return src;
   if (/^(https?:)?\/\//i.test(src) || src.startsWith("data:") || src.startsWith("blob:")) {
-    return src;
+    return rewriteStaleR2Url(src);
   }
   if (src.startsWith("/") && !src.startsWith("/uploads")) {
     return src;
