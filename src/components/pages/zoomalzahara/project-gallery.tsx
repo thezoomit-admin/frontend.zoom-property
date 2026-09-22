@@ -3,10 +3,12 @@
 import { useState } from "react";
 
 import { ImageFrame } from "@/components/media/image-frame";
+import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import {
   ImagePreview,
   PreviewTrigger,
 } from "@/components/pages/zoomalzahara/image-preview";
+import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
 import { ZOOM_AL_ZAHARA_GALLERY } from "@/data/zoomalzahara";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +37,7 @@ export function ProjectGallery({
 
   return (
     <div className="mt-8">
-      <div className="relative overflow-hidden rounded-lg border border-border">
+      <div className={`relative overflow-hidden ${landingCardClass}`}>
         <ImageFrame
           src={image.src}
           alt={label}
@@ -61,38 +63,37 @@ export function ProjectGallery({
         </div>
       </div>
 
-      <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
+      <ThumbRail columns={6}>
         {ZOOM_AL_ZAHARA_GALLERY.map((shot, index) => {
           const selected = index === active;
           const shotLabel = shots[index]?.label ?? shot.alt;
 
           return (
-            <li key={shot.src}>
-              <button
-                type="button"
-                onClick={() => setActive(index)}
-                aria-pressed={selected}
-                aria-label={shotLabel}
-                className={cn(
-                  "block w-full cursor-pointer overflow-hidden rounded-lg border transition-all",
-                  selected
-                    ? "border-primary ring-2 ring-primary/30"
-                    : "border-transparent hover:border-primary/40",
-                )}
-              >
-                <ImageFrame
-                  src={shot.src}
-                  alt={shotLabel}
-                  ratio="4/3"
-                  rounded="lg"
-                  hover="zoom"
-                  sizes="(min-width: 640px) 16vw, 33vw"
-                />
-              </button>
-            </li>
+            <button
+              key={shot.src}
+              type="button"
+              onClick={() => setActive(index)}
+              aria-pressed={selected}
+              aria-label={shotLabel}
+              className={cn(
+                "block w-full cursor-pointer overflow-hidden rounded-lg border transition-all",
+                selected
+                  ? "border-primary ring-2 ring-primary/30"
+                  : "border-transparent hover:border-primary/40",
+              )}
+            >
+              <ImageFrame
+                src={shot.src}
+                alt={shotLabel}
+                ratio="4/3"
+                rounded="lg"
+                hover="zoom"
+                sizes="(min-width: 640px) 16vw, 31vw"
+              />
+            </button>
           );
         })}
-      </ul>
+      </ThumbRail>
 
       <ImagePreview
         images={previewImages}

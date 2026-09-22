@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import { submitContactForm } from "@/server/features/inquiries/action";
 
 interface LeadFormDict {
@@ -72,7 +73,7 @@ export function ZoomAlZaharaLeadForm({
       className={
         compact
           ? "flex flex-col gap-3.5"
-          : "flex flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:p-5"
+          : `flex flex-col gap-4 p-4 sm:p-5 ${landingCardClass}`
       }
     >
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">

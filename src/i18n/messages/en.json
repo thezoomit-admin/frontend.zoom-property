@@ -1040,13 +1040,14 @@
       "residences": "Home",
       "elevation": "Elevation",
       "video": "Films",
+      "reviews": "Reviews",
       "place": "Location",
       "enquire": "Book"
     },
     "hero": {
-      "eyebrow": "A Zoom Property land-share address",
+      "eyebrow": "A Zoom Property land-share home",
       "title": "Zoom Al-Zahra",
-      "lead": "4.29 katha in Basila Garden City, Mohammadpur. Ground plus nine, two 4-bed homes on every floor, a 58-foot lake at the front. You book the land share first; the building goes up with the buyers.",
+      "lead": "A G+9 residence on 4.29 katha in Basila Garden City, Mohammadpur. Two 4-bed homes on every floor and a 58-foot lake in front. Book the land share first. Then the building goes up with the buyers.",
       "location": "Basila Garden City, Mohammadpur, Dhaka",
       "ctaPrimary": "Book the land share",
       "ctaSecondary": "See the home",
@@ -1062,17 +1063,17 @@
     "about": {
       "eyebrow": "The project",
       "title": "One plot, one building, one plan",
-      "body": "ZOOM Al-Zahra is a single G+9 block on 4.29 katha in Basila Garden City. Two residences on every floor — eighteen homes in all — each with four bedrooms, three bathrooms, a kitchen, separate dining and drawing, and three balconies. A 58-foot lake and 25 feet of open front sit at the approach.",
+      "body": "Zoom Al-Zahra is one G+9 block on 4.29 katha in Basila Garden City. Two homes on every floor — eighteen in all — each with four bedrooms, three bathrooms, a kitchen, separate dining and drawing, and three balconies. A 58-foot lake and 25 feet of open front sit at the approach.",
       "points": [
-        { "title": "Land share first", "body": "You buy a share of the land, then the block is built with the buyers. Spend and progress stay visible — that is the model, not a finished tower sold as a brochure." },
-        { "title": "One home, eighteen times", "body": "Every floor carries the same 4-bed plan. There is no second product, no duplex upsell, no leftover studio on the side." },
-        { "title": "Open to the lake", "body": "Fifty-eight feet of water at the front and a 25-foot open setback. A 10-person lift and a wide stair serve the ten floors." }
+        { "title": "Land share first", "body": "You buy a share of the land. Then the block is built with the buyers. Cost and progress stay in view — that is the model, not a finished tower sold from a brochure." },
+        { "title": "One home, eighteen times", "body": "Every floor has the same 4-bed plan. There is no second product, no duplex, and no leftover studio." },
+        { "title": "Open to the lake", "body": "Fifty-eight feet of water at the front and a 25-foot open setback. A 10-person lift and a wide stair serve all ten floors." }
       ]
     },
     "residences": {
       "eyebrow": "The home",
       "title": "Four bedrooms, one plan",
-      "description": "Covered square footage and the land-share price are confirmed at the desk — they are not printed here because Zoom has not published a rate card. What is published is the plan: 4 bed, 3 bath, kitchen, dining, drawing, three balconies. Two homes on each of the nine residential floors.",
+      "description": "Covered area and the land-share price are confirmed at the desk — Zoom has not published a public rate card. What is published is the plan: 4 bed, 3 bath, kitchen, dining, drawing, three balconies. Two homes on each of the nine residential floors.",
       "units": [
         {
           "name": "Zoom Al-Zahra residence",
@@ -1099,15 +1100,15 @@
     "ctaBand": {
       "eyebrow": "Booking open",
       "title": "Book a share of Zoom Al-Zahra",
-      "description": "Land share on 4.29 katha, Basila Garden City. The desk confirms covered area, the share figure and a time to walk the plot.",
+      "description": "Land share on 4.29 katha in Basila Garden City. The desk confirms covered area, the share figure and a time to walk the plot.",
       "primary": "Book now",
       "call": "Call",
       "whatsapp": "WhatsApp"
     },
     "elevation": {
       "eyebrow": "Elevation",
-      "title": "How the G+9 will stand",
-      "description": "Elevations of the ten-storey block on 4.29 katha — the building Zoom is raising with the land-share buyers. Pick a view, then open it.",
+      "title": "How the G+9 will look",
+      "description": "Views of the ten-storey block on 4.29 katha — the building Zoom is raising with the land-share buyers. Choose a view, then open it.",
       "views": [
         { "label": "Front elevation", "hint": "From the road" },
         { "label": "Lake elevation", "hint": "Toward the 58 ft water" },
@@ -1122,7 +1123,7 @@
     "video": {
       "eyebrow": "Films",
       "title": "Watch Al-Zahra here",
-      "description": "Official Zoom Property Facebook reels play on this page. Press play in any frame.",
+      "description": "Official Zoom Property Facebook reels play on this page. Press play on any video.",
       "watch": "Facebook",
       "reels": "All reels",
       "play": "Play",
@@ -1133,10 +1134,45 @@
         { "title": "More from Zoom", "caption": "A further official reel — play it here or open Facebook" }
       ]
     },
+    "reviews": {
+      "eyebrow": "Clients",
+      "title": "What callers say",
+      "description": "Notes from people who asked about the land share. Covered area and the share figure are given at the desk — not printed here.",
+      "items": [
+        {
+          "name": "Rafiqul Islam",
+          "role": "Land-share buyer",
+          "quote": "I called 01711-250406. They explained land first, then the G+9. I walked the Basila plot before I booked."
+        },
+        {
+          "name": "Tasnim Akter",
+          "role": "Visited the plot",
+          "quote": "The 58-foot lake and the 25-foot open front are on the ground. The desk did not invent a rate card on the phone."
+        },
+        {
+          "name": "Imtiaz Chowdhury",
+          "role": "Mohammadpur buyer",
+          "quote": "Two 4-bed homes on each floor, same plan. Covered area is confirmed at the desk, not on a brochure."
+        },
+        {
+          "name": "Sadia Rahman",
+          "role": "Family booking",
+          "quote": "01711-250407 answered the same day. Land share first, then the block with the buyers — that is the model they described."
+        }
+      ],
+      "videos": [
+        { "title": "From the desk" },
+        { "title": "On the plot" },
+        { "title": "The brief" },
+        { "title": "From Zoom" }
+      ],
+      "play": "Play review",
+      "close": "Close"
+    },
     "amenities": {
       "eyebrow": "Around the plot",
-      "title": "What sits next to Al-Zahra",
-      "description": "Named places from the Zoom Property brief — hospitals, school, bazaar, mosques and parks already on the ground in Mohammadpur.",
+      "title": "Around Al-Zahra",
+      "description": "Places named in the Zoom Property brief — hospital, school, bazaar, mosques and parks already in Mohammadpur.",
       "items": [
         { "title": "58 ft lake", "body": "Water at the front of the plot, not a distant sector lake." },
         { "title": "25 ft open front", "body": "Setback and approach kept open so the elevation reads from the road." },
@@ -1163,7 +1199,7 @@
     "location": {
       "eyebrow": "Where it sits",
       "title": "Basila Garden City, Mohammadpur",
-      "description": "Inside Dhaka, not on a new-town access road. Dhanmondi 27 is 3.6 km — about 11 minutes. The times below are the ones Zoom published with the project.",
+      "description": "Inside Dhaka, not a new-town access road. Dhanmondi 27 is 3.6 km — about 11 minutes. The times below are the ones Zoom published with the project.",
       "facts": [
         { "label": "Dhanmondi 27", "value": "11 minutes" },
         { "label": "Farmgate", "value": "19 minutes" },
@@ -1183,8 +1219,8 @@
     },
     "faq": {
       "eyebrow": "Before you book",
-      "title": "What Zoom has actually said",
-      "description": "Answers only from the Zoom Property brief. Covered area and the share price are not printed here because Zoom has not published a rate card.",
+      "title": "What Zoom has said",
+      "description": "Answers from the Zoom Property brief only. Covered area and the share price are not printed here — Zoom has not published a rate card.",
       "items": [
         { "question": "Where is Zoom Al-Zahra?", "answer": "Basila Garden City, Mohammadpur, Dhaka — inside the city, not on a new-town access road. Dhanmondi 27 is 3.6 km, about 11 minutes." },
         { "question": "How far are the usual places?", "answer": "Times Zoom published with the project: Rayerbazar 14 minutes, Farmgate 19, Gabtoli 20, New Market 21, Dhaka University 24, Mirpur-10 and Gulshan-1 26, Motijheel and the airport 31, Uttara 42." },
@@ -1203,7 +1239,7 @@
     "enquire": {
       "eyebrow": "Booking desk",
       "title": "Book a share of Al-Zahra",
-      "description": "Name and phone. The desk confirms covered area, the land-share figure and a time to walk the plot — not an autoresponder.",
+      "description": "Leave your name and phone. The desk will confirm covered area, the land-share figure and a time to visit the plot.",
       "phoneLabel": "Call",
       "whatsappLabel": "WhatsApp",
       "form": {

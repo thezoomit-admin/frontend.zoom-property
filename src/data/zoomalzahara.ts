@@ -9,20 +9,26 @@ export const ZOOM_AL_ZAHARA_PHONES = {
   secondary: "01711-250407",
 } as const;
 
-const photo = (id: string, w = 1600) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+const photo = (id: string, w = 1920) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=90`;
 
 export const ZOOM_AL_ZAHARA_HERO = photo("photo-1600585154340-be6161a56a0c", 2400);
 
-export const ZOOM_AL_ZAHARA_ABOUT = photo("photo-1439066615861-d1af74d74000", 1600);
+export const ZOOM_AL_ZAHARA_ABOUT = photo("photo-1439066615861-d1af74d74000", 1920);
 
-export const ZOOM_AL_ZAHARA_RESIDENCE = photo("photo-1600585154340-be6161a56a0c", 1600);
+export const ZOOM_AL_ZAHARA_RESIDENCE = photo("photo-1600585154340-be6161a56a0c", 1920);
 
 export const ZOOM_AL_ZAHARA_STAT_ICONS: IconName[] = [
-  "area",
-  "layers",
-  "building",
-  "bed",
+  "fa-solid fa-ruler-combined",
+  "fa-solid fa-layer-group",
+  "fa-solid fa-building",
+  "fa-solid fa-bed",
+];
+
+export const ZOOM_AL_ZAHARA_ABOUT_ICONS: IconName[] = [
+  "fa-solid fa-handshake",
+  "fa-solid fa-clone",
+  '<i class="fa-solid fa-water"></i>',
 ];
 
 export const ZOOM_AL_ZAHARA_ELEVATIONS = [
@@ -49,6 +55,32 @@ export const ZOOM_AL_ZAHARA_ELEVATIONS = [
   {
     src: photo("photo-1486325212027-8081e485255e"),
     alt: "Dusk facade of Zoom Al-Zahra",
+  },
+] as const;
+
+const face = (id: string) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=400&q=90`;
+
+export const ZOOM_AL_ZAHARA_REVIEWS = [
+  {
+    image: face("photo-1507003211169-0a1dd7228f2d"),
+    poster: photo("photo-1545324418-cc1a3fa10c00", 900),
+    video: "https://www.facebook.com/reel/1633768221804628",
+  },
+  {
+    image: face("photo-1580489944761-15a19d654956"),
+    poster: photo("photo-1439066615861-d1af74d74000", 900),
+    video: "https://www.facebook.com/reel/1410572034383190",
+  },
+  {
+    image: face("photo-1560250097-0b93528c311a"),
+    poster: photo("photo-1487958449943-2429e8be8625", 900),
+    video: "https://www.facebook.com/reel/1751522772664278",
+  },
+  {
+    image: face("photo-1573496359142-b8d87734a5a2"),
+    poster: photo("photo-1600596542815-ffad4c1539a9", 900),
+    video: "https://www.facebook.com/reel/29210395125215493",
   },
 ] as const;
 
@@ -99,12 +131,12 @@ export const ZOOM_AL_ZAHARA_GALLERY = [
 ] as const;
 
 export const ZOOM_AL_ZAHARA_AMENITY_ICONS: IconName[] = [
-  "location",
-  "area",
-  "shield",
-  "users",
-  "approved",
-  "building",
+  "fa-solid fa-water",
+  "fa-solid fa-road",
+  "fa-solid fa-hospital",
+  "fa-solid fa-school",
+  "fa-solid fa-basket-shopping",
+  '<i class="fa-solid fa-mosque"></i>',
 ];
 
 export const ZOOM_AL_ZAHARA_MAP_EMBED =

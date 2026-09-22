@@ -7,6 +7,8 @@ import { Section } from "@/components/common/section";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
+import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
+import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
 import {
   ImagePreview,
   PreviewTrigger,
@@ -20,14 +22,18 @@ import {
 import type { Dictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
-const UNIT_ICONS: IconName[] = ["bed", "bath", "area"];
+const UNIT_ICONS: IconName[] = [
+  "fa-solid fa-bed",
+  "fa-solid fa-bath",
+  "fa-solid fa-ruler-combined",
+];
 const HIGHLIGHT_ICONS: IconName[] = [
-  "kitchen",
-  "split",
-  "balcony",
-  "lift",
-  "building",
-  "stairs",
+  "fa-solid fa-kitchen-set",
+  "fa-solid fa-door-open",
+  "fa-solid fa-window-maximize",
+  "fa-solid fa-elevator",
+  "fa-solid fa-building",
+  "fa-solid fa-stairs",
 ];
 
 export function ProjectResidence({
@@ -83,32 +89,31 @@ export function ProjectResidence({
               </p>
             </div>
           </div>
-          <ul className="grid grid-cols-4 gap-2">
+          <ThumbRail>
             {shots.map((shot, index) => (
-              <li key={shot.src}>
-                <button
-                  type="button"
-                  onClick={() => setActive(index)}
-                  aria-pressed={index === active}
-                  aria-label={shot.alt}
-                  className={cn(
-                    "block w-full cursor-pointer overflow-hidden rounded-lg border",
-                    index === active
-                      ? "border-primary ring-2 ring-primary/30"
-                      : "border-transparent hover:border-primary/40",
-                  )}
-                >
-                  <ImageFrame
-                    src={shot.src}
-                    alt={shot.alt}
-                    ratio="4/3"
-                    rounded="lg"
-                    sizes="12vw"
-                  />
-                </button>
-              </li>
+              <button
+                key={shot.src}
+                type="button"
+                onClick={() => setActive(index)}
+                aria-pressed={index === active}
+                aria-label={shot.alt}
+                className={cn(
+                  "block w-full cursor-pointer overflow-hidden rounded-lg border",
+                  index === active
+                    ? "border-primary ring-2 ring-primary/30"
+                    : "border-transparent hover:border-primary/40",
+                )}
+              >
+                <ImageFrame
+                  src={shot.src}
+                  alt={shot.alt}
+                  ratio="4/3"
+                  rounded="lg"
+                  sizes="(min-width: 640px) 12vw, 31vw"
+                />
+              </button>
             ))}
-          </ul>
+          </ThumbRail>
         </Reveal>
 
         <div className="flex flex-col">
@@ -116,13 +121,13 @@ export function ProjectResidence({
             eyebrow={dict.eyebrow}
             title={dict.title}
             description={dict.description}
-            titleClassName="lg:whitespace-normal"
+            titleClassName={landingTitleClass}
           />
-          <div className="mt-6 flex flex-1 flex-col rounded-lg border border-border bg-card p-5">
+          <div className={`mt-6 flex flex-1 flex-col p-5 ${landingCardClass}`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-heading text-lg font-bold text-foreground">
+                  <h3 className="font-heading text-lg font-extrabold text-foreground">
                     {unit.name}
                   </h3>
                   <Badge className="bg-primary text-primary-foreground">

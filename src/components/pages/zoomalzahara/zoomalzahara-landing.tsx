@@ -6,11 +6,13 @@ import { Section } from "@/components/common/section";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
+import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
 import { ZoomAlZaharaLeadForm } from "@/components/pages/zoomalzahara/lead-form";
 import { ProjectElevations } from "@/components/pages/zoomalzahara/project-elevations";
 import { ProjectFilms } from "@/components/pages/zoomalzahara/project-films";
 import { ProjectGallery } from "@/components/pages/zoomalzahara/project-gallery";
 import { ProjectResidence } from "@/components/pages/zoomalzahara/project-residence";
+import { ProjectReviews } from "@/components/pages/zoomalzahara/project-reviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +23,8 @@ import {
 } from "@/components/ui/accordion";
 import {
   ZOOM_AL_ZAHARA_ABOUT,
+  ZOOM_AL_ZAHARA_ABOUT_ICONS,
   ZOOM_AL_ZAHARA_AMENITY_ICONS,
-  ZOOM_AL_ZAHARA_FACEBOOK,
   ZOOM_AL_ZAHARA_HERO,
   ZOOM_AL_ZAHARA_MAP_EMBED,
   ZOOM_AL_ZAHARA_PHONES,
@@ -58,6 +60,7 @@ export function ZoomAlZaharaLanding({
         phoneAlt={ZOOM_AL_ZAHARA_PHONES.secondary}
         whatsapp={whatsapp}
       />
+      <Reviews dict={dict.reviews} />
     </div>
   );
 }
@@ -80,38 +83,39 @@ function Hero({
         alt={hero.title}
         fill
         priority
+        quality={90}
         sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover object-[center_72%]"
+        className="absolute inset-0 h-full w-full object-cover object-[center_68%]"
       />
-      <div className="absolute inset-0 bg-linear-to-r from-black/78 via-black/48 to-black/20" />
-      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-black/15" />
+      <div className="absolute inset-0 bg-linear-to-r from-black/62 via-black/38 to-black/12" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-black/20" />
 
       <AppContainer className="relative z-10 pb-8 pt-16 sm:pt-20 lg:pb-10">
         <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(28rem,calc(38rem-50px))] lg:gap-8">
           <Reveal className="flex flex-col gap-4 text-white sm:gap-5">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border border-white/25 bg-black/35 text-white backdrop-blur-md">
+              <Badge className="border border-white/20 bg-white/10 text-white backdrop-blur-md">
                 {hero.badge}
               </Badge>
-              <Badge className="border border-white/25 bg-black/35 text-white backdrop-blur-md">
+              <Badge className="border border-white/20 bg-white/10 text-white backdrop-blur-md">
                 {hero.handover}
               </Badge>
             </div>
-            <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-white/75">
+            <p className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white/80 sm:text-xs">
               {hero.eyebrow}
             </p>
             <Heading
               as="h1"
               size="h1"
-              className="text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]"
+              className="!font-extrabold text-white"
             >
               {hero.title}
             </Heading>
-            <p className="max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">
+            <p className="max-w-xl text-[15px] leading-relaxed text-white/90 sm:text-base sm:leading-7">
               {hero.lead}
             </p>
-            <p className="flex items-center gap-2 text-sm font-medium text-white/80">
-              <Icon name="location" size="xs" />
+            <p className="flex items-center gap-2 text-sm font-medium text-white/85">
+              <Icon name="fa-location-dot" size="xs" />
               {hero.location}
             </p>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -143,7 +147,7 @@ function Hero({
             delay={0.08}
             className="hidden w-full rounded-lg border border-white/20 bg-white p-5 shadow-2xl lg:block lg:p-7"
           >
-            <p className="font-heading text-lg font-bold text-foreground">
+            <p className="font-heading text-lg font-extrabold text-foreground">
               {dict.enquire.title}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -160,7 +164,7 @@ function Hero({
         </div>
       </AppContainer>
 
-      <div className="relative z-10 border-t border-white/15 bg-black/50 backdrop-blur-md">
+      <div className="relative z-10 border-t border-white/10 bg-black/35 backdrop-blur-md">
         <AppContainer>
           <ul className="grid grid-cols-2 lg:grid-cols-4">
             {dict.stats.map((stat, index) => (
@@ -179,7 +183,7 @@ function Hero({
                   />
                 </span>
                 <div className="min-w-0">
-                  <p className="font-heading text-xl font-bold tracking-tight text-white sm:text-2xl">
+                  <p className="font-heading text-xl font-extrabold tracking-tight text-white sm:text-2xl">
                     {stat.value}
                   </p>
                   <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/65">
@@ -204,19 +208,22 @@ function About({ dict }: { dict: Dictionary["zoomalzahara"]["about"] }) {
             eyebrow={dict.eyebrow}
             title={dict.title}
             description={dict.body}
-            titleClassName="lg:whitespace-normal"
+            titleClassName={landingTitleClass}
           />
           <ul className="mt-6 grid flex-1 gap-3">
-            {dict.points.map((point) => (
+            {dict.points.map((point, index) => (
               <li
                 key={point.title}
-                className="flex gap-3 rounded-lg border border-border bg-card p-4"
+                className={`flex gap-3 p-4 ${landingCardClass}`}
               >
                 <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Icon name="check" size="xs" />
+                  <Icon
+                    name={ZOOM_AL_ZAHARA_ABOUT_ICONS[index] ?? "fa-solid fa-check"}
+                    size="xs"
+                  />
                 </span>
                 <div>
-                  <h3 className="font-heading text-sm font-bold text-foreground sm:text-base">
+                  <h3 className="font-heading text-sm font-extrabold text-foreground sm:text-base">
                     {point.title}
                   </h3>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -227,15 +234,15 @@ function About({ dict }: { dict: Dictionary["zoomalzahara"]["about"] }) {
             ))}
           </ul>
         </div>
-        <Reveal delay={0.08} className="min-h-[20rem] lg:min-h-full">
+        <Reveal delay={0.08} className="min-h-80 lg:min-h-full">
           <ImageFrame
             src={ZOOM_AL_ZAHARA_ABOUT}
             alt={dict.title}
             ratio="auto"
             rounded="lg"
             sizes="(min-width: 1024px) 42vw, 100vw"
-            className="h-full min-h-[20rem] lg:min-h-[32rem]"
-            imageClassName="object-cover"
+            className="h-full min-h-80 lg:min-h-128"
+            imageClassName="object-cover object-center"
           />
         </Reveal>
       </div>
@@ -250,7 +257,7 @@ function Elevation({ dict }: { dict: Dictionary["zoomalzahara"]["elevation"] }) 
         eyebrow={dict.eyebrow}
         title={dict.title}
         description={dict.description}
-        titleClassName="lg:whitespace-normal"
+        titleClassName={landingTitleClass}
       />
       <ProjectElevations
         views={dict.views}
@@ -272,34 +279,32 @@ function Films({ dict }: { dict: Dictionary["zoomalzahara"]["video"] }) {
         eyebrow={dict.eyebrow}
         title={dict.title}
         description={dict.description}
-        titleClassName="lg:whitespace-normal"
-        className="sm:items-start"
-        action={
-          <div className="flex flex-col gap-2 sm:items-end">
-            <Button asChild variant="outline" className="h-8 px-3">
-              <a
-                href={ZOOM_AL_ZAHARA_FACEBOOK}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Icon name="facebook" size="xs" />
-                {dict.watch}
-              </a>
-            </Button>
-            <Button asChild variant="outline" className="h-8 px-3">
-              <a
-                href={`${ZOOM_AL_ZAHARA_FACEBOOK}/reels`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Icon name="play" size="xs" />
-                {dict.reels}
-              </a>
-            </Button>
-          </div>
-        }
+        titleClassName={landingTitleClass}
       />
-      <ProjectFilms films={dict.films} watchLabel={dict.watch} />
+      <ProjectFilms films={dict.films} />
+    </Section>
+  );
+}
+
+function Reviews({ dict }: { dict: Dictionary["zoomalzahara"]["reviews"] }) {
+  return (
+    <Section
+      id="reviews"
+      spacing="sm"
+      className="scroll-mt-24 border-y border-border bg-muted/30"
+    >
+      <SectionHeading
+        eyebrow={dict.eyebrow}
+        title={dict.title}
+        description={dict.description}
+        titleClassName={landingTitleClass}
+      />
+      <ProjectReviews
+        items={dict.items}
+        videos={dict.videos}
+        playLabel={dict.play}
+        closeLabel={dict.close}
+      />
     </Section>
   );
 }
@@ -317,19 +322,19 @@ function Lifestyle({
         eyebrow={amenities.eyebrow}
         title={amenities.title}
         description={amenities.description}
-        titleClassName="lg:whitespace-normal"
+        titleClassName={landingTitleClass}
       />
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {amenities.items.map((item, index) => (
           <li
             key={item.title}
-            className="flex h-full gap-3 rounded-lg border border-border bg-card p-4"
+            className={`flex h-full gap-3 p-4 ${landingCardClass}`}
           >
             <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Icon name={ZOOM_AL_ZAHARA_AMENITY_ICONS[index] ?? "check"} size="sm" />
             </span>
             <div>
-              <h3 className="font-heading text-sm font-bold text-foreground">
+              <h3 className="font-heading text-sm font-extrabold text-foreground">
                 {item.title}
               </h3>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
@@ -344,7 +349,7 @@ function Lifestyle({
         <SectionHeading
           eyebrow={gallery.eyebrow}
           title={gallery.title}
-          titleClassName="lg:whitespace-normal"
+          titleClassName={landingTitleClass}
         />
         <ProjectGallery
           shots={gallery.shots}
@@ -375,12 +380,13 @@ function Place({
             eyebrow={location.eyebrow}
             title={location.title}
             description={location.description}
-            titleClassName="lg:whitespace-normal"
+            titleClassName={landingTitleClass}
           />
           <dl className="grid grid-cols-2 gap-3">
             {location.facts.map((fact) => (
-              <div key={fact.label} className="rounded-lg border border-border bg-card p-4">
-                <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <div key={fact.label} className={`p-4 ${landingCardClass}`}>
+                <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <Icon name="fa-solid fa-clock" size="xs" className="text-primary" />
                   {fact.label}
                 </dt>
                 <dd className="mt-1 font-heading text-sm font-bold text-foreground">
@@ -393,20 +399,20 @@ function Place({
             <p className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-primary">
               {process.eyebrow}
             </p>
-            <h3 className="mt-2 font-heading text-lg font-bold text-foreground">
+            <h3 className="mt-2 font-heading text-lg font-extrabold text-foreground">
               {process.title}
             </h3>
             <ol className="mt-4 grid gap-3">
               {process.steps.map((step, index) => (
                 <li
                   key={step.title}
-                  className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border border-border bg-card p-3.5"
+                  className={`grid grid-cols-[auto_1fr] gap-3 p-3.5 ${landingCardClass}`}
                 >
                   <span className="font-heading text-xs font-bold text-primary">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    <p className="font-heading text-sm font-bold text-foreground">
+                    <p className="font-heading text-sm font-extrabold text-foreground">
                       {step.title}
                     </p>
                     <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
@@ -418,7 +424,7 @@ function Place({
             </ol>
           </div>
         </div>
-        <div className="min-h-64 overflow-hidden rounded-lg border border-border bg-card sm:min-h-88 lg:col-span-7 lg:min-h-full">
+        <div className={`min-h-64 overflow-hidden sm:min-h-88 lg:col-span-7 lg:min-h-full ${landingCardClass}`}>
           <iframe
             src={ZOOM_AL_ZAHARA_MAP_EMBED}
             title={location.title}
@@ -458,20 +464,20 @@ function Close({
             eyebrow={faq.eyebrow}
             title={faq.title}
             description={faq.description}
-            titleClassName="lg:whitespace-normal"
+            titleClassName={landingTitleClass}
           />
           <Accordion type="single" collapsible className="mt-6 w-full">
             {faq.items.map((item, index) => (
               <AccordionItem
                 key={item.question}
                 value={item.question}
-                className="rounded-lg border-border px-3 data-open:bg-muted/40 sm:px-4"
+                className={`${landingCardClass} mb-2 not-last:border-b-0 px-3 data-open:bg-muted/40 sm:px-4`}
               >
                 <AccordionTrigger className="cursor-pointer items-start gap-3 py-4 text-left hover:text-primary hover:no-underline">
                   <span className="mt-0.5 font-heading text-[11px] font-bold tracking-wide text-primary">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="flex-1 font-semibold text-foreground">
+                  <span className="flex-1 font-extrabold text-foreground">
                     {item.question}
                   </span>
                 </AccordionTrigger>
@@ -490,7 +496,7 @@ function Close({
             eyebrow={enquire.eyebrow}
             title={enquire.title}
             description={enquire.description}
-            titleClassName="lg:whitespace-normal"
+            titleClassName={landingTitleClass}
           />
           <div className="mt-5">
             <ContactPills
@@ -521,22 +527,22 @@ function LandingCta({
 }) {
   return (
     <Section spacing="sm">
-      <div className="flex flex-col gap-4 rounded-lg bg-primary px-5 py-5 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-8 sm:py-6">
+      <div className="flex flex-col gap-4 rounded-lg bg-primary px-5 py-5 text-primary-foreground shadow-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-8 sm:py-6">
         <div className="min-w-0 max-w-xl">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-primary-foreground/75">
             {dict.eyebrow}
           </p>
-          <h2 className="mt-1 font-heading text-xl font-bold leading-snug text-balance sm:text-2xl">
+          <h2 className="mt-1 font-heading text-xl font-extrabold leading-snug text-balance sm:text-2xl">
             {dict.title}
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-primary-foreground/80">
             {dict.description}
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <Button
             asChild
-            className="h-9 bg-primary-foreground px-4 text-primary hover:bg-primary-foreground/90"
+            className="h-10 w-full bg-primary-foreground px-4 text-primary hover:bg-primary-foreground/90 sm:h-9 sm:w-auto"
           >
             <a href="#enquire">
               {dict.primary}
@@ -546,7 +552,7 @@ function LandingCta({
           <Button
             asChild
             variant="outline"
-            className="h-9 border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
+            className="h-10 w-full border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground sm:h-9 sm:w-auto"
           >
             <a href={telHref(phone)}>
               <Icon name="phone" size="xs" />
@@ -556,7 +562,7 @@ function LandingCta({
           <Button
             asChild
             variant="outline"
-            className="h-9 border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
+            className="h-10 w-full border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground sm:h-9 sm:w-auto"
           >
             <a href={whatsappHref(whatsapp)}>
               <Icon name="whatsapp" size="xs" />

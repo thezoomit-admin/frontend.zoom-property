@@ -127,8 +127,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
               path: ZOOM_AL_ZAHARA_PATH,
               ctaLabel: dict.zoomalzahara.nav.enquire,
               ctaHref: "#enquire",
+              name: dict.zoomalzahara.hero.title,
               location: dict.zoomalzahara.hero.location,
-              phones: [ZOOM_AL_ZAHARA_PHONES.primary, ZOOM_AL_ZAHARA_PHONES.secondary],
+              phone: ZOOM_AL_ZAHARA_PHONES.primary,
             }}
           />
           <CampaignMain campaignPath={ZOOM_AL_ZAHARA_PATH}>{children}</CampaignMain>

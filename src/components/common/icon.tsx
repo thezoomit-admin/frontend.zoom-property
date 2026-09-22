@@ -144,6 +144,37 @@ export const icons = {
 
 export type IconName = keyof typeof icons | string;
 
+function parseFontAwesome(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  const fromTag = trimmed.match(/<i[^>]*class(?:Name)?=["']([^"']+)["'][^>]*>/i);
+  let classes = (fromTag?.[1] ?? trimmed).replace(/\s+/g, " ").trim();
+
+  const looksFa =
+    /\bfa[srlbde]?\b/.test(classes) ||
+    /\bfa-(solid|regular|brands|light|thin|duotone|sharp)\b/.test(classes) ||
+    /\bfa-[a-z0-9-]+/.test(classes);
+
+  if (!looksFa) {
+    if (/^[a-z][a-z0-9-]{1,40}$/i.test(trimmed) && !(trimmed in icons)) {
+      classes = `fa-solid fa-${trimmed}`;
+    } else {
+      return null;
+    }
+  }
+
+  const hasPack =
+    /\bfa[srlbde]\b/.test(classes) ||
+    /\bfa-(solid|regular|brands|light|thin|duotone|sharp)\b/.test(classes);
+
+  if (!hasPack) {
+    classes = `fa-solid ${classes}`;
+  }
+
+  return classes;
+}
+
 const iconVariants = cva("shrink-0", {
   variants: {
     size: {
@@ -169,58 +200,36 @@ export interface IconProps extends VariantProps<typeof iconVariants> {
 
 export function Icon({ name, icon, size, className, label }: IconProps) {
   const Component = icon ?? (name ? icons[name as keyof typeof icons] : undefined);
-  
+
   if (!Component) {
-    if (typeof name === "string") {
-      const trimmedName = name.trim();
-      let faClasses = "";
+    const faClasses = parseFontAwesome(typeof name === "string" ? name : "");
 
-      // Check if it's a full <i> tag: <i class="fa-solid fa-house"></i>
-      const match = trimmedName.match(/<i[^>]*class(?:Name)?=["']([^"']+)["'][^>]*>/i);
-      if (match) {
-        faClasses = match[1];
-      } else if (
-        trimmedName.includes("fa-") || 
-        trimmedName.startsWith("fas ") || 
-        trimmedName.startsWith("far ") || 
-        trimmedName.startsWith("fab ")
-      ) {
-        // Assume it's raw classes like "fa-solid fa-house"
-        faClasses = trimmedName;
-      }
+    if (faClasses) {
+      const faSizeMap: Record<string, string> = {
+        xs: "text-[14px]",
+        sm: "text-[16px]",
+        md: "text-[20px]",
+        lg: "text-[24px]",
+        xl: "text-[32px]",
+      };
+      const fontSizeClass = faSizeMap[size || "sm"];
 
-      if (faClasses) {
-        // Map iconVariants sizes to font sizes for FontAwesome
-        const faSizeMap: Record<string, string> = {
-          xs: "text-[14px]",
-          sm: "text-[16px]",
-          md: "text-[20px]",
-          lg: "text-[24px]",
-          xl: "text-[32px]",
-        };
-        const fontSizeClass = faSizeMap[size || "sm"];
+      const faIcon = (
+        <i
+          className={cn("shrink-0 leading-none", fontSizeClass, faClasses, className)}
+          aria-hidden={label ? undefined : true}
+        />
+      );
 
-        const faIcon = (
-          <i
-            className={cn(
-              "shrink-0 leading-none",
-              fontSizeClass,
-              faClasses,
-              className
-            )}
-            aria-hidden={label ? undefined : true}
-          />
-        );
-
-        return label ? (
-          <span role="img" aria-label={label} className="contents">
-            {faIcon}
-          </span>
-        ) : (
-          faIcon
-        );
-      }
+      return label ? (
+        <span role="img" aria-label={label} className="contents">
+          {faIcon}
+        </span>
+      ) : (
+        faIcon
+      );
     }
+
     return null;
   }
 

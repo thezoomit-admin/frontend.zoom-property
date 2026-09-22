@@ -3,7 +3,7 @@ export type VideoProvider = "youtube" | "vimeo" | "facebook";
 /** Facebook plugin player for a public video or reel URL. */
 export function facebookEmbedUrl(
   pageUrl: string,
-  size: { width?: number; height?: number } = {},
+  size: { width?: number; height?: number; autoplay?: boolean } = {},
 ) {
   const width = String(size.width ?? 267);
   const height = String(size.height ?? 476);
@@ -14,7 +14,26 @@ export function facebookEmbedUrl(
     height,
     t: "0",
   });
+  if (size.autoplay) params.set("autoplay", "true");
   return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
+}
+
+export function isFacebookVideo(url: string) {
+  return /facebook\.com\/(reel|watch|video|plugins\/video)/i.test(url);
+}
+
+export function playerEmbed(url: string) {
+  if (isFacebookVideo(url) || url.includes("facebook.com")) {
+    return {
+      src: facebookEmbedUrl(url, { width: 360, height: 640, autoplay: true }),
+      portrait: true as const,
+    };
+  }
+
+  return {
+    src: embedUrl(parseVideoId(url, "youtube"), "youtube"),
+    portrait: false as const,
+  };
 }
 
 /** Extracts the video id from the common YouTube / Vimeo URL shapes. */

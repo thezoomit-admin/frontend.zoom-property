@@ -10,7 +10,8 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { embedUrl, parseVideoId } from "@/lib/video";
+import { playerEmbed } from "@/lib/video";
+import { cn } from "@/lib/utils";
 
 export interface VideoLightboxProps {
   /** `null` keeps the dialog unmounted — that is what closes it. */
@@ -51,25 +52,23 @@ export function VideoLightbox({
 
   if (!url) return null;
 
-  const videoId = parseVideoId(url, "youtube");
+  const player = playerEmbed(url);
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         showCloseButton={false}
         data-lenis-prevent
-        // `w-screen`: `inset-0` stops at the reserved scrollbar gutter, which
-        // would leave an unpainted strip down the right of the scrim.
-        overlayClassName="w-screen bg-black/85 supports-backdrop-filter:backdrop-blur-sm"
-        className="max-w-[calc(100%-1.5rem)] gap-0 border-0 bg-transparent p-0 text-white shadow-none ring-0 sm:max-w-2xl lg:max-w-4xl"
+        overlayClassName="bg-black/85 supports-backdrop-filter:backdrop-blur-sm"
+        className={cn(
+          "max-h-[calc(100dvh-6rem)] max-w-[calc(100%-3rem)] gap-0 border-0 bg-transparent p-0 text-white shadow-none ring-0",
+          player.portrait
+            ? "w-[min(68vw,15.5rem)] sm:max-w-[16rem]"
+            : "sm:max-w-2xl lg:max-w-4xl",
+        )}
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
 
-        {/* The frame.
-            Three layers, each doing one job: a soft accent glow that lifts the
-            panel off the scrim, a hairline gradient edge that catches light at
-            the top-left corner, and a black mat that gives the picture a margin
-            to sit in — the same reason a print is never mounted edge to edge. */}
         <div className="relative">
           <span
             aria-hidden
@@ -78,9 +77,17 @@ export function VideoLightbox({
 
           <div className="rounded-2xl bg-linear-to-br from-white/35 via-white/10 to-white/5 p-px shadow-2xl shadow-black/70">
             <div className="rounded-[15px] bg-brand-charcoal p-1.5 sm:p-2.5">
-              <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+              <div
+                data-video-embed
+                className={cn(
+                  "relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10",
+                  player.portrait
+                    ? "mx-auto aspect-9/16 h-[min(50dvh,24rem)] w-auto max-w-full"
+                    : "aspect-video w-full",
+                )}
+              >
                 <iframe
-                  src={embedUrl(videoId, "youtube")}
+                  src={player.src}
                   title={title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -90,12 +97,9 @@ export function VideoLightbox({
             </div>
           </div>
 
-          {/* Close — clear of the frame so it never sits over the player's own
-              controls; above it on the narrow layouts, where there is no room
-              beside it. */}
           <DialogClose
             aria-label={closeLabel}
-            className="absolute -top-12 right-0 flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-brand-green-light hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-light sm:-right-4 sm:-top-4"
+            className="absolute -top-11 right-0 flex size-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-brand-green-light hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-light sm:-right-3 sm:-top-3"
           >
             <Icon name="close" size="sm" />
           </DialogClose>

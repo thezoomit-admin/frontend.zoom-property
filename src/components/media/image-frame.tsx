@@ -67,12 +67,13 @@ export function ImageFrame({
         placeholder="blur"
         blurDataURL={blurDataURL ?? shimmerDataUrl()}
         className={cn(
-          "object-cover",
+          "object-cover object-center",
           hover === "zoom" &&
             "transition-transform duration-700 ease-out-expo group-hover/frame:scale-105",
           imageClassName,
         )}
         {...props}
+        quality={90}
       />
 
       {overlay ? (

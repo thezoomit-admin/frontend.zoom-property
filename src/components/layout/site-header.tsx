@@ -65,13 +65,15 @@ export function SiteHeader({
   phone: string;
   /** The menu itself, edited in the panel. Empty and no bar is drawn. */
   menu: NavLink[];
-  /** Campaign landing chrome: logo, location, phones and a book CTA — no site nav. */
+  /** Campaign landing chrome: project name, location, one phone beside language — no site nav. */
   campaign?: {
     path: string;
     links?: NavLink[];
     ctaLabel: string;
     ctaHref: string;
+    name?: string;
     location?: string;
+    phone?: string;
     phones?: string[];
   };
 }) {
@@ -109,8 +111,12 @@ export function SiteHeader({
   const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");
   const ctaLabel = campaignActive ? campaign!.ctaLabel : dict.bookViewing;
   const hideOnScroll = campaignActive ? false : hidden;
-  const campaignPhones = campaignActive ? (campaign?.phones ?? []) : [];
+  const campaignPhone =
+    campaignActive
+      ? (campaign?.phone ?? campaign?.phones?.[0] ?? "")
+      : "";
   const campaignLocation = campaignActive ? campaign?.location : undefined;
+  const campaignName = campaignActive ? campaign?.name : undefined;
 
   return (
     <motion.header
@@ -155,25 +161,18 @@ export function SiteHeader({
         </Link>
 
         {campaignActive ? (
-          <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 lg:flex">
+          <div className="min-w-0 flex-1 px-1 sm:px-3">
+            {campaignName ? (
+              <p className="truncate font-heading text-sm font-extrabold leading-tight text-foreground sm:text-base">
+                {campaignName}
+              </p>
+            ) : null}
             {campaignLocation ? (
-              <p className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <Icon name="location" size="xs" className="text-primary" />
+              <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground">
+                <Icon name="fa-location-dot" size="xs" className="shrink-0 text-primary" />
                 <span className="truncate">{campaignLocation}</span>
               </p>
             ) : null}
-            <div className="flex items-center gap-1.5">
-              {campaignPhones.map((number) => (
-                <a
-                  key={number}
-                  href={telHref(number)}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted/50"
-                >
-                  <Icon name="phone" size="xs" className="text-primary" />
-                  {number}
-                </a>
-              ))}
-            </div>
           </div>
         ) : (
           <nav className="hidden items-center gap-1.5 lg:flex">
@@ -215,13 +214,13 @@ export function SiteHeader({
               <Icon name="phone" size="xs" />
               {phone}
             </a>
-          ) : campaignPhones[0] ? (
+          ) : campaignPhone ? (
             <a
-              href={telHref(campaignPhones[0])}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground lg:hidden"
+              href={telHref(campaignPhone)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted/50"
             >
               <Icon name="phone" size="xs" className="text-primary" />
-              <span className="hidden sm:inline">{campaignPhones[0]}</span>
+              <span className="hidden sm:inline">{campaignPhone}</span>
             </a>
           ) : null}
 
