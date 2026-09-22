@@ -4,8 +4,38 @@
 
 .text-editor {
   overflow-x: auto;
-  line-height: 1.6;
-  color: #333;
+  font-family: Outfit, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1f2937;
+}
+
+/* TinyMCE alignment classes + inline styles */
+.text-editor .alignleft,
+.text-editor [style*="text-align: left"] {
+  text-align: left;
+}
+
+.text-editor .aligncenter,
+.text-editor [style*="text-align: center"] {
+  text-align: center;
+}
+
+.text-editor .alignright,
+.text-editor [style*="text-align: right"] {
+  text-align: right;
+}
+
+.text-editor .alignjustify,
+.text-editor [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+.text-editor img.aligncenter,
+.text-editor img[style*="margin-left: auto"] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ---------------------------
@@ -18,58 +48,50 @@
 .text-editor h5 {
 }
 .text-editor h1 {
-  font-weight: 800;
-  font-size: 2.55rem;
-  line-height: 1.2;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #1a202c;
-  letter-spacing: -0.025em;
-  text-transform: capitalize;
+  font-weight: 700;
+  font-size: 2em;
+  line-height: 1.25;
+  margin: 0.5em 0 0.4em;
+  color: #1f2937;
 }
 
 .text-editor h2 {
-  font-size: 2.275rem;
-  font-weight: 800;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #2d3748;
+  font-size: 1.5em;
+  font-weight: 700;
+  margin: 0.5em 0 0.4em;
+  color: #1f2937;
   line-height: 1.3;
 }
 
 .text-editor h3 {
-  font-size: 1.6rem;
+  font-size: 1.25em;
   font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
-  color: #2d3748;
+  margin: 0.5em 0 0.3em;
+  color: #1f2937;
   line-height: 1.4;
 }
 
 .text-editor h4 {
-  font-size: 1.25rem;
+  font-size: 1.1em;
   font-weight: 600;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  color: #2d3748;
+  margin: 0.4em 0 0.3em;
+  color: #1f2937;
   line-height: 1.4;
 }
 
 .text-editor h5 {
-  font-size: 1.125rem;
+  font-size: 1em;
   font-weight: 600;
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  color: #2d3748;
+  margin: 0.4em 0 0.3em;
+  color: #1f2937;
   line-height: 1.4;
 }
 
 .text-editor h6 {
-  font-size: 1rem;
+  font-size: 0.95em;
   font-weight: 600;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  color: #4a5568;
+  margin: 0.4em 0 0.3em;
+  color: #4b5563;
   line-height: 1.4;
 }
 
@@ -108,21 +130,18 @@
      Text Formatting
   --------------------------- */
 .text-editor p {
-  margin-bottom: 1rem;
-  line-height: 1.7;
-
+  margin: 0 0 0.75em;
+  line-height: 1.8;
 }
 
 .text-editor strong,
 .text-editor b {
   font-weight: 700;
-  color: #1a202c;
 }
 
 .text-editor em,
 .text-editor i {
   font-style: italic;
-  color: #2d3748;
 }
 
 .text-editor u {
@@ -416,132 +435,14 @@
      Links - Enhanced
   --------------------------- */
 .text-editor a,
-.text-editor a *,
-.text-editor a:visited,
-.text-editor a:visited *,
-.text-editor a[style*='color:'],
-.text-editor a[data-mce-style*='color:'] {
-  color: #4b802d !important;
+.text-editor a:visited {
+  color: #35ad0b;
   text-decoration: underline;
   transition: color 0.2s ease;
 }
 
-.text-editor a:hover,
-.text-editor a:hover * {
-  color: #1a4570 !important;
-}
-
-.text-editor a[data-mce-selected] {
-  background-color: #bee3f8;
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-/* ---------------------------
-     Colors - Enhanced TinyMCE Color Support
-  --------------------------- */
-
-/* Direct style attribute colors - highest priority */
-.text-editor [style*='color:'] {
-  color: inherit !important;
-}
-
-.text-editor [style*='background-color:'] {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
-}
-
-/* TinyMCE data attribute colors */
-.text-editor [data-mce-style*='color:'] {
-  color: inherit !important;
-}
-
-.text-editor [data-mce-style*='background-color:'] {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
-}
-
-/* Specific element color support */
-.text-editor span[style*='color:'],
-.text-editor p[style*='color:'],
-.text-editor div[style*='color:'],
-.text-editor h1[style*='color:'],
-.text-editor h2[style*='color:'],
-.text-editor h3[style*='color:'],
-.text-editor h4[style*='color:'],
-.text-editor h5[style*='color:'],
-.text-editor h6[style*='color:'] {
-  color: inherit !important;
-}
-
-.text-editor span[style*='background-color:'],
-.text-editor p[style*='background-color:'],
-.text-editor div[style*='background-color:'],
-.text-editor h1[style*='background-color:'],
-.text-editor h2[style*='background-color:'],
-.text-editor h3[style*='background-color:'],
-.text-editor h4[style*='background-color:'],
-.text-editor h5[style*='background-color:'],
-.text-editor h6[style*='background-color:'] {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
-
-/* Ensure the visible editor area is comfortably large for composing messages */
-.rich-text-editor-wrapper {
-  min-height: 360px;
-}
-
-.rich-text-editor-wrapper .tox .tox-editor-container {
-  min-height: 320px !important;
-}
-}
-
-/* TinyMCE color classes (if any) */
-.text-editor .mce-color {
-  color: inherit !important;
-}
-
-.text-editor .mce-bgcolor {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
-}
-
-/* Foreground and background color spans */
-.text-editor .mce-foreground-color {
-  color: inherit !important;
-}
-
-.text-editor .mce-background-color {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
-}
-
-/* Ensure color inheritance works properly */
-.text-editor * {
-  color: inherit;
-}
-
-/* Specific color overrides for common TinyMCE color applications */
-.text-editor span[data-mce-color],
-.text-editor span[data-mce-bgcolor] {
-  color: inherit !important;
-  background-color: inherit !important;
-}
-
-/* Font color and background color attributes */
-.text-editor [data-mce-font-color] {
-  color: inherit !important;
-}
-
-.text-editor [data-mce-background-color] {
-  background-color: inherit !important;
-  padding: 0.125em 0.25em;
-  border-radius: 0.2em;
+.text-editor a:hover {
+  color: #2a8809;
 }
 
 /* ---------------------------

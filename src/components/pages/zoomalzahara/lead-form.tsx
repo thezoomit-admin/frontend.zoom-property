@@ -117,7 +117,7 @@ export function ZoomAlZaharaLeadForm({
             placeholder="you@domain.com"
           />
         </Field>
-        <Field id={`${id}-plan`} label={dict.plan}>
+        <Field id={`${id}-plan`} label={dict.plan || "Plan"}>
           <div className="relative">
             <Input
               id={`${id}-plan`}

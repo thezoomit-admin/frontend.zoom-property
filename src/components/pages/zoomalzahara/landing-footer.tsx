@@ -16,7 +16,7 @@ export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
 
   return (
     <footer className="border-t border-footer-foreground/10 bg-footer pb-[calc(3.5rem+env(safe-area-inset-bottom))] text-footer-foreground lg:pb-[env(safe-area-inset-bottom)]">
-      <AppContainer className="py-5 sm:py-6">
+      <AppContainer className="py-3.5 sm:py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <a href={home} className="flex min-w-0 items-center gap-3">
             <Logo variant="onDark" className="h-7 w-auto" />

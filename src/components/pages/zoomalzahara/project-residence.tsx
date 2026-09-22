@@ -60,8 +60,12 @@ export function ProjectResidence({
         )}
       >
         {current ? (
-          <Reveal className="flex min-h-80 flex-col gap-3">
-            <div className="relative min-h-80 flex-1 overflow-hidden rounded-lg">
+          <Reveal className="flex h-full min-w-0 flex-col gap-3">
+            {/*
+              flex-1 stage fills leftover height beside the right card so there
+              is no empty white gap under the thumbs. Image stays object-contain.
+            */}
+            <div className="relative min-h-72 flex-1 overflow-hidden rounded-lg bg-muted sm:min-h-80">
               <ImageFrame
                 src={current.src}
                 alt={current.alt}
@@ -70,7 +74,8 @@ export function ProjectResidence({
                 hover="zoom"
                 overlay
                 sizes="(min-width: 1024px) 48vw, 100vw"
-                className="h-full min-h-80 lg:min-h-128"
+                className="absolute inset-0 size-full rounded-lg"
+                imageClassName="object-contain object-center"
               />
               <PreviewTrigger
                 label={dict.preview}
@@ -87,7 +92,12 @@ export function ProjectResidence({
               </div>
             </div>
             {shots.length > 1 ? (
-              <ThumbRail>
+              <ThumbRail
+                columns={4}
+                desktop="none"
+                className="mt-0 shrink-0"
+                itemClassName="basis-[42%] sm:basis-[30%] lg:basis-[24%]"
+              >
                 {shots.map((shot, index) => (
                   <button
                     key={`${shot.src}-${index}`}
@@ -96,7 +106,7 @@ export function ProjectResidence({
                     aria-pressed={index === active}
                     aria-label={shot.alt}
                     className={cn(
-                      "block w-full cursor-pointer overflow-hidden rounded-lg border",
+                      "block w-full cursor-pointer overflow-hidden rounded-lg border bg-muted",
                       index === active
                         ? "border-primary ring-2 ring-primary/30"
                         : "border-transparent hover:border-primary/40",
@@ -107,7 +117,8 @@ export function ProjectResidence({
                       alt={shot.alt}
                       ratio="4/3"
                       rounded="lg"
-                      sizes="(min-width: 640px) 12vw, 31vw"
+                      sizes="(min-width: 1024px) 12vw, 40vw"
+                      imageClassName="object-cover object-center"
                     />
                   </button>
                 ))}
@@ -116,7 +127,7 @@ export function ProjectResidence({
           </Reveal>
         ) : null}
 
-        <div className="flex flex-col">
+        <div className="flex h-full flex-col">
           {dict.eyebrow || dict.title || dict.description ? (
             <SectionHeading
               eyebrow={dict.eyebrow || undefined}
@@ -221,6 +232,8 @@ export function ProjectResidence({
           onClose={() => setOpen(false)}
           onIndexChange={setActive}
           closeLabel={dict.close}
+          ratio="auto"
+          contain
         />
       ) : null}
     </Section>

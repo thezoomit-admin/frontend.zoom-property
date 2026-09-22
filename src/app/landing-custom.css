@@ -1,0 +1,298 @@
+/**
+ * Landing page — Custom section rich-text preview
+ * Matches admin TinyMCE output (inline styles, fonts, colors) while
+ * giving a clean, readable storefront presentation.
+ */
+
+.landing-custom {
+  width: 100%;
+}
+
+.landing-custom__header {
+  margin-bottom: 1.5rem;
+}
+
+/* ── Rich text canvas ─────────────────────────────────────────── */
+.landing-custom-richtext {
+  width: 100%;
+  max-width: none;
+  overflow-x: auto;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--foreground, #1f2937);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TinyMCE alignment */
+.landing-custom-richtext .alignleft,
+.landing-custom-richtext [style*="text-align: left"] {
+  text-align: left;
+}
+
+.landing-custom-richtext .aligncenter,
+.landing-custom-richtext [style*="text-align: center"] {
+  text-align: center;
+}
+
+.landing-custom-richtext .alignright,
+.landing-custom-richtext [style*="text-align: right"] {
+  text-align: right;
+}
+
+.landing-custom-richtext .alignjustify,
+.landing-custom-richtext [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+/* Headings — only when TinyMCE did not set an inline size */
+.landing-custom-richtext h1:not([style*="font-size"]) {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--foreground, #111827);
+  margin: 1.25em 0 0.5em;
+}
+
+.landing-custom-richtext h2:not([style*="font-size"]) {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--foreground, #111827);
+  margin: 1.15em 0 0.45em;
+}
+
+.landing-custom-richtext h3:not([style*="font-size"]) {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.2rem, 1.6vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--foreground, #111827);
+  margin: 1em 0 0.4em;
+}
+
+.landing-custom-richtext h4:not([style*="font-size"]),
+.landing-custom-richtext h5:not([style*="font-size"]),
+.landing-custom-richtext h6:not([style*="font-size"]) {
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--foreground, #1f2937);
+  margin: 0.9em 0 0.35em;
+}
+
+.landing-custom-richtext h1:first-child,
+.landing-custom-richtext h2:first-child,
+.landing-custom-richtext h3:first-child,
+.landing-custom-richtext p:first-child {
+  margin-top: 0;
+}
+
+/* Paragraphs */
+.landing-custom-richtext p {
+  margin: 0 0 0.9em;
+}
+
+.landing-custom-richtext p:last-child {
+  margin-bottom: 0;
+}
+
+/* Inline emphasis — respect TinyMCE colors when present */
+.landing-custom-richtext strong:not([style*="color"]),
+.landing-custom-richtext b:not([style*="color"]) {
+  font-weight: 700;
+  color: var(--foreground, #111827);
+}
+
+.landing-custom-richtext em,
+.landing-custom-richtext i {
+  font-style: italic;
+}
+
+.landing-custom-richtext u {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Links */
+.landing-custom-richtext a {
+  color: var(--brand-green, #4b802d);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.landing-custom-richtext a:hover {
+  color: var(--brand-green-dark, #3a6423);
+}
+
+/* Lists */
+.landing-custom-richtext ul,
+.landing-custom-richtext ol {
+  margin: 0.75em 0 1em;
+  padding-left: 1.5em;
+}
+
+.landing-custom-richtext ul {
+  list-style-type: disc;
+}
+
+.landing-custom-richtext ol {
+  list-style-type: decimal;
+}
+
+.landing-custom-richtext li {
+  margin-bottom: 0.4em;
+  padding-left: 0.2em;
+}
+
+.landing-custom-richtext li::marker {
+  color: var(--brand-green, #4b802d);
+}
+
+.landing-custom-richtext ul ul,
+.landing-custom-richtext ol ol,
+.landing-custom-richtext ul ol,
+.landing-custom-richtext ol ul {
+  margin: 0.35em 0;
+}
+
+/* Blockquote */
+.landing-custom-richtext blockquote {
+  margin: 1.25em 0;
+  padding: 0.85em 1.15em;
+  border-left: 3px solid var(--brand-green, #4b802d);
+  background: color-mix(in oklab, var(--brand-green, #4b802d) 6%, transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--muted-foreground, #4b5563);
+  font-style: italic;
+}
+
+.landing-custom-richtext blockquote p {
+  margin: 0;
+}
+
+/* Images from the editor */
+.landing-custom-richtext img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.25em auto;
+  border-radius: 0.5rem;
+}
+
+.landing-custom-richtext img.alignleft {
+  float: left;
+  margin: 0.25em 1.25em 1em 0;
+  max-width: min(50%, 22rem);
+}
+
+.landing-custom-richtext img.alignright {
+  float: right;
+  margin: 0.25em 0 1em 1.25em;
+  max-width: min(50%, 22rem);
+}
+
+.landing-custom-richtext img.aligncenter,
+.landing-custom-richtext img[style*="margin-left: auto"] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tables */
+.landing-custom-richtext table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25em 0;
+  font-size: 0.95em;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.landing-custom-richtext th,
+.landing-custom-richtext td {
+  border: 1px solid var(--border, #e5e7eb);
+  padding: 0.7em 0.9em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.landing-custom-richtext thead {
+  background: color-mix(in oklab, var(--brand-green, #4b802d) 8%, white);
+  font-weight: 700;
+}
+
+.landing-custom-richtext tbody tr:nth-child(even) {
+  background: color-mix(in oklab, var(--muted, #f3f4f6) 70%, transparent);
+}
+
+/* HR */
+.landing-custom-richtext hr {
+  border: none;
+  height: 1px;
+  margin: 1.75em 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border, #e5e7eb),
+    transparent
+  );
+}
+
+/* Code */
+.landing-custom-richtext code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  border-radius: 0.3em;
+  background: var(--muted, #f3f4f6);
+}
+
+.landing-custom-richtext pre {
+  margin: 1.1em 0;
+  padding: 1em 1.15em;
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: var(--muted, #f3f4f6);
+  border: 1px solid var(--border, #e5e7eb);
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+.landing-custom-richtext pre code {
+  padding: 0;
+  background: none;
+}
+
+/* Clear floats after floated images */
+.landing-custom-richtext::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .landing-custom-richtext {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .landing-custom-richtext img.alignleft,
+  .landing-custom-richtext img.alignright {
+    float: none;
+    max-width: 100%;
+    margin: 1em auto;
+  }
+
+  .landing-custom-richtext table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

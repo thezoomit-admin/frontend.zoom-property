@@ -2,7 +2,7 @@ import "server-only";
 
 import type { Locale } from "@/i18n/config";
 import { landingHref } from "@/lib/landing";
-import { isFacebookVideo, youtubeThumbnail, parseVideoId } from "@/lib/video";
+import { resolveVideoProvider } from "@/lib/video";
 
 import { mediaUrl } from "../../base-api";
 import { LANDING_SECTIONS } from "./types";
@@ -109,6 +109,7 @@ export function toLandingView(
   const faq = row.faq || {};
   const enquire = row.enquire || {};
   const form = enquire.form || {};
+  const custom = row.custom || {};
 
   const title = pick(locale, hero.title, hero.titleBn);
   const projectName =
@@ -230,18 +231,11 @@ export function toLandingView(
         .map((item) => {
           const url = String(item.url || "").trim();
           if (!url) return null;
-          const provider: "facebook" | "youtube" =
-            item.provider || (isFacebookVideo(url) ? "facebook" : "youtube");
-          const poster =
-            mediaUrl(item.poster as never) ||
-            (provider === "youtube"
-              ? youtubeThumbnail(parseVideoId(url, "youtube"))
-              : "");
+          const provider = resolveVideoProvider(url, item.provider);
           return {
             title: pick(locale, item.title, item.titleBn) || projectName,
             caption: pick(locale, item.caption, item.captionBn),
             url,
-            poster,
             provider,
           };
         })
@@ -311,11 +305,10 @@ export function toLandingView(
           role: pick(locale, item.role, item.roleBn),
           quote: pick(locale, item.quote, item.quoteBn),
           avatar: mediaUrl(item.avatar as never),
-          poster: mediaUrl(item.poster as never),
           videoUrl: String(item.videoUrl || "").trim(),
         }))
         .filter(
-          (item) => item.name || item.quote || item.videoUrl || item.poster,
+          (item) => item.name || item.quote || item.videoUrl,
         ),
     },
     faq: {
@@ -374,6 +367,11 @@ export function toLandingView(
           form.successBodyBn,
         ),
       },
+    },
+    custom: {
+      eyebrow: pick(locale, custom.eyebrow, custom.eyebrowBn),
+      title: pick(locale, custom.title, custom.titleBn),
+      body: pick(locale, custom.body, custom.bodyBn),
     },
   };
 }

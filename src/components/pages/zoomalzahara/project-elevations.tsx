@@ -2,15 +2,18 @@
 
 import { useState } from "react";
 
-import { Icon } from "@/components/common/icon";
 import { ImageFrame } from "@/components/media/image-frame";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
-import { ImagePreview } from "@/components/pages/zoomalzahara/image-preview";
-import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
+import {
+  ImagePreview,
+  PreviewTrigger,
+} from "@/components/pages/zoomalzahara/image-preview";
 import { cn } from "@/lib/utils";
 
-const VISIBLE_THUMBS = 4;
-
+/**
+ * Elevation: tall/wide composites with object-contain.
+ * Thumbs on the right — when there are too many, the rail scrolls.
+ */
 export function ProjectElevations({
   views,
   previewLabel,
@@ -27,103 +30,105 @@ export function ProjectElevations({
   if (!images[0]) return null;
 
   const current = images[index];
-  const copy = images[index];
   const total = images.length;
-  const hasRail = total > 1;
-  const railScrolls = total > VISIBLE_THUMBS;
+  const label = current.label || current.alt;
+  const hasThumbs = total > 1;
 
   return (
-    <>
-      <div className={`mt-8 overflow-hidden ${landingCardClass}`}>
-        <div
-          className={cn(
-            "grid gap-2 p-2",
-            hasRail && "lg:grid-cols-[minmax(0,1fr)_13.75rem]",
-          )}
-        >
-          <div className="relative min-h-72 overflow-hidden rounded-md lg:h-120 lg:min-h-0">
-            <ImageFrame
-              key={`${index}-${current.src}`}
-              src={current.src}
-              alt={current.alt || current.label || ""}
-              ratio="auto"
-              rounded="md"
-              hover="none"
-              overlay
-              sizes="(min-width: 1024px) 58vw, 100vw"
-              className="size-full min-h-72 rounded-md lg:min-h-0"
-            />
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              aria-label={`${previewLabel}: ${current.alt || current.label || ""}`}
-              className="absolute inset-0 z-10 cursor-pointer rounded-md"
-            />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-3 right-3 z-20 flex size-9 items-center justify-center rounded-full border border-white/25 bg-black/45 text-white backdrop-blur-md"
-            >
-              <Icon name="expand" size="sm" />
-            </span>
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-linear-to-t from-black/80 via-black/35 to-transparent px-4 py-4 sm:px-5">
-              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
-                {String(index + 1).padStart(2, "0")} /{" "}
-                {String(total).padStart(2, "0")}
-              </p>
-              <p className="mt-1 font-heading text-xl font-bold text-white sm:text-2xl">
-                {copy?.label || current.alt}
-              </p>
-              {copy?.hint ? (
-                <p className="mt-0.5 text-sm text-white/80">{copy.hint}</p>
-              ) : null}
+    <div className="mt-8">
+      <div className={`overflow-hidden ${landingCardClass}`}>
+        <div className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4">
+          <div
+            className={cn(
+              "flex flex-col gap-3",
+              hasThumbs && "sm:flex-row sm:items-stretch sm:gap-4",
+            )}
+          >
+            <div className="relative min-h-100 min-w-0 flex-1 overflow-hidden rounded-lg bg-linear-to-b from-slate-100 to-slate-200/80 sm:min-h-112 lg:min-h-160">
+              <ImageFrame
+                key={`${index}-${current.src}`}
+                src={current.src}
+                alt={label}
+                ratio="auto"
+                rounded="lg"
+                hover="none"
+                overlay={false}
+                sizes="(min-width: 1024px) 65vw, 100vw"
+                className="absolute inset-0 size-full rounded-lg bg-transparent"
+                imageClassName="object-contain object-center p-2 sm:p-3"
+              />
+              <PreviewTrigger
+                label={`${previewLabel}: ${label}`}
+                onClick={() => setOpen(true)}
+              />
             </div>
-          </div>
 
-          {hasRail ? (
-            <>
-              <div className="lg:hidden">
-                <ThumbRail desktop="none" className="mt-0">
-                  {images.map((image, viewIndex) => (
-                    <ElevationThumb
-                      key={`${viewIndex}-${image.src}`}
-                      image={image}
-                      label={image.label || image.alt}
-                      selected={viewIndex === index}
-                      onSelect={() => setIndex(viewIndex)}
-                      sizes="31vw"
-                      className="h-20"
-                    />
-                  ))}
-                </ThumbRail>
-              </div>
+            {hasThumbs ? (
               <ul
                 className={cn(
-                  "hidden lg:flex lg:h-120 lg:flex-col lg:gap-2",
-                  railScrolls
-                    ? "az-thumb-scroll-y lg:overflow-y-auto lg:pr-0.5"
-                    : "lg:overflow-hidden",
+                  "az-thumb-scroll-y flex shrink-0 gap-2",
+                  /* Mobile: horizontal strip with scrollbar when overflowing */
+                  "max-w-full overflow-x-auto overflow-y-hidden pb-1",
+                  /* Desktop: vertical rail locked to main image height */
+                  "sm:h-auto sm:w-44 sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pb-0 sm:pr-1 lg:w-52",
                 )}
+                data-lenis-prevent
               >
-                {images.map((image, viewIndex) => (
-                  <li
-                    key={`${viewIndex}-${image.src}`}
-                    className="relative h-[calc((100%-1.5rem)/4)] min-h-0 shrink-0"
-                  >
-                    <ElevationThumb
-                      image={image}
-                      label={image.label || image.alt}
-                      selected={viewIndex === index}
-                      onSelect={() => setIndex(viewIndex)}
-                      sizes="14vw"
-                      className="h-full"
-                    />
-                  </li>
-                ))}
+                {images.map((image, viewIndex) => {
+                  const selected = viewIndex === index;
+                  const thumbLabel = image.label || image.alt;
+
+                  return (
+                    <li
+                      key={`${viewIndex}-${image.src}`}
+                      className="w-36 shrink-0 sm:w-full"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setIndex(viewIndex)}
+                        aria-pressed={selected}
+                        aria-label={thumbLabel}
+                        className={cn(
+                          "block w-full cursor-pointer overflow-hidden rounded-lg border bg-muted transition-all",
+                          selected
+                            ? "border-primary ring-2 ring-primary/30"
+                            : "border-transparent hover:border-primary/40",
+                        )}
+                      >
+                        <ImageFrame
+                          src={image.src}
+                          alt={thumbLabel}
+                          ratio="4/3"
+                          rounded="lg"
+                          hover="zoom"
+                          sizes="208px"
+                          imageClassName="object-contain object-center p-1"
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
-            </>
-          ) : null}
+            ) : null}
+          </div>
+
+          <div>
+            <p className="font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+              {String(index + 1).padStart(2, "0")} /{" "}
+              {String(total).padStart(2, "0")}
+            </p>
+            <p className="mt-1 font-heading text-base font-bold text-foreground sm:text-lg">
+              {label}
+            </p>
+            {current.hint ? (
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {current.hint}
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
+
       <ImagePreview
         images={images.map((image) => ({
           src: image.src,
@@ -134,49 +139,8 @@ export function ProjectElevations({
         onClose={() => setOpen(false)}
         onIndexChange={setIndex}
         closeLabel={closeLabel}
-      />
-    </>
-  );
-}
-
-function ElevationThumb({
-  image,
-  label,
-  selected,
-  onSelect,
-  sizes,
-  className,
-}: {
-  image: { src: string; alt: string };
-  label: string;
-  selected: boolean;
-  onSelect: () => void;
-  sizes: string;
-  className?: string;
-}) {
-  return (
-    <div className={cn("relative overflow-hidden rounded-md", className)}>
-      <ImageFrame
-        src={image.src}
-        alt={image.alt}
         ratio="auto"
-        rounded="md"
-        hover="none"
-        overlay
-        sizes={sizes}
-        className="size-full rounded-md"
-      />
-      <button
-        type="button"
-        onClick={onSelect}
-        aria-pressed={selected}
-        aria-label={label}
-        className={cn(
-          "absolute inset-0 z-20 cursor-pointer rounded-md ring-2 ring-inset transition-all duration-300",
-          selected
-            ? "ring-primary"
-            : "ring-transparent hover:ring-foreground/30",
-        )}
+        contain
       />
     </div>
   );

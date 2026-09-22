@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { AspectRatio } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
 export type PreviewShot = { src: string; alt: string };
@@ -19,6 +20,8 @@ export function ImagePreview({
   onClose,
   onIndexChange,
   closeLabel,
+  ratio = "video",
+  contain = false,
 }: {
   images: PreviewShot[];
   index: number;
@@ -26,11 +29,17 @@ export function ImagePreview({
   onClose: () => void;
   onIndexChange?: (index: number) => void;
   closeLabel: string;
+  /** Locked frame for the lightbox — use `tall` for portrait, `auto` + contain for elevations. */
+  ratio?: AspectRatio;
+  /** Show the full image without cropping (best for tall buildings). */
+  contain?: boolean;
 }) {
   const image = images[index];
   if (!image) return null;
 
   const hasMany = images.length > 1;
+  const isPortrait = ratio === "tall" || ratio === "portrait";
+  const useContain = contain || isPortrait;
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -38,17 +47,28 @@ export function ImagePreview({
         showCloseButton={false}
         data-lenis-prevent
         overlayClassName="w-screen bg-black/85 supports-backdrop-filter:backdrop-blur-sm"
-        className="max-w-[calc(100%-1.5rem)] gap-0 border-0 bg-transparent p-0 shadow-none ring-0 sm:max-w-4xl"
+        className={cn(
+          "max-w-[calc(100%-1.5rem)] gap-0 border-0 bg-transparent p-0 shadow-none ring-0",
+          isPortrait ? "sm:max-w-lg" : "sm:max-w-5xl",
+        )}
       >
         <DialogTitle className="sr-only">{image.alt}</DialogTitle>
         <div className="relative overflow-hidden rounded-lg bg-black">
           <ImageFrame
             src={image.src}
             alt={image.alt}
-            ratio="video"
+            ratio={ratio === "auto" ? "auto" : ratio}
             rounded="lg"
-            sizes="90vw"
-            className="min-h-72 sm:min-h-120"
+            sizes={isPortrait ? "(min-width: 640px) 32vw, 90vw" : "90vw"}
+            className={cn(
+              useContain
+                ? "flex min-h-[70vh] items-center justify-center bg-black"
+                : "min-h-72 sm:min-h-120",
+              ratio === "auto" && useContain && "h-[min(85vh,52rem)] w-full",
+            )}
+            imageClassName={
+              useContain ? "object-contain object-center" : undefined
+            }
           />
           {hasMany && onIndexChange ? (
             <>

@@ -11,21 +11,22 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Thumbnail strip: Embla drag-slider on small screens (no native scrollbar).
- * From `sm` it becomes an even grid so every thumb stays in view.
+ * Thumbnail strip — horizontal drag-slider at every breakpoint.
+ * (Desktop used to switch to a wrapping grid, which left a lonely 7th thumb
+ * on a second row when there were many images.)
  */
 export function ThumbRail({
   children,
   className,
   itemClassName,
   columns = 4,
-  desktop = "grid",
+  desktop = "none",
 }: {
   children: ReactNode;
   className?: string;
   itemClassName?: string;
   columns?: 4 | 6;
-  /** `none` keeps the slider at every width — parent hides it on large screens. */
+  /** `grid` = Embla on mobile, grid from `sm`. `none` = slider everywhere. */
   desktop?: "grid" | "none";
 }) {
   const items = Children.toArray(children);
@@ -51,6 +52,11 @@ export function ThumbRail({
 
   const grid =
     columns === 6 ? "sm:grid-cols-6" : "sm:grid-cols-4";
+
+  const slideBasis =
+    columns === 6
+      ? "basis-[31%] sm:basis-[15.5%]"
+      : "basis-[31%] sm:basis-[23%]";
 
   return (
     <>
@@ -78,8 +84,8 @@ export function ThumbRail({
               <CarouselItem
                 key={index}
                 className={cn(
-                  "min-w-0 basis-[31%] pl-2 sm:basis-[23%]",
-                  itemClassName,
+                  "min-w-0 pl-2",
+                  itemClassName ?? slideBasis,
                 )}
               >
                 {child}

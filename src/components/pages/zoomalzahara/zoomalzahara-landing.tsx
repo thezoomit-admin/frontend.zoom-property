@@ -2,6 +2,7 @@ import Image from "@/components/common/image";
 import { AppContainer } from "@/components/common/app-container";
 import { Heading } from "@/components/common/heading";
 import { Icon } from "@/components/common/icon";
+import { RichText } from "@/components/common/rich-text";
 import { Section } from "@/components/common/section";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
@@ -34,7 +35,7 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
     (show("enquire") && landing.cta.primary);
 
   return (
-    <div className="bg-background pb-16 lg:pb-0">
+    <div className="bg-background">
       {show("hero") ? <Hero landing={landing} /> : null}
       {show("about") && hasAbout(landing) ? <About dict={landing.about} /> : null}
       {show("residences") && hasResidences(landing) ? (
@@ -80,6 +81,9 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
           whatsapp={landing.whatsapp}
         />
       ) : null}
+      {show("custom") && hasCustom(landing) ? (
+        <CustomContent dict={landing.custom} />
+      ) : null}
       {sticky ? (
         <LandingStickyCta
           phone={landing.phone}
@@ -92,6 +96,11 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
       ) : null}
     </div>
   );
+}
+
+function hasCustom(landing: LandingView) {
+  const row = landing.custom;
+  return Boolean(row?.title || row?.body || row?.eyebrow);
 }
 
 function hasAbout(landing: LandingView) {
@@ -308,10 +317,10 @@ function About({ dict }: { dict: LandingView["about"] }) {
       <div
         className={cn(
           "grid items-stretch gap-6 lg:gap-8",
-          dict.image ? "lg:grid-cols-[1.05fr_0.95fr]" : "lg:grid-cols-1",
+          dict.image ? "lg:grid-cols-[0.95fr_1.05fr]" : "lg:grid-cols-1",
         )}
       >
-        <div className="flex flex-col">
+        <div className="flex min-w-0 flex-col">
           {dict.eyebrow || dict.title || dict.body ? (
             <SectionHeading
               eyebrow={dict.eyebrow || undefined}
@@ -321,7 +330,7 @@ function About({ dict }: { dict: LandingView["about"] }) {
             />
           ) : null}
           {dict.points.length ? (
-            <ul className="mt-6 grid flex-1 gap-3">
+            <ul className="mt-6 grid gap-3">
               {dict.points.map((point, index) => (
                 <li
                   key={`${point.title}-${index}`}
@@ -351,16 +360,22 @@ function About({ dict }: { dict: LandingView["about"] }) {
           ) : null}
         </div>
         {dict.image ? (
-          <Reveal delay={0.08} className="min-h-80 lg:min-h-full">
-            <ImageFrame
-              src={dict.image}
-              alt={dict.title}
-              ratio="auto"
-              rounded="lg"
-              sizes="(min-width: 1024px) 42vw, 100vw"
-              className="h-full min-h-80 lg:min-h-128"
-              imageClassName="object-cover object-center"
-            />
+          <Reveal delay={0.08} className="h-full min-w-0">
+            {/*
+              Stretch to the left column height so the flyer reads large.
+              object-contain keeps the full composite (no squash / crop).
+            */}
+            <div className="relative h-full min-h-112 overflow-hidden rounded-lg bg-muted sm:min-h-128 lg:min-h-full">
+              <ImageFrame
+                src={dict.image}
+                alt={dict.title}
+                ratio="auto"
+                rounded="lg"
+                sizes="(min-width: 1024px) 48vw, 100vw"
+                className="absolute inset-0 size-full min-h-112 rounded-lg bg-transparent sm:min-h-128"
+                imageClassName="!object-contain object-center p-1 sm:p-2"
+              />
+            </div>
           </Reveal>
         ) : null}
       </div>
@@ -718,7 +733,11 @@ function Close({
   const showEnquire = Boolean(enquire);
 
   return (
-    <Section id="enquire" spacing="sm" className="scroll-mt-24">
+    <Section
+      id="enquire"
+      spacing="sm"
+      className="scroll-mt-24 !pb-4 sm:!pb-6"
+    >
       <div
         className={cn(
           "grid items-start gap-6 lg:gap-8",
@@ -792,6 +811,30 @@ function Close({
             </div>
           </aside>
         ) : null}
+      </div>
+    </Section>
+  );
+}
+
+/** Free-form rich HTML band at the bottom of the landing (admin TinyMCE). */
+function CustomContent({ dict }: { dict: LandingView["custom"] }) {
+  return (
+    <Section
+      id="custom"
+      spacing="none"
+      className="scroll-mt-24 border-t border-border/60 bg-background pt-8 pb-8 sm:pt-10 sm:pb-12 lg:pt-12 lg:pb-14"
+    >
+      <div className="landing-custom">
+        {dict.eyebrow || dict.title ? (
+          <SectionHeading
+            eyebrow={dict.eyebrow || undefined}
+            title={dict.title || dict.eyebrow}
+            titleClassName={landingTitleClass}
+            className="landing-custom__header"
+            animate={false}
+          />
+        ) : null}
+        <RichText html={dict.body} className="landing-custom-richtext" />
       </div>
     </Section>
   );

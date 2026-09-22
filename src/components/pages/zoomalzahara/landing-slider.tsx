@@ -16,10 +16,13 @@ import { cn } from "@/lib/utils";
 export function LandingSlider({
   children,
   itemClassName = "basis-[82%] sm:basis-1/2 xl:basis-1/3",
+  itemClassNames,
   autoplayMs = 5500,
 }: {
   children: ReactNode;
   itemClassName?: string;
+  /** Optional per-slide width/basis (e.g. Facebook reel vs YouTube 16:9). */
+  itemClassNames?: (string | undefined)[];
   autoplayMs?: number;
 }) {
   const items = Children.toArray(children);
@@ -80,11 +83,14 @@ export function LandingSlider({
         className="cursor-grab px-0 touch-pan-x active:cursor-grabbing"
         data-lenis-prevent
       >
-        <CarouselContent className="-ml-3 select-none">
+        <CarouselContent className="-ml-3 items-start select-none">
           {items.map((child, index) => (
             <CarouselItem
               key={index}
-              className={cn("min-w-0 pl-3", itemClassName)}
+              className={cn(
+                "min-w-0 pl-3 self-start",
+                itemClassNames?.[index] || itemClassName,
+              )}
             >
               {child}
             </CarouselItem>

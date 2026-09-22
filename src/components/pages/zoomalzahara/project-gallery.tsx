@@ -60,37 +60,39 @@ export function ProjectGallery({
         </div>
       </div>
 
-      <ThumbRail columns={6}>
-        {shots.map((shot, index) => {
-          const selected = index === active;
-          const shotLabel = shot.label || shot.alt;
+      {shots.length > 1 ? (
+        <ThumbRail columns={6} desktop="none">
+          {shots.map((shot, index) => {
+            const selected = index === active;
+            const shotLabel = shot.label || shot.alt;
 
-          return (
-            <button
-              key={`${shot.src}-${index}`}
-              type="button"
-              onClick={() => setActive(index)}
-              aria-pressed={selected}
-              aria-label={shotLabel}
-              className={cn(
-                "block w-full cursor-pointer overflow-hidden rounded-lg border transition-all",
-                selected
-                  ? "border-primary ring-2 ring-primary/30"
-                  : "border-transparent hover:border-primary/40",
-              )}
-            >
-              <ImageFrame
-                src={shot.src}
-                alt={shotLabel}
-                ratio="4/3"
-                rounded="lg"
-                hover="zoom"
-                sizes="(min-width: 640px) 16vw, 31vw"
-              />
-            </button>
-          );
-        })}
-      </ThumbRail>
+            return (
+              <button
+                key={`${shot.src}-${index}`}
+                type="button"
+                onClick={() => setActive(index)}
+                aria-pressed={selected}
+                aria-label={shotLabel}
+                className={cn(
+                  "block w-full cursor-pointer overflow-hidden rounded-lg border transition-all",
+                  selected
+                    ? "border-primary ring-2 ring-primary/30"
+                    : "border-transparent hover:border-primary/40",
+                )}
+              >
+                <ImageFrame
+                  src={shot.src}
+                  alt={shotLabel}
+                  ratio="4/3"
+                  rounded="lg"
+                  hover="zoom"
+                  sizes="(min-width: 640px) 14vw, 31vw"
+                />
+              </button>
+            );
+          })}
+        </ThumbRail>
+      ) : null}
 
       <ImagePreview
         images={previewImages}

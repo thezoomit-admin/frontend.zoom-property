@@ -14,6 +14,7 @@ export const LANDING_SECTIONS = [
   "reviews",
   "faq",
   "enquire",
+  "custom",
 ] as const;
 
 export type LandingSectionKey = (typeof LANDING_SECTIONS)[number];
@@ -61,7 +62,7 @@ export interface ApiLandingFilm {
   captionBn?: string;
   url?: string;
   poster?: ApiMedia | string | null;
-  provider?: "facebook" | "youtube";
+  provider?: "facebook" | "youtube" | "vimeo";
 }
 
 export interface ApiLandingShot {
@@ -321,6 +322,14 @@ export interface ApiProjectLanding {
       successBodyBn?: string;
     };
   };
+  custom?: {
+    eyebrow?: string;
+    eyebrowBn?: string;
+    title?: string;
+    titleBn?: string;
+    body?: string;
+    bodyBn?: string;
+  };
   project?: { _id?: string; name?: string; nameBn?: string; slug?: string };
 }
 
@@ -425,8 +434,7 @@ export interface LandingView {
       title: string;
       caption: string;
       url: string;
-      poster: string;
-      provider: "facebook" | "youtube";
+      provider: "facebook" | "youtube" | "vimeo";
     }[];
   };
   amenities: {
@@ -476,7 +484,6 @@ export interface LandingView {
       role: string;
       quote: string;
       avatar: string;
-      poster: string;
       videoUrl: string;
     }[];
   };
@@ -506,6 +513,11 @@ export interface LandingView {
       successTitle: string;
       successBody: string;
     };
+  };
+  custom: {
+    eyebrow: string;
+    title: string;
+    body: string;
   };
 }
 
