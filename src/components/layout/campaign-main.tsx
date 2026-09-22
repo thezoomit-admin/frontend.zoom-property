@@ -6,14 +6,14 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export function CampaignMain({
-  campaignPath,
+  campaignPaths,
   children,
 }: {
-  campaignPath: string;
+  campaignPaths: string[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const campaign = pathname.includes(campaignPath);
+  const campaign = campaignPaths.some((path) => pathname.includes(path));
 
   return (
     <main

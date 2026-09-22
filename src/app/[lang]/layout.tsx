@@ -16,7 +16,7 @@ import { LOCALES, LOCALE_TAGS } from "@/i18n/config";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { socialProfiles } from "@/lib/contact";
-import { ZOOM_AL_ZAHARA_PATH, ZOOM_AL_ZAHARA_PHONES } from "@/data/zoomalzahara";
+import { getLandingChrome } from "@/server/features/project-landing";
 import { navLinks } from "@/lib/nav-links";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -74,7 +74,12 @@ export function generateStaticParams() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
-  const [locale, dict] = await Promise.all([getLocale(), getDictionary()]);
+  const locale = await getLocale();
+  const [dict, campaigns] = await Promise.all([
+    getDictionary(),
+    getLandingChrome(locale),
+  ]);
+  const campaignHrefs = campaigns.map((row) => row.href);
 
   return (
     <html
@@ -123,30 +128,18 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             dict={dict.nav}
             phone={dict.contact.details.phone}
             menu={navLinks(dict.nav.menu)}
-            campaign={{
-              path: ZOOM_AL_ZAHARA_PATH,
-              ctaLabel: dict.zoomalzahara.nav.enquire,
+            campaigns={campaigns.map((row) => ({
+              path: row.href,
+              ctaLabel: row.ctaLabel,
               ctaHref: "#enquire",
-              name: dict.zoomalzahara.hero.title,
-              location: dict.zoomalzahara.hero.location,
-              phone: ZOOM_AL_ZAHARA_PHONES.primary,
-            }}
+              name: row.name,
+              location: row.location,
+              phone: row.phone,
+            }))}
           />
-          <CampaignMain campaignPath={ZOOM_AL_ZAHARA_PATH}>{children}</CampaignMain>
+          <CampaignMain campaignPaths={campaignHrefs}>{children}</CampaignMain>
           <SiteFooter />
-          <MobileBottomNav
-            locale={locale}
-            campaign={{
-              path: ZOOM_AL_ZAHARA_PATH,
-              items: [
-                { href: "#about", icon: "location", label: dict.zoomalzahara.nav.about },
-                { href: "#residences", icon: "building", label: dict.zoomalzahara.nav.residences },
-                { href: "#video", icon: "play", label: dict.zoomalzahara.nav.video },
-                { href: "#place", icon: "area", label: dict.zoomalzahara.nav.place },
-                { href: "#enquire", icon: "mail", label: dict.zoomalzahara.nav.enquire },
-              ],
-            }}
-          />
+          <MobileBottomNav locale={locale} campaignPaths={campaignHrefs} />
           <ContactDock />
           <ScrollToTop />
         </Providers>

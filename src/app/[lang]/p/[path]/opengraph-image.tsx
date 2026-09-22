@@ -7,8 +7,8 @@ export const contentType = "image/png";
 export default async function Image({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string; path: string }>;
 }) {
-  const { lang } = await params;
-  return landingOgResponse("zoomalzahara", lang);
+  const { lang, path } = await params;
+  return landingOgResponse(path, lang);
 }

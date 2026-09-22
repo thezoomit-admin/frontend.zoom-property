@@ -1,20 +1,15 @@
 import { AppContainer } from "@/components/common/app-container";
 import { Icon } from "@/components/common/icon";
 import { Logo } from "@/components/layout/logo";
-import {
-  ZOOM_AL_ZAHARA_FACEBOOK,
-  ZOOM_AL_ZAHARA_PATH,
-  ZOOM_AL_ZAHARA_PHONES,
-} from "@/data/zoomalzahara";
-import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
+import { getLocale } from "@/i18n/dictionaries";
 import { telHref, whatsappHref } from "@/lib/contact";
+import type { LandingChrome } from "@/server/features/project-landing/types";
 
-export async function LandingFooter() {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
-  const copy = dict.zoomalzahara;
-  const home = localeHref(locale, ZOOM_AL_ZAHARA_PATH);
-  const primary = ZOOM_AL_ZAHARA_PHONES.primary;
+export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
+  const locale = await getLocale();
+  const home = localeHref(locale, chrome.href);
+  const primary = chrome.phone;
 
   const pill =
     "inline-flex h-8 items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 text-xs font-semibold text-footer-foreground transition-colors hover:bg-white/20";
@@ -26,38 +21,52 @@ export async function LandingFooter() {
           <a href={home} className="flex min-w-0 items-center gap-3">
             <Logo variant="onDark" className="h-7 w-auto" />
             <span className="min-w-0">
-              <span className="block font-heading text-sm font-extrabold">
-                {copy.hero.title}
-              </span>
-              <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-footer-foreground/70">
-                <Icon name="fa-location-dot" size="xs" />
-                <span className="truncate">{copy.hero.location}</span>
-              </span>
+              {chrome.name ? (
+                <span className="block font-heading text-sm font-extrabold">
+                  {chrome.name}
+                </span>
+              ) : null}
+              {chrome.location ? (
+                <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-footer-foreground/70">
+                  <Icon name="fa-location-dot" size="xs" />
+                  <span className="truncate">{chrome.location}</span>
+                </span>
+              ) : null}
             </span>
           </a>
 
           <div className="flex flex-wrap gap-2">
-            <a href={telHref(primary)} className={pill} aria-label={`${copy.enquire.phoneLabel} ${primary}`}>
-              <Icon name="phone" size="xs" />
-              {primary}
-            </a>
-            <a
-              href={whatsappHref(primary)}
-              className={pill}
-              aria-label={`${copy.enquire.whatsappLabel} ${primary}`}
-            >
-              <Icon name="whatsapp" size="xs" />
-              {copy.enquire.whatsappLabel}
-            </a>
-            <a
-              href={ZOOM_AL_ZAHARA_FACEBOOK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={pill}
-            >
-              <Icon name="facebook" size="xs" />
-              Facebook
-            </a>
+            {primary ? (
+              <a
+                href={telHref(primary)}
+                className={pill}
+                aria-label={`${chrome.phoneLabel} ${primary}`}
+              >
+                <Icon name="phone" size="xs" />
+                {primary}
+              </a>
+            ) : null}
+            {chrome.whatsapp ? (
+              <a
+                href={whatsappHref(chrome.whatsapp)}
+                className={pill}
+                aria-label={`${chrome.whatsappLabel} ${chrome.whatsapp}`}
+              >
+                <Icon name="whatsapp" size="xs" />
+                {chrome.whatsappLabel}
+              </a>
+            ) : null}
+            {chrome.facebookUrl ? (
+              <a
+                href={chrome.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={pill}
+              >
+                <Icon name="facebook" size="xs" />
+                Facebook
+              </a>
+            ) : null}
           </div>
         </div>
       </AppContainer>

@@ -17,8 +17,8 @@ interface LeadFormDict {
   namePlaceholder: string;
   phone: string;
   email: string;
-  plan: string;
-  planAny: string;
+  plan?: string;
+  planAny?: string;
   message: string;
   messagePlaceholder: string;
   submit: string;
@@ -31,10 +31,14 @@ interface LeadFormDict {
 export function ZoomAlZaharaLeadForm({
   dict,
   projectName,
+  source,
+  path,
   variant = "default",
 }: {
   dict: LeadFormDict;
   projectName: string;
+  source: string;
+  path: string;
   variant?: "default" | "compact";
 }) {
   const compact = variant === "compact";
@@ -51,17 +55,16 @@ export function ZoomAlZaharaLeadForm({
     const planLine = `Plan: ${projectName}`;
     formData.set("budget", projectName);
     formData.set("message", note ? `${planLine}\n${note}` : planLine);
-    formData.set("source", "Zoom Al Zahara");
-    formData.set("subject", "Zoom Al Zahara viewing");
+    formData.set("source", source);
+    formData.set("subject", `${projectName} viewing`);
     formData.set("enquiry", "buy");
-    formData.set("area", "mohammadpur");
 
     const res = await submitContactForm(formData);
 
     if (res.success) {
       trackMeta("Lead", {
-        content_name: "Zoom Al Zahara",
-        content_ids: ["zoomalzahara"],
+        content_name: projectName,
+        content_ids: [path],
       });
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();

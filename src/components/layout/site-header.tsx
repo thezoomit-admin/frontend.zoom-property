@@ -58,7 +58,7 @@ export function SiteHeader({
   dict,
   phone,
   menu,
-  campaign,
+  campaigns,
 }: {
   locale: Locale;
   dict: NavDict;
@@ -66,7 +66,7 @@ export function SiteHeader({
   /** The menu itself, edited in the panel. Empty and no bar is drawn. */
   menu: NavLink[];
   /** Campaign landing chrome: project name, location, one phone beside language — no site nav. */
-  campaign?: {
+  campaigns?: {
     path: string;
     links?: NavLink[];
     ctaLabel: string;
@@ -75,7 +75,7 @@ export function SiteHeader({
     location?: string;
     phone?: string;
     phones?: string[];
-  };
+  }[];
 }) {
   const [open, setOpen] = useState(false);
   const { direction, scrolledPast } = useScrollDirection();
@@ -105,7 +105,8 @@ export function SiteHeader({
     return () => lenis.start();
   }, [open, lenis]);
 
-  const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
+  const campaign = campaigns?.find((item) => pathname.includes(item.path));
+  const campaignActive = Boolean(campaign);
   const home = localeHref(locale, campaignActive ? campaign!.path : "/");
   const navItems = campaignActive ? [] : menu;
   const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");

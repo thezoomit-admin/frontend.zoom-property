@@ -9,30 +9,27 @@ import {
   PreviewTrigger,
 } from "@/components/pages/zoomalzahara/image-preview";
 import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
-import { ZOOM_AL_ZAHARA_GALLERY } from "@/data/zoomalzahara";
 import { cn } from "@/lib/utils";
-
-type ShotCopy = { label: string };
 
 export function ProjectGallery({
   shots,
   openLabel,
   closeLabel,
 }: {
-  shots: ShotCopy[];
+  shots: { src: string; alt: string; label?: string }[];
   openLabel: string;
   closeLabel: string;
 }) {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
-  const image = ZOOM_AL_ZAHARA_GALLERY[active];
-  const label = shots[active]?.label ?? image?.alt;
+  const image = shots[active];
+  const label = image?.label || image?.alt;
 
   if (!image) return null;
 
-  const previewImages = ZOOM_AL_ZAHARA_GALLERY.map((shot, index) => ({
+  const previewImages = shots.map((shot) => ({
     src: shot.src,
-    alt: shots[index]?.label ?? shot.alt,
+    alt: shot.label || shot.alt,
   }));
 
   return (
@@ -55,7 +52,7 @@ export function ProjectGallery({
         <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-5">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
             {String(active + 1).padStart(2, "0")} /{" "}
-            {String(ZOOM_AL_ZAHARA_GALLERY.length).padStart(2, "0")}
+            {String(shots.length).padStart(2, "0")}
           </p>
           <p className="mt-1 font-heading text-base font-bold text-white sm:text-lg">
             {label}
@@ -64,13 +61,13 @@ export function ProjectGallery({
       </div>
 
       <ThumbRail columns={6}>
-        {ZOOM_AL_ZAHARA_GALLERY.map((shot, index) => {
+        {shots.map((shot, index) => {
           const selected = index === active;
-          const shotLabel = shots[index]?.label ?? shot.alt;
+          const shotLabel = shot.label || shot.alt;
 
           return (
             <button
-              key={shot.src}
+              key={`${shot.src}-${index}`}
               type="button"
               onClick={() => setActive(index)}
               aria-pressed={selected}

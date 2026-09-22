@@ -7,10 +7,7 @@ import { ImageFrame } from "@/components/media/image-frame";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import { ImagePreview } from "@/components/pages/zoomalzahara/image-preview";
 import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
-import { ZOOM_AL_ZAHARA_ELEVATIONS } from "@/data/zoomalzahara";
 import { cn } from "@/lib/utils";
-
-type ViewCopy = { label: string; hint?: string };
 
 const VISIBLE_THUMBS = 4;
 
@@ -19,21 +16,18 @@ export function ProjectElevations({
   previewLabel,
   closeLabel,
 }: {
-  views: ViewCopy[];
+  views: { src: string; alt: string; label?: string; hint?: string }[];
   previewLabel: string;
   closeLabel: string;
 }) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
-  const images = ZOOM_AL_ZAHARA_ELEVATIONS.map((view, viewIndex) => ({
-    src: view.src,
-    alt: views[viewIndex]?.label ?? view.alt,
-  }));
+  const images = views.filter((view) => view.src);
 
   if (!images[0]) return null;
 
   const current = images[index];
-  const copy = views[index];
+  const copy = images[index];
   const total = images.length;
   const hasRail = total > 1;
   const railScrolls = total > VISIBLE_THUMBS;
@@ -51,7 +45,7 @@ export function ProjectElevations({
             <ImageFrame
               key={`${index}-${current.src}`}
               src={current.src}
-              alt={current.alt}
+              alt={current.alt || current.label || ""}
               ratio="auto"
               rounded="md"
               hover="none"
@@ -62,7 +56,7 @@ export function ProjectElevations({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              aria-label={`${previewLabel}: ${current.alt}`}
+              aria-label={`${previewLabel}: ${current.alt || current.label || ""}`}
               className="absolute inset-0 z-10 cursor-pointer rounded-md"
             />
             <span
@@ -77,7 +71,7 @@ export function ProjectElevations({
                 {String(total).padStart(2, "0")}
               </p>
               <p className="mt-1 font-heading text-xl font-bold text-white sm:text-2xl">
-                {copy?.label ?? current.alt}
+                {copy?.label || current.alt}
               </p>
               {copy?.hint ? (
                 <p className="mt-0.5 text-sm text-white/80">{copy.hint}</p>
@@ -93,7 +87,7 @@ export function ProjectElevations({
                     <ElevationThumb
                       key={`${viewIndex}-${image.src}`}
                       image={image}
-                      label={views[viewIndex]?.label ?? image.alt}
+                      label={image.label || image.alt}
                       selected={viewIndex === index}
                       onSelect={() => setIndex(viewIndex)}
                       sizes="31vw"
@@ -117,7 +111,7 @@ export function ProjectElevations({
                   >
                     <ElevationThumb
                       image={image}
-                      label={views[viewIndex]?.label ?? image.alt}
+                      label={image.label || image.alt}
                       selected={viewIndex === index}
                       onSelect={() => setIndex(viewIndex)}
                       sizes="14vw"
@@ -131,7 +125,10 @@ export function ProjectElevations({
         </div>
       </div>
       <ImagePreview
-        images={images}
+        images={images.map((image) => ({
+          src: image.src,
+          alt: image.label || image.alt,
+        }))}
         index={index}
         open={open}
         onClose={() => setOpen(false)}

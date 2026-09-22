@@ -41,6 +41,7 @@ export {
   getProjectBySlug,
   getProjects,
 } from "./features/projects";
+export { getLandingByPath, getLandingChrome } from "./features/project-landing";
 export {
   getHomeProperties,
   getProperties,

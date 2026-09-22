@@ -6,8 +6,9 @@ import { AppContainer } from "@/components/common/app-container";
 import { Logo } from "@/components/layout/logo";
 import { Text } from "@/components/common/text";
 import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
-import { ZOOM_AL_ZAHARA_PATH } from "@/data/zoomalzahara";
 import { getProjects } from "@/server/features/projects";
+import { getLandingChrome } from "@/server/features/project-landing";
+import { matchLanding } from "@/lib/landing";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { footerLinks } from "@/lib/footer-links";
@@ -33,8 +34,10 @@ import { PATHNAME_HEADER } from "@/lib/not-found";
  */
 export async function SiteFooter() {
   const pathname = (await headers()).get(PATHNAME_HEADER) ?? "";
-  if (pathname.includes(ZOOM_AL_ZAHARA_PATH)) {
-    return <LandingFooter />;
+  const locale = await getLocale();
+  const chrome = matchLanding(pathname, await getLandingChrome(locale));
+  if (chrome) {
+    return <LandingFooter chrome={chrome} />;
   }
 
   // The project column is whatever is published, not a list typed in here:

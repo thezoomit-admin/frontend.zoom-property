@@ -18,16 +18,15 @@ const navItems = [
 
 export function MobileBottomNav({
   locale,
-  campaign,
+  campaignPaths,
 }: {
   locale: Locale;
-  campaign?: {
-    path: string;
-    items: { href: string; icon: string; label: string }[];
-  };
+  campaignPaths?: string[];
 }) {
   const pathname = usePathname();
-  const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
+  const campaignActive = Boolean(
+    campaignPaths?.some((path) => pathname.includes(path)),
+  );
   if (campaignActive) return null;
 
   const items = navItems.map((item) => ({

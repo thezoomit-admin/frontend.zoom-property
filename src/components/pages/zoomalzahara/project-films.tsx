@@ -6,11 +6,8 @@ import Image from "@/components/common/image";
 import { Icon } from "@/components/common/icon";
 import { LandingSlider } from "@/components/pages/zoomalzahara/landing-slider";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
-import { ZOOM_AL_ZAHARA_FILMS } from "@/data/zoomalzahara";
-import { embedUrl, facebookEmbedUrl, parseVideoId } from "@/lib/video";
+import { embedUrl, facebookEmbedUrl, isFacebookVideo, parseVideoId } from "@/lib/video";
 import { cn } from "@/lib/utils";
-
-type FilmCopy = { title: string; caption: string };
 
 function FilmCard({
   title,
@@ -52,13 +49,17 @@ function FilmCard({
               aria-label={`${playLabel}: ${title}`}
               className="group absolute inset-0 cursor-pointer"
             >
-              <Image
-                src={poster}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 22vw, 78vw"
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-              />
+              {poster ? (
+                <Image
+                  src={poster}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 22vw, 78vw"
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <span aria-hidden className="absolute inset-0 bg-zinc-900" />
+              )}
               <span
                 aria-hidden
                 className="absolute inset-0 bg-linear-to-t from-black/55 via-black/15 to-transparent"
@@ -91,31 +92,40 @@ export function ProjectFilms({
   films,
   playLabel,
 }: {
-  films: FilmCopy[];
+  films: {
+    title: string;
+    url: string;
+    poster?: string;
+    provider?: "facebook" | "youtube";
+  }[];
   playLabel: string;
 }) {
   const [playing, setPlaying] = useState<number | null>(null);
 
-  const cards = ZOOM_AL_ZAHARA_FILMS.map((film, index) => {
-    const title = films[index]?.title ?? "Zoom Al-Zahra";
-    const src =
-      film.provider === "facebook"
+  const cards = films
+    .filter((film) => film.url)
+    .map((film, index) => {
+      const facebook =
+        film.provider === "facebook" || isFacebookVideo(film.url);
+      const src = facebook
         ? facebookEmbedUrl(film.url, { width: 360, height: 640, autoplay: true })
         : embedUrl(parseVideoId(film.url, "youtube"), "youtube");
 
-    return (
-      <FilmCard
-        key={film.url}
-        title={title}
-        src={src}
-        poster={film.poster}
-        index={index}
-        playLabel={playLabel}
-        playing={playing === index}
-        onPlay={() => setPlaying(index)}
-      />
-    );
-  });
+      return (
+        <FilmCard
+          key={`${film.url}-${index}`}
+          title={film.title}
+          src={src}
+          poster={film.poster || ""}
+          index={index}
+          playLabel={playLabel}
+          playing={playing === index}
+          onPlay={() => setPlaying(index)}
+        />
+      );
+    });
+
+  if (!cards.length) return null;
 
   return (
     <LandingSlider itemClassName="basis-[78%] sm:basis-1/2 lg:basis-1/4" autoplayMs={0}>
