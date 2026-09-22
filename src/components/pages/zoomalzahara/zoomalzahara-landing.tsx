@@ -141,11 +141,21 @@ function Hero({ landing }: { landing: LandingView }) {
           priority
           quality={90}
           sizes="100vw"
-          className="absolute inset-0 h-full w-full object-cover object-[center_68%]"
+          className="absolute inset-0 h-full w-full object-cover object-[center_55%] sm:object-[center_68%]"
         />
       ) : null}
-      <div className="absolute inset-0 bg-linear-to-r from-black/62 via-black/38 to-black/12" />
-      <div className="absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-black/20" />
+      {/* Desktop wash — keep the photo visible on the right */}
+      <div className="absolute inset-0 hidden bg-linear-to-r from-black/62 via-black/38 to-black/12 lg:block" />
+      <div className="absolute inset-0 hidden bg-linear-to-t from-black/55 via-black/10 to-black/20 lg:block" />
+      {/* Mobile wash — darker + soft bottom blur so copy stays readable */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-linear-to-b from-black/55 via-black/50 to-black/78 lg:hidden"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-black/30 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,black_58%,transparent)] lg:hidden"
+      />
 
       <AppContainer className="relative z-10 pb-8 pt-16 sm:pt-20 lg:pb-10">
         <div
@@ -156,39 +166,45 @@ function Hero({ landing }: { landing: LandingView }) {
               : "lg:grid-cols-1",
           )}
         >
-          <Reveal className="flex flex-col gap-4 text-white sm:gap-5">
+          <Reveal className="flex flex-col gap-4 text-white sm:gap-5 max-lg:rounded-xl max-lg:border max-lg:border-white/15 max-lg:bg-black/40 max-lg:p-4 max-lg:shadow-[0_12px_40px_rgba(0,0,0,0.35)] max-lg:backdrop-blur-md sm:max-lg:p-5">
             {hero.badge || hero.handover ? (
               <div className="flex flex-wrap items-center gap-2">
                 {hero.badge ? (
-                  <Badge className="border border-white/20 bg-white/10 text-white backdrop-blur-md">
+                  <Badge className="border border-white/25 bg-white/15 text-white backdrop-blur-md">
                     {hero.badge}
                   </Badge>
                 ) : null}
                 {hero.handover ? (
-                  <Badge className="border border-white/20 bg-white/10 text-white backdrop-blur-md">
+                  <Badge className="border border-white/25 bg-white/15 text-white backdrop-blur-md">
                     {hero.handover}
                   </Badge>
                 ) : null}
               </div>
             ) : null}
             {hero.eyebrow ? (
-              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white/80 sm:text-xs">
+              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white/90 sm:text-xs">
                 {hero.eyebrow}
               </p>
             ) : null}
             {hero.title ? (
-              <Heading as="h1" size="h1" className="!font-extrabold text-white">
+              <Heading
+                as="h1"
+                size="h1"
+                tone="inverse"
+                weight="bold"
+                className="!font-extrabold [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]"
+              >
                 {hero.title}
               </Heading>
             ) : null}
             {hero.lead ? (
-              <p className="max-w-xl text-[15px] leading-relaxed text-white/90 sm:text-base sm:leading-7">
+              <p className="max-w-xl text-[15px] leading-relaxed text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.45)] sm:text-base sm:leading-7">
                 {hero.lead}
               </p>
             ) : null}
             {hero.location ? (
-              <p className="flex items-center gap-2 text-sm font-medium text-white/85">
-                <Icon name="fa-location-dot" size="xs" />
+              <p className="flex items-center gap-2 text-sm font-medium text-white">
+                <Icon name="fa-location-dot" size="xs" className="text-brand-green-light" />
                 {hero.location}
               </p>
             ) : null}
@@ -206,7 +222,7 @@ function Hero({ landing }: { landing: LandingView }) {
                   <Button
                     asChild
                     variant="outline"
-                    className="h-10 border-white/40 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white"
+                    className="h-10 border-white/50 bg-white/15 px-5 text-white hover:bg-white/25 hover:text-white"
                   >
                     <a href="#residences">{hero.ctaSecondary}</a>
                   </Button>
@@ -253,7 +269,7 @@ function Hero({ landing }: { landing: LandingView }) {
       </AppContainer>
 
       {hero.stats.length ? (
-        <div className="relative z-10 border-t border-white/10 bg-black/35 backdrop-blur-md">
+        <div className="relative z-10 border-t border-white/10 bg-black/55 backdrop-blur-md lg:bg-black/35">
           <AppContainer>
             <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.stats.map((stat, index) => (
@@ -265,14 +281,14 @@ function Hero({ landing }: { landing: LandingView }) {
                     index > 1 ? "border-t border-white/15 lg:border-t-0" : ""
                   }`}
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-white/15 bg-white/10 text-white sm:size-10 sm:rounded-lg">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-white/20 bg-white/15 text-white sm:size-10 sm:rounded-lg">
                     <Icon name={stat.icon || "check"} size="sm" />
                   </span>
                   <div className="min-w-0">
                     <p className="font-heading text-xl font-extrabold tracking-tight text-white sm:text-2xl">
                       {stat.value}
                     </p>
-                    <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/65">
+                    <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/80">
                       {stat.label}
                     </p>
                   </div>
