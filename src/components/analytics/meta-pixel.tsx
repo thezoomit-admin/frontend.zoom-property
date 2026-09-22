@@ -32,10 +32,10 @@ export function MetaPixel() {
       trackMeta("PageView");
     }
 
-    if (pathname.includes("/zoomalzahara")) {
+    if (pathname.includes("/p/") || pathname.includes("/zoomalzahara")) {
+      const slug = pathname.split("/").filter(Boolean).pop() || "landing";
       trackMeta("ViewContent", {
-        content_ids: ["zoomalzahara"],
-        content_name: "Zoom Al Zahara",
+        content_ids: [slug],
         content_type: "product",
       });
       return;
