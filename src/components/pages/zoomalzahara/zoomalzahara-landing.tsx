@@ -433,13 +433,13 @@ function Place({
             landingCardClass,
           )}
         >
-          <div className="flex items-center gap-3 border-b border-primary/15 bg-linear-to-r from-primary/12 via-card to-card px-4 py-3">
-            <span className="relative flex size-10 shrink-0 items-center justify-center">
+          <div className="flex items-center gap-2.5 border-b border-primary/15 bg-linear-to-r from-primary/12 via-card to-card px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
+            <span className="relative flex size-9 shrink-0 items-center justify-center sm:size-10">
               <span
                 aria-hidden
                 className="absolute inset-0 rounded-full bg-primary/25 ring-4 ring-primary/15"
               />
-              <span className="relative flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30">
+              <span className="relative flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30 sm:size-10">
                 <Icon name="fa-solid fa-location-dot" size="sm" />
               </span>
             </span>
@@ -451,18 +451,24 @@ function Place({
                 {location.title}
               </p>
             </div>
-            <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+            >
               <a
                 href={ZOOM_AL_ZAHARA_MAP_LINK}
                 target="_blank"
                 rel="noreferrer"
+                aria-label={location.mapOpen}
               >
-                {location.mapOpen}
+                <span className="hidden sm:inline">{location.mapOpen}</span>
                 <Icon name="arrowUpRight" size="xs" />
               </a>
             </Button>
           </div>
-          <div className="relative min-h-72 flex-1 overflow-hidden sm:min-h-88 lg:min-h-160">
+          <div className="relative min-h-80 flex-1 overflow-hidden sm:min-h-96 lg:min-h-160">
             <iframe
               src={ZOOM_AL_ZAHARA_MAP_EMBED}
               title={location.title}
