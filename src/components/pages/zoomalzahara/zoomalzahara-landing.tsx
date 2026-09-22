@@ -8,6 +8,7 @@ import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
 import { ZoomAlZaharaLeadForm } from "@/components/pages/zoomalzahara/lead-form";
+import { LandingStickyCta } from "@/components/pages/zoomalzahara/landing-sticky-cta";
 import { ProjectElevations } from "@/components/pages/zoomalzahara/project-elevations";
 import { ProjectFilms } from "@/components/pages/zoomalzahara/project-films";
 import { ProjectGallery } from "@/components/pages/zoomalzahara/project-gallery";
@@ -45,7 +46,7 @@ export function ZoomAlZaharaLanding({
   whatsapp: string;
 }) {
   return (
-    <div className="bg-background">
+    <div className="bg-background pb-16 lg:pb-0">
       <Hero dict={dict} phone={phone} whatsapp={whatsapp} />
       <About dict={dict.about} />
       <ProjectResidence dict={dict.residences} />
@@ -54,6 +55,7 @@ export function ZoomAlZaharaLanding({
       <Lifestyle amenities={dict.amenities} gallery={dict.gallery} />
       <Place location={dict.location} process={dict.process} />
       <LandingCta dict={dict.ctaBand} phone={phone} whatsapp={whatsapp} />
+      <Reviews dict={dict.reviews} />
       <Close
         faq={dict.faq}
         enquire={dict.enquire}
@@ -62,7 +64,13 @@ export function ZoomAlZaharaLanding({
         phoneAlt={ZOOM_AL_ZAHARA_PHONES.secondary}
         whatsapp={whatsapp}
       />
-      <Reviews dict={dict.reviews} />
+      <LandingStickyCta
+        phone={phone}
+        whatsapp={whatsapp}
+        bookLabel={dict.ctaBand.primary}
+        callLabel={dict.ctaBand.call}
+        whatsappLabel={dict.ctaBand.whatsapp}
+      />
     </div>
   );
 }
@@ -283,7 +291,7 @@ function Films({ dict }: { dict: Dictionary["zoomalzahara"]["video"] }) {
         description={dict.description}
         titleClassName={landingTitleClass}
       />
-      <ProjectFilms films={dict.films} />
+      <ProjectFilms films={dict.films} playLabel={dict.play} />
     </Section>
   );
 }

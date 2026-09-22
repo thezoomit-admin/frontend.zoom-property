@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
+import { trackMeta } from "@/components/analytics/meta-pixel";
 import { submitContactForm } from "@/server/features/inquiries/action";
 
 interface LeadFormDict {
@@ -58,6 +59,10 @@ export function ZoomAlZaharaLeadForm({
     const res = await submitContactForm(formData);
 
     if (res.success) {
+      trackMeta("Lead", {
+        content_name: "Zoom Al Zahara",
+        content_ids: ["zoomalzahara"],
+      });
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
     } else {

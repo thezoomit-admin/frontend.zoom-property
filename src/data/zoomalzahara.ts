@@ -88,18 +88,22 @@ export const ZOOM_AL_ZAHARA_FILMS = [
   {
     provider: "facebook" as const,
     url: "https://www.facebook.com/reel/1633768221804628",
+    poster: photo("photo-1545324418-cc1a3fa10c00", 900),
   },
   {
     provider: "facebook" as const,
     url: "https://www.facebook.com/reel/29210395125215493",
+    poster: photo("photo-1600596542815-ffad4c1539a9", 900),
   },
   {
     provider: "facebook" as const,
     url: "https://www.facebook.com/reel/1410572034383190",
+    poster: photo("photo-1439066615861-d1af74d74000", 900),
   },
   {
     provider: "facebook" as const,
     url: "https://www.facebook.com/reel/1751522772664278",
+    poster: photo("photo-1487958449943-2429e8be8625", 900),
   },
 ];
 

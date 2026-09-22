@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { JsonLd } from "@/components/common/json-ld";
 import { ZoomAlZaharaLanding } from "@/components/pages/zoomalzahara/zoomalzahara-landing";
-import { ZOOM_AL_ZAHARA_PHONES } from "@/data/zoomalzahara";
+import { ZOOM_AL_ZAHARA_FACEBOOK, ZOOM_AL_ZAHARA_PHONES } from "@/data/zoomalzahara";
 import { localeAlternates } from "@/i18n/alternates";
 import { LOCALE_TAGS } from "@/i18n/config";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
@@ -55,12 +55,23 @@ export default async function ZoomAlZaharaPage() {
     name: copy.hero.title,
     description: copy.metaDescription,
     url: absoluteUrl(localeHref(locale, path)),
+    telephone: `+88${ZOOM_AL_ZAHARA_PHONES.primary.replace(/\D/g, "")}`,
+    sameAs: [ZOOM_AL_ZAHARA_FACEBOOK],
+    numberOfRooms: 4,
+    numberOfBathroomsTotal: 3,
+    numberOfBedrooms: 4,
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Basila Garden City, Mohammadpur",
+      streetAddress: "Basila Garden City",
+      addressLocality: "Mohammadpur",
       addressRegion: "Dhaka",
       addressCountry: "BD",
     },
+    amenityFeature: [
+      { "@type": "LocationFeatureSpecification", name: "10-person lift", value: true },
+      { "@type": "LocationFeatureSpecification", name: "3 balconies", value: true },
+      { "@type": "LocationFeatureSpecification", name: "58 ft lake front", value: true },
+    ],
   };
 
   return (

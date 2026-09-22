@@ -11,7 +11,8 @@ declare global {
 
 const detailPath = /^\/(?:bn|en)\/(properties|projects)\/([^/?#]+)$/;
 
-function track(event: string, params?: Record<string, unknown>) {
+export function trackMeta(event: string, params?: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
   window.fbq?.("track", event, params);
 }
 
@@ -27,15 +28,24 @@ export function MetaPixel() {
     const isInitialPageLoad = previousPathname.current === null;
     previousPathname.current = pathname;
 
-    if (isInitialPageLoad) return;
+    if (!isInitialPageLoad) {
+      trackMeta("PageView");
+    }
 
-    track("PageView");
+    if (pathname.includes("/zoomalzahara")) {
+      trackMeta("ViewContent", {
+        content_ids: ["zoomalzahara"],
+        content_name: "Zoom Al Zahara",
+        content_type: "product",
+      });
+      return;
+    }
 
     const match = pathname.match(detailPath);
     if (!match) return;
 
     const [, type, slug] = match;
-    track("ViewContent", {
+    trackMeta("ViewContent", {
       content_ids: [slug],
       content_type: type === "properties" ? "property" : "project",
     });
@@ -47,10 +57,14 @@ export function MetaPixel() {
       if (!anchor) return;
 
       const href = anchor.getAttribute("href") ?? "";
-      if (href.startsWith("tel:") || href.startsWith("mailto:")) {
-        track("Contact");
+      if (
+        href.startsWith("tel:") ||
+        href.startsWith("mailto:") ||
+        href.includes("wa.me/")
+      ) {
+        trackMeta("Contact");
       } else if (/^\/(?:bn|en)\/contact(?:[/?#]|$)/.test(href)) {
-        track("Lead");
+        trackMeta("Lead");
       }
     };
 
