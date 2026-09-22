@@ -11,6 +11,7 @@ const projects = createResource<ApiProject, Project>({
   tag: CACHE_TAGS.projects,
   map: toProject,
   fallback,
+  sort: "order",
   slugOf: (p) => p.slug,
 });
 

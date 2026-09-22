@@ -11,7 +11,7 @@ import type { ApiMedia } from "./types";
  * in each feature folder.
  */
 
-const R2_PUBLIC_FALLBACK = "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev";
+const R2_PUBLIC_FALLBACK = "https://pub-fe014e73b16347aab5e799483354b483.r2.dev";
 
 /**
  * What this accepts.

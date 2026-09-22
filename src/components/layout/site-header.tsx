@@ -58,12 +58,24 @@ export function SiteHeader({
   dict,
   phone,
   menu,
+  campaigns,
 }: {
   locale: Locale;
   dict: NavDict;
   phone: string;
   /** The menu itself, edited in the panel. Empty and no bar is drawn. */
   menu: NavLink[];
+  /** Campaign landing chrome: project name, location, one phone beside language — no site nav. */
+  campaigns?: {
+    path: string;
+    links?: NavLink[];
+    ctaLabel: string;
+    ctaHref: string;
+    name?: string;
+    location?: string;
+    phone?: string;
+    phones?: string[];
+  }[];
 }) {
   const [open, setOpen] = useState(false);
   const { direction, scrolledPast } = useScrollDirection();
@@ -93,16 +105,28 @@ export function SiteHeader({
     return () => lenis.start();
   }, [open, lenis]);
 
-  const home = localeHref(locale, "/");
+  const campaign = campaigns?.find((item) => pathname.includes(item.path));
+  const campaignActive = Boolean(campaign);
+  const home = localeHref(locale, campaignActive ? campaign!.path : "/");
+  const navItems = campaignActive ? [] : menu;
+  const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");
+  const ctaLabel = campaignActive ? campaign!.ctaLabel : dict.bookViewing;
+  const hideOnScroll = campaignActive ? false : hidden;
+  const campaignPhone =
+    campaignActive
+      ? (campaign?.phone ?? campaign?.phones?.[0] ?? "")
+      : "";
+  const campaignLocation = campaignActive ? campaign?.location : undefined;
+  const campaignName = campaignActive ? campaign?.name : undefined;
 
   return (
     <motion.header
       initial={false}
-      animate={{ y: hidden ? "-100%" : "0%" }}
+      animate={{ y: hideOnScroll ? "-100%" : "0%" }}
       transition={
         prefersReducedMotion
           ? { duration: 0 }
-          : hidden
+          : hideOnScroll
             ? { duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }
             : { duration: 0.32, ease: [0.16, 1, 0.3, 1] }
       }
@@ -137,43 +161,69 @@ export function SiteHeader({
           />
         </Link>
 
-        <nav className="hidden items-center gap-1.5 lg:flex">
-          {menu.map((item) => {
-            const href = localeHref(locale, item.href);
-            const active = pathname === href || pathname.startsWith(`${href}/`);
-            return (
-              <Link
-                key={`${item.href}-${item.label}`}
-                href={href}
-                className={cn(
-                  "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
-                  active
-                    ? "bg-primary/[0.08] font-semibold text-primary"
-                    : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                )}
-              >
-                <span>{item.label}</span>
-                {active && (
-                  <motion.span
-                    layoutId="activeNavIndicator"
-                    className="absolute bottom-0 left-3 right-3 h-[2.5px] rounded-full bg-primary shadow-xs"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        {campaignActive ? (
+          <div className="min-w-0 flex-1 px-1 sm:px-3">
+            {campaignName ? (
+              <p className="truncate font-heading text-sm font-extrabold leading-tight text-foreground sm:text-base">
+                {campaignName}
+              </p>
+            ) : null}
+            {campaignLocation ? (
+              <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground">
+                <Icon name="fa-location-dot" size="xs" className="shrink-0 text-primary" />
+                <span className="truncate">{campaignLocation}</span>
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <nav className="hidden items-center gap-1.5 lg:flex">
+            {navItems.map((item) => {
+              const href = localeHref(locale, item.href);
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={`${item.href}-${item.label}`}
+                  href={href}
+                  className={cn(
+                    "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
+                    active
+                      ? "bg-primary/[0.08] font-semibold text-primary"
+                      : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                  )}
+                >
+                  <span>{item.label}</span>
+                  {active && (
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute bottom-0 left-3 right-3 h-[2.5px] rounded-full bg-primary shadow-xs"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         <div className="flex items-center gap-1">
           {/* whitespace-nowrap keeps the number on one line at every width. */}
-          <a
-            href={telHref(phone)}
-            className="hidden items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted xl:flex"
-          >
-            <Icon name="phone" size="xs" />
-            {phone}
-          </a>
+          {!campaignActive ? (
+            <a
+              href={telHref(phone)}
+              className="hidden items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted xl:flex"
+            >
+              <Icon name="phone" size="xs" />
+              {phone}
+            </a>
+          ) : campaignPhone ? (
+            <a
+              href={telHref(campaignPhone)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted/50"
+            >
+              <Icon name="phone" size="xs" className="text-primary" />
+              <span className="hidden sm:inline">{campaignPhone}</span>
+            </a>
+          ) : null}
 
           <LanguageSwitcher
             locale={locale}
@@ -181,10 +231,19 @@ export function SiteHeader({
             onDark={false}
           />
 
-          <Button size="lg" className="ml-1 hidden font-medium sm:inline-flex" asChild>
-            <Link href={localeHref(locale, "/contact")}>{dict.bookViewing}</Link>
+          <Button
+            size="lg"
+            className={cn("ml-1 font-medium", !campaignActive && "hidden sm:inline-flex")}
+            asChild
+          >
+            {campaignActive ? (
+              <a href={ctaHref}>{ctaLabel}</a>
+            ) : (
+              <Link href={ctaHref}>{ctaLabel}</Link>
+            )}
           </Button>
 
+          {campaignActive ? null : (
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button
@@ -204,25 +263,34 @@ export function SiteHeader({
               </SheetHeader>
 
               <nav className="flex flex-col gap-1 py-4">
-                {menu.map((item) => {
-                  const href = localeHref(locale, item.href);
-                  const active = pathname === href || pathname.startsWith(`${href}/`);
-                  return (
+                {navItems.map((item) => {
+                  const href = campaignActive ? item.href : localeHref(locale, item.href);
+                  const active =
+                    !campaignActive && (pathname === href || pathname.startsWith(`${href}/`));
+                  const className = cn(
+                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all",
+                    active
+                      ? "bg-primary/[0.08] font-semibold text-primary border-l-4 border-primary pl-3"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium",
+                  );
+                  return campaignActive ? (
+                    <a
+                      key={`${item.href}-${item.label}`}
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      className={className}
+                    >
+                      <span>{item.label}</span>
+                    </a>
+                  ) : (
                     <Link
                       key={`${item.href}-${item.label}`}
                       href={href}
                       onClick={() => setOpen(false)}
-                      className={cn(
-                        "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all",
-                        active
-                          ? "bg-primary/[0.08] font-semibold text-primary border-l-4 border-primary pl-3"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium",
-                      )}
+                      className={className}
                     >
                       <span>{item.label}</span>
-                      {active && (
-                        <span className="size-1.5 rounded-full bg-primary" />
-                      )}
+                      {active && <span className="size-1.5 rounded-full bg-primary" />}
                     </Link>
                   );
                 })}
@@ -237,13 +305,20 @@ export function SiteHeader({
                     {phone}
                   </a>
                 <Button size="lg" className="w-full" style={{ height: "42px" }} asChild>
-                  <Link href={localeHref(locale, "/contact")} onClick={() => setOpen(false)}>
-                    {dict.bookViewing}
-                  </Link>
+                  {campaignActive ? (
+                    <a href={ctaHref} onClick={() => setOpen(false)}>
+                      {ctaLabel}
+                    </a>
+                  ) : (
+                    <Link href={ctaHref} onClick={() => setOpen(false)}>
+                      {ctaLabel}
+                    </Link>
+                  )}
                 </Button>
               </div>
             </SheetContent>
           </Sheet>
+          )}
         </div>
       </AppContainer>
     </motion.header>

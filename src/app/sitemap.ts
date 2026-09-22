@@ -4,6 +4,7 @@ import { galleryImages, siteConfig } from "@/data/site";
 import { services } from "@/data/services";
 import { DEFAULT_LOCALE, LOCALES, LOCALE_TAGS } from "@/i18n/config";
 import { getInsights } from "@/server/features/insights";
+import { getLandingChrome } from "@/server/features/project-landing";
 import { getProjects } from "@/server/features/projects";
 import { getProperties } from "@/server/features/properties";
 
@@ -124,11 +125,36 @@ function serviceEntries(): MetadataRoute.Sitemap {
   );
 }
 
+/** One entry per published campaign landing per locale. */
+function landingEntries(
+  landings: Awaited<ReturnType<typeof getLandingChrome>>,
+): MetadataRoute.Sitemap {
+  return LOCALES.flatMap((locale) =>
+    landings
+      .filter((row) => row.href && row.href !== "/")
+      .map((row) => {
+        const route = row.href;
+        return {
+          url: url(locale, route),
+          alternates: {
+            languages: {
+              ...Object.fromEntries(
+                LOCALES.map((l) => [LOCALE_TAGS[l], url(l, route)]),
+              ),
+              "x-default": url(DEFAULT_LOCALE, route),
+            },
+          },
+        };
+      }),
+  );
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [insights, properties, projects] = await Promise.all([
+  const [insights, properties, projects, landings] = await Promise.all([
     getInsights(1_000),
     getProperties(1_000),
     getProjects(1_000),
+    getLandingChrome(DEFAULT_LOCALE),
   ]);
   const lastModified = new Date();
 
@@ -161,5 +187,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...projectEntries(projects),
     ...articleEntries(insights),
     ...serviceEntries(),
+    ...landingEntries(landings),
   ];
 }

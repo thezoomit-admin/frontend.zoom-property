@@ -1,14 +1,19 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 
 import { Icon } from "@/components/common/icon";
 import { AppContainer } from "@/components/common/app-container";
 import { Logo } from "@/components/layout/logo";
 import { Text } from "@/components/common/text";
+import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
 import { getProjects } from "@/server/features/projects";
+import { getLandingChrome } from "@/server/features/project-landing";
+import { matchLanding } from "@/lib/landing";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { footerLinks } from "@/lib/footer-links";
 import { mailHref, socialProfiles, telHref } from "@/lib/contact";
+import { PATHNAME_HEADER } from "@/lib/not-found";
 
 /**
  * Footer.
@@ -28,12 +33,18 @@ import { mailHref, socialProfiles, telHref } from "@/lib/contact";
  * contact details into a cramped column.
  */
 export async function SiteFooter() {
+  const pathname = (await headers()).get(PATHNAME_HEADER) ?? "";
+  const locale = await getLocale();
+  const chrome = matchLanding(pathname, await getLandingChrome(locale));
+  if (chrome) {
+    return <LandingFooter chrome={chrome} />;
+  }
+
   // The project column is whatever is published, not a list typed in here:
   // a footer that still advertises a delivered project is worse than one with
   // a shorter column. Four, because that is what the column has room for.
-  const [dict, locale, projects] = await Promise.all([
+  const [dict, projects] = await Promise.all([
     getDictionary(),
-    getLocale(),
     getProjects({ isFooter: true, limit: 6, sort: "order" }),
   ]);
   const footerProjects = projects

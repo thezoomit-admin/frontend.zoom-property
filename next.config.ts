@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    qualities: [75, 90],
     remotePatterns: [
       { protocol: "http", hostname: "localhost", pathname: "/**" },
       { protocol: "http", hostname: "127.0.0.1", pathname: "/**" },

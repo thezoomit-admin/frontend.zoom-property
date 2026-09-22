@@ -172,6 +172,7 @@
   /* ------------------------------------------------------------------ */
   html {
     @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/35 hover:scrollbar-thumb-primary/60;
+    scrollbar-width: thin;
 
     /* Radius is set through the plugin's own custom property rather than its
      * `scrollbar-thumb-rounded-*` class: that utility is registered from the
@@ -188,6 +189,43 @@
      * visibly the fixed header — jumps sideways for as long as the overlay is
      * open. With `stable` the space stays whether or not the bar is drawn. */
     scrollbar-gutter: stable;
+  }
+
+  html::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Mobile thumbs use Embla — hide any leftover native bar. */
+  .az-thumb-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .az-thumb-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Desktop elevation rail only: a 3px track, never a fat OS bar. */
+  .az-thumb-scroll-y {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--brand-green) 35%, transparent) transparent;
+  }
+
+  .az-thumb-scroll-y::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  .az-thumb-scroll-y::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .az-thumb-scroll-y::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--brand-green) 40%, transparent);
   }
 
   /* ------------------------------------------------------------------ */
@@ -455,8 +493,10 @@ html.lenis body {
 /* …except inside a dialog. The rule above exists so the wheel keeps reaching
    the page over an embed; in a modal player it would also kill YouTube's own
    controls, and there is no page left to scroll behind it anyway. */
-.lenis.lenis-smooth [data-slot="dialog-content"] iframe {
+.lenis.lenis-smooth [data-slot="dialog-content"] iframe,
+.lenis.lenis-smooth [data-video-embed] iframe {
   pointer-events: auto;
 }
 
 @import './text-editor.css';
+@import './landing-custom.css';

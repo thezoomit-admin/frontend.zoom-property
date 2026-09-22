@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { CampaignMain } from "@/components/layout/campaign-main";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { ScrollToTop } from "@/components/motion/scroll-to-top";
@@ -15,6 +16,7 @@ import { LOCALES, LOCALE_TAGS } from "@/i18n/config";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { socialProfiles } from "@/lib/contact";
+import { getLandingChrome } from "@/server/features/project-landing";
 import { navLinks } from "@/lib/nav-links";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -72,7 +74,12 @@ export function generateStaticParams() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
-  const [locale, dict] = await Promise.all([getLocale(), getDictionary()]);
+  const locale = await getLocale();
+  const [dict, campaigns] = await Promise.all([
+    getDictionary(),
+    getLandingChrome(locale),
+  ]);
+  const campaignHrefs = campaigns.map((row) => row.href);
 
   return (
     <html
@@ -121,12 +128,18 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             dict={dict.nav}
             phone={dict.contact.details.phone}
             menu={navLinks(dict.nav.menu)}
+            campaigns={campaigns.map((row) => ({
+              path: row.href,
+              ctaLabel: row.ctaLabel,
+              ctaHref: "#enquire",
+              name: row.name,
+              location: row.location,
+              phone: row.phone,
+            }))}
           />
-          <main id="top" className="flex-1 pt-13.5 pb-18 sm:pt-17.5 lg:pb-0">
-            {children}
-          </main>
+          <CampaignMain campaignPaths={campaignHrefs}>{children}</CampaignMain>
           <SiteFooter />
-          <MobileBottomNav locale={locale} />
+          <MobileBottomNav locale={locale} campaignPaths={campaignHrefs} />
           <ContactDock />
           <ScrollToTop />
         </Providers>
