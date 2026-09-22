@@ -1107,11 +1107,14 @@
     "elevation": {
       "eyebrow": "Elevation",
       "title": "How the G+9 will stand",
-      "description": "Front, lake and approach elevations of the ten-storey block on 4.29 katha — the building Zoom is raising with the land-share buyers.",
+      "description": "Elevations of the ten-storey block on 4.29 katha — the building Zoom is raising with the land-share buyers. Pick a view, then open it.",
       "views": [
         { "label": "Front elevation", "hint": "From the road" },
         { "label": "Lake elevation", "hint": "Toward the 58 ft water" },
-        { "label": "Approach", "hint": "25 ft open front" }
+        { "label": "Approach", "hint": "25 ft open front" },
+        { "label": "Side elevation", "hint": "Along the plot" },
+        { "label": "Street massing", "hint": "How the block sits" },
+        { "label": "Dusk facade", "hint": "After the light drops" }
       ],
       "preview": "Preview photo",
       "close": "Close"

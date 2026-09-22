@@ -35,8 +35,20 @@ export const ZOOM_AL_ZAHARA_ELEVATIONS = [
     alt: "Lake elevation of Zoom Al-Zahra",
   },
   {
-    src: photo("photo-1464146072230-91cabc968346"),
+    src: photo("photo-1600596542815-ffad4c1539a9"),
     alt: "Approach elevation from the road",
+  },
+  {
+    src: photo("photo-1613490493576-7fde63acd811"),
+    alt: "Side elevation of the block",
+  },
+  {
+    src: photo("photo-1479839672679-a46483c0e7c8"),
+    alt: "Street massing of the G+9",
+  },
+  {
+    src: photo("photo-1486325212027-8081e485255e"),
+    alt: "Dusk facade of Zoom Al-Zahra",
   },
 ] as const;
 

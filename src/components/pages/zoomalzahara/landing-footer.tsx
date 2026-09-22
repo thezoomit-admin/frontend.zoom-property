@@ -21,79 +21,78 @@ export async function LandingFooter() {
   const links = [
     { href: "#about", label: copy.nav.about },
     { href: "#residences", label: copy.nav.residences },
-    { href: "#elevation", label: copy.nav.elevation },
     { href: "#video", label: copy.nav.video },
     { href: "#place", label: copy.nav.place },
     { href: "#enquire", label: copy.nav.enquire },
   ];
 
-  return (
-    <footer className="border-t border-footer-foreground/10 bg-footer pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-footer-foreground lg:pb-0">
-      <AppContainer className="py-10 sm:py-12">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
-          <div className="flex flex-col gap-4">
-            <a href={home} aria-label={copy.hero.title} className="w-fit">
-              <Logo variant="onDark" className="h-9 w-auto" />
-            </a>
-            <p className="font-heading text-lg font-bold">{copy.hero.title}</p>
-            <p className="max-w-md text-sm leading-relaxed text-footer-foreground/75">
-              {copy.hero.location}
-            </p>
-            <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:gap-3">
-              <a
-                href={telHref(primary)}
-                className="inline-flex items-center gap-2 text-sm hover:text-brand-green-light"
-              >
-                <Icon name="phone" size="xs" />
-                {primary}
-              </a>
-              <a
-                href={telHref(secondary)}
-                className="inline-flex items-center gap-2 text-sm hover:text-brand-green-light"
-              >
-                <Icon name="phone" size="xs" />
-                {secondary}
-              </a>
-              <a
-                href={whatsappHref(primary)}
-                className="inline-flex items-center gap-2 text-sm hover:text-brand-green-light"
-              >
-                <Icon name="whatsapp" size="xs" />
-                {copy.enquire.whatsappLabel}
-              </a>
-              <a
-                href={ZOOM_AL_ZAHARA_FACEBOOK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm hover:text-brand-green-light"
-              >
-                <Icon name="facebook" size="xs" />
-                Facebook
-              </a>
-            </div>
-          </div>
+  const pill =
+    "inline-flex h-8 items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 text-xs font-semibold text-footer-foreground transition-colors hover:bg-white/20";
 
-          <nav aria-label={copy.hero.title} className="grid grid-cols-2 gap-x-6 gap-y-2.5 self-end">
+  return (
+    <footer className="border-t border-footer-foreground/10 bg-footer pb-[env(safe-area-inset-bottom)] text-footer-foreground">
+      <AppContainer className="py-5 sm:py-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <a href={home} className="flex min-w-0 items-center gap-3">
+            <Logo variant="onDark" className="h-7 w-auto" />
+            <span className="min-w-0">
+              <span className="block font-heading text-sm font-bold">
+                {copy.hero.title}
+              </span>
+              <span className="block truncate text-xs text-footer-foreground/70">
+                {copy.hero.location}
+              </span>
+            </span>
+          </a>
+
+          <nav
+            aria-label={copy.hero.title}
+            className="flex flex-wrap items-center gap-x-4 gap-y-1"
+          >
             {links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-footer-foreground/75 transition-colors hover:text-brand-green-light"
+                className="text-xs font-semibold text-footer-foreground/75 transition-colors hover:text-brand-green-light"
               >
                 {link.label}
               </a>
             ))}
           </nav>
-        </div>
-      </AppContainer>
 
-      <div className="border-t border-footer-foreground/10">
-        <AppContainer className="py-4">
-          <p className="text-xs text-footer-foreground/60">
-            © {year} {copy.hero.title}
-          </p>
-        </AppContainer>
-      </div>
+          <div className="flex flex-wrap gap-2">
+            <a href={telHref(primary)} className={pill} aria-label={`${copy.enquire.phoneLabel} ${primary}`}>
+              <Icon name="phone" size="xs" />
+              {primary}
+            </a>
+            <a href={telHref(secondary)} className={pill} aria-label={`${copy.enquire.phoneLabel} ${secondary}`}>
+              <Icon name="phone" size="xs" />
+              {secondary}
+            </a>
+            <a
+              href={whatsappHref(primary)}
+              className={pill}
+              aria-label={`${copy.enquire.whatsappLabel} ${primary}`}
+            >
+              <Icon name="whatsapp" size="xs" />
+              {copy.enquire.whatsappLabel}
+            </a>
+            <a
+              href={ZOOM_AL_ZAHARA_FACEBOOK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={pill}
+            >
+              <Icon name="facebook" size="xs" />
+              Facebook
+            </a>
+          </div>
+        </div>
+
+        <p className="mt-4 text-[11px] text-footer-foreground/60">
+          © {year} {copy.hero.title}
+        </p>
+      </AppContainer>
     </footer>
   );
 }

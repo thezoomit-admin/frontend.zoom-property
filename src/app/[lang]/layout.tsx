@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { CampaignMain } from "@/components/layout/campaign-main";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { ScrollToTop } from "@/components/motion/scroll-to-top";
@@ -15,7 +16,7 @@ import { LOCALES, LOCALE_TAGS } from "@/i18n/config";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { socialProfiles } from "@/lib/contact";
-import { ZOOM_AL_ZAHARA_PATH } from "@/data/zoomalzahara";
+import { ZOOM_AL_ZAHARA_PATH, ZOOM_AL_ZAHARA_PHONES } from "@/data/zoomalzahara";
 import { navLinks } from "@/lib/nav-links";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -124,19 +125,13 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             menu={navLinks(dict.nav.menu)}
             campaign={{
               path: ZOOM_AL_ZAHARA_PATH,
-              links: [
-                { href: "#about", label: dict.zoomalzahara.nav.about },
-                { href: "#residences", label: dict.zoomalzahara.nav.residences },
-                { href: "#video", label: dict.zoomalzahara.nav.video },
-                { href: "#place", label: dict.zoomalzahara.nav.place },
-              ],
               ctaLabel: dict.zoomalzahara.nav.enquire,
               ctaHref: "#enquire",
+              location: dict.zoomalzahara.hero.location,
+              phones: [ZOOM_AL_ZAHARA_PHONES.primary, ZOOM_AL_ZAHARA_PHONES.secondary],
             }}
           />
-          <main id="top" className="flex-1 pt-13.5 pb-18 sm:pt-17.5 lg:pb-0">
-            {children}
-          </main>
+          <CampaignMain campaignPath={ZOOM_AL_ZAHARA_PATH}>{children}</CampaignMain>
           <SiteFooter />
           <MobileBottomNav
             locale={locale}

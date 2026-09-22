@@ -40,18 +40,20 @@ export function AppImage({
   onError,
   ...props
 }: AppImageProps) {
-  const [hasError, setHasError] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   // Safe fallback if src is missing or failed
   const resolved = typeof src === "string" ? resolveImageSrc(src) : src;
-  const imageSrc = !resolved || hasError ? fallbackSrc : resolved;
+  const resolvedKey = typeof resolved === "string" ? resolved : "";
+  const imageSrc =
+    !resolved || failedSrc === resolvedKey ? fallbackSrc : resolved;
 
   // Resolve blur placeholder
   const resolvedBlur =
     placeholder === "blur" ? (blurDataURL ?? shimmerDataUrl()) : blurDataURL;
 
   const handleError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    setHasError(true);
+    if (resolvedKey) setFailedSrc(resolvedKey);
     onError?.(e);
   };
 

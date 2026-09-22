@@ -28,13 +28,13 @@ export function MobileBottomNav({
 }) {
   const pathname = usePathname();
   const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
-  const items = campaignActive
-    ? campaign!.items
-    : navItems.map((item) => ({
-        href: localeHref(locale, item.href),
-        icon: item.icon,
-        label: locale === "bn" ? item.bn : item.en,
-      }));
+  if (campaignActive) return null;
+
+  const items = navItems.map((item) => ({
+    href: localeHref(locale, item.href),
+    icon: item.icon,
+    label: locale === "bn" ? item.bn : item.en,
+  }));
 
   return (
     <nav
@@ -43,9 +43,8 @@ export function MobileBottomNav({
     >
       <div className="mx-auto flex max-w-md items-stretch justify-between">
         {items.map((item) => {
-          const active = campaignActive
-            ? false
-            : item.href.endsWith("/") || item.href.split("/").filter(Boolean).length <= 1
+          const active =
+            item.href.endsWith("/") || item.href.split("/").filter(Boolean).length <= 1
               ? pathname === item.href
               : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -54,27 +53,17 @@ export function MobileBottomNav({
             active ? "text-primary" : "text-muted-foreground hover:text-foreground",
           );
 
-          const inner = (
-            <>
-              <span className={cn("flex size-8 items-center justify-center rounded-lg transition-colors", active && "bg-primary/10")}>
-                <Icon name={item.icon} size="sm" />
-              </span>
-              <span className="truncate">{item.label}</span>
-            </>
-          );
-
-          return campaignActive ? (
-            <a key={item.href} href={item.href} className={className}>
-              {inner}
-            </a>
-          ) : (
+          return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={className}
             >
-              {inner}
+              <span className={cn("flex size-8 items-center justify-center rounded-lg transition-colors", active && "bg-primary/10")}>
+                <Icon name={item.icon} size="sm" />
+              </span>
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}

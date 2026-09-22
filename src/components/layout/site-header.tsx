@@ -65,12 +65,14 @@ export function SiteHeader({
   phone: string;
   /** The menu itself, edited in the panel. Empty and no bar is drawn. */
   menu: NavLink[];
-  /** In-page nav used on a campaign landing (e.g. Zoom Al Zahara). */
+  /** Campaign landing chrome: logo, location, phones and a book CTA — no site nav. */
   campaign?: {
     path: string;
-    links: NavLink[];
+    links?: NavLink[];
     ctaLabel: string;
     ctaHref: string;
+    location?: string;
+    phones?: string[];
   };
 }) {
   const [open, setOpen] = useState(false);
@@ -103,10 +105,12 @@ export function SiteHeader({
 
   const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
   const home = localeHref(locale, campaignActive ? campaign!.path : "/");
-  const navItems = campaignActive ? campaign!.links : menu;
+  const navItems = campaignActive ? [] : menu;
   const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");
   const ctaLabel = campaignActive ? campaign!.ctaLabel : dict.bookViewing;
   const hideOnScroll = campaignActive ? false : hidden;
+  const campaignPhones = campaignActive ? (campaign?.phones ?? []) : [];
+  const campaignLocation = campaignActive ? campaign?.location : undefined;
 
   return (
     <motion.header
@@ -150,45 +154,76 @@ export function SiteHeader({
           />
         </Link>
 
-        <nav className="hidden items-center gap-1.5 lg:flex">
-          {navItems.map((item) => {
-            const href = campaignActive ? item.href : localeHref(locale, item.href);
-            const active =
-              !campaignActive && (pathname === href || pathname.startsWith(`${href}/`));
-            const className = cn(
-              "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
-              active
-                ? "bg-primary/[0.08] font-semibold text-primary"
-                : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-            );
-            return campaignActive ? (
-              <a key={`${item.href}-${item.label}`} href={href} className={className}>
-                <span>{item.label}</span>
-              </a>
-            ) : (
-              <Link key={`${item.href}-${item.label}`} href={href} className={className}>
-                <span>{item.label}</span>
-                {active && (
-                  <motion.span
-                    layoutId="activeNavIndicator"
-                    className="absolute bottom-0 left-3 right-3 h-[2.5px] rounded-full bg-primary shadow-xs"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        {campaignActive ? (
+          <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 lg:flex">
+            {campaignLocation ? (
+              <p className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Icon name="location" size="xs" className="text-primary" />
+                <span className="truncate">{campaignLocation}</span>
+              </p>
+            ) : null}
+            <div className="flex items-center gap-1.5">
+              {campaignPhones.map((number) => (
+                <a
+                  key={number}
+                  href={telHref(number)}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted/50"
+                >
+                  <Icon name="phone" size="xs" className="text-primary" />
+                  {number}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <nav className="hidden items-center gap-1.5 lg:flex">
+            {navItems.map((item) => {
+              const href = localeHref(locale, item.href);
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={`${item.href}-${item.label}`}
+                  href={href}
+                  className={cn(
+                    "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
+                    active
+                      ? "bg-primary/[0.08] font-semibold text-primary"
+                      : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                  )}
+                >
+                  <span>{item.label}</span>
+                  {active && (
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute bottom-0 left-3 right-3 h-[2.5px] rounded-full bg-primary shadow-xs"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
 
         <div className="flex items-center gap-1">
           {/* whitespace-nowrap keeps the number on one line at every width. */}
-          <a
-            href={telHref(phone)}
-            className="hidden items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted xl:flex"
-          >
-            <Icon name="phone" size="xs" />
-            {phone}
-          </a>
+          {!campaignActive ? (
+            <a
+              href={telHref(phone)}
+              className="hidden items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted xl:flex"
+            >
+              <Icon name="phone" size="xs" />
+              {phone}
+            </a>
+          ) : campaignPhones[0] ? (
+            <a
+              href={telHref(campaignPhones[0])}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground lg:hidden"
+            >
+              <Icon name="phone" size="xs" className="text-primary" />
+              <span className="hidden sm:inline">{campaignPhones[0]}</span>
+            </a>
+          ) : null}
 
           <LanguageSwitcher
             locale={locale}
@@ -196,7 +231,11 @@ export function SiteHeader({
             onDark={false}
           />
 
-          <Button size="lg" className="ml-1 hidden font-medium sm:inline-flex" asChild>
+          <Button
+            size="lg"
+            className={cn("ml-1 font-medium", !campaignActive && "hidden sm:inline-flex")}
+            asChild
+          >
             {campaignActive ? (
               <a href={ctaHref}>{ctaLabel}</a>
             ) : (
@@ -204,6 +243,7 @@ export function SiteHeader({
             )}
           </Button>
 
+          {campaignActive ? null : (
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button
@@ -278,6 +318,7 @@ export function SiteHeader({
               </div>
             </SheetContent>
           </Sheet>
+          )}
         </div>
       </AppContainer>
     </motion.header>
