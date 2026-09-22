@@ -27,6 +27,7 @@ const ROUTES = [
   "/reviews",
   "/terms",
   "/privacy",
+  "/zoomalzahara",
 ] as const;
 
 const url = (locale: string, route: string) =>

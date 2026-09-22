@@ -16,8 +16,25 @@ const navItems = [
   { href: "/contact", icon: "mail", en: "Contact", bn: "যোগাযোগ" },
 ] as const;
 
-export function MobileBottomNav({ locale }: { locale: Locale }) {
+export function MobileBottomNav({
+  locale,
+  campaign,
+}: {
+  locale: Locale;
+  campaign?: {
+    path: string;
+    items: { href: string; icon: string; label: string }[];
+  };
+}) {
   const pathname = usePathname();
+  const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
+  const items = campaignActive
+    ? campaign!.items
+    : navItems.map((item) => ({
+        href: localeHref(locale, item.href),
+        icon: item.icon,
+        label: locale === "bn" ? item.bn : item.en,
+      }));
 
   return (
     <nav
@@ -25,24 +42,39 @@ export function MobileBottomNav({ locale }: { locale: Locale }) {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-lg lg:hidden"
     >
       <div className="mx-auto flex max-w-md items-stretch justify-between">
-        {navItems.map((item) => {
-          const href = localeHref(locale, item.href);
-          const active = item.href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+        {items.map((item) => {
+          const active = campaignActive
+            ? false
+            : item.href.endsWith("/") || item.href.split("/").filter(Boolean).length <= 1
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-          return (
-            <Link
-              key={item.href}
-              href={href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg py-1.5 text-[10px] font-medium transition-colors",
-                active ? "text-primary" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
+          const className = cn(
+            "flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg py-1.5 text-[10px] font-medium transition-colors",
+            active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+          );
+
+          const inner = (
+            <>
               <span className={cn("flex size-8 items-center justify-center rounded-lg transition-colors", active && "bg-primary/10")}>
                 <Icon name={item.icon} size="sm" />
               </span>
-              <span className="truncate">{locale === "bn" ? item.bn : item.en}</span>
+              <span className="truncate">{item.label}</span>
+            </>
+          );
+
+          return campaignActive ? (
+            <a key={item.href} href={item.href} className={className}>
+              {inner}
+            </a>
+          ) : (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={className}
+            >
+              {inner}
             </Link>
           );
         })}

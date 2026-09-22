@@ -455,7 +455,8 @@ html.lenis body {
 /* …except inside a dialog. The rule above exists so the wheel keeps reaching
    the page over an embed; in a modal player it would also kill YouTube's own
    controls, and there is no page left to scroll behind it anyway. */
-.lenis.lenis-smooth [data-slot="dialog-content"] iframe {
+.lenis.lenis-smooth [data-slot="dialog-content"] iframe,
+.lenis.lenis-smooth [data-video-embed] iframe {
   pointer-events: auto;
 }
 

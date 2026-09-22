@@ -15,6 +15,7 @@ import { LOCALES, LOCALE_TAGS } from "@/i18n/config";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { socialProfiles } from "@/lib/contact";
+import { ZOOM_AL_ZAHARA_PATH } from "@/data/zoomalzahara";
 import { navLinks } from "@/lib/nav-links";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -121,12 +122,35 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             dict={dict.nav}
             phone={dict.contact.details.phone}
             menu={navLinks(dict.nav.menu)}
+            campaign={{
+              path: ZOOM_AL_ZAHARA_PATH,
+              links: [
+                { href: "#about", label: dict.zoomalzahara.nav.about },
+                { href: "#residences", label: dict.zoomalzahara.nav.residences },
+                { href: "#video", label: dict.zoomalzahara.nav.video },
+                { href: "#place", label: dict.zoomalzahara.nav.place },
+              ],
+              ctaLabel: dict.zoomalzahara.nav.enquire,
+              ctaHref: "#enquire",
+            }}
           />
           <main id="top" className="flex-1 pt-13.5 pb-18 sm:pt-17.5 lg:pb-0">
             {children}
           </main>
           <SiteFooter />
-          <MobileBottomNav locale={locale} />
+          <MobileBottomNav
+            locale={locale}
+            campaign={{
+              path: ZOOM_AL_ZAHARA_PATH,
+              items: [
+                { href: "#about", icon: "location", label: dict.zoomalzahara.nav.about },
+                { href: "#residences", icon: "building", label: dict.zoomalzahara.nav.residences },
+                { href: "#video", icon: "play", label: dict.zoomalzahara.nav.video },
+                { href: "#place", icon: "area", label: dict.zoomalzahara.nav.place },
+                { href: "#enquire", icon: "mail", label: dict.zoomalzahara.nav.enquire },
+              ],
+            }}
+          />
           <ContactDock />
           <ScrollToTop />
         </Providers>

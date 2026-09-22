@@ -1,4 +1,21 @@
-export type VideoProvider = "youtube" | "vimeo";
+export type VideoProvider = "youtube" | "vimeo" | "facebook";
+
+/** Facebook plugin player for a public video or reel URL. */
+export function facebookEmbedUrl(
+  pageUrl: string,
+  size: { width?: number; height?: number } = {},
+) {
+  const width = String(size.width ?? 267);
+  const height = String(size.height ?? 476);
+  const params = new URLSearchParams({
+    href: pageUrl,
+    show_text: "false",
+    width,
+    height,
+    t: "0",
+  });
+  return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
+}
 
 /** Extracts the video id from the common YouTube / Vimeo URL shapes. */
 export function parseVideoId(url: string, provider: VideoProvider) {

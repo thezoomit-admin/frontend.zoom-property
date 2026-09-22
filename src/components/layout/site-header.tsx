@@ -58,12 +58,20 @@ export function SiteHeader({
   dict,
   phone,
   menu,
+  campaign,
 }: {
   locale: Locale;
   dict: NavDict;
   phone: string;
   /** The menu itself, edited in the panel. Empty and no bar is drawn. */
   menu: NavLink[];
+  /** In-page nav used on a campaign landing (e.g. Zoom Al Zahara). */
+  campaign?: {
+    path: string;
+    links: NavLink[];
+    ctaLabel: string;
+    ctaHref: string;
+  };
 }) {
   const [open, setOpen] = useState(false);
   const { direction, scrolledPast } = useScrollDirection();
@@ -93,16 +101,21 @@ export function SiteHeader({
     return () => lenis.start();
   }, [open, lenis]);
 
-  const home = localeHref(locale, "/");
+  const campaignActive = Boolean(campaign && pathname.includes(campaign.path));
+  const home = localeHref(locale, campaignActive ? campaign!.path : "/");
+  const navItems = campaignActive ? campaign!.links : menu;
+  const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");
+  const ctaLabel = campaignActive ? campaign!.ctaLabel : dict.bookViewing;
+  const hideOnScroll = campaignActive ? false : hidden;
 
   return (
     <motion.header
       initial={false}
-      animate={{ y: hidden ? "-100%" : "0%" }}
+      animate={{ y: hideOnScroll ? "-100%" : "0%" }}
       transition={
         prefersReducedMotion
           ? { duration: 0 }
-          : hidden
+          : hideOnScroll
             ? { duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }
             : { duration: 0.32, ease: [0.16, 1, 0.3, 1] }
       }
@@ -138,20 +151,22 @@ export function SiteHeader({
         </Link>
 
         <nav className="hidden items-center gap-1.5 lg:flex">
-          {menu.map((item) => {
-            const href = localeHref(locale, item.href);
-            const active = pathname === href || pathname.startsWith(`${href}/`);
-            return (
-              <Link
-                key={`${item.href}-${item.label}`}
-                href={href}
-                className={cn(
-                  "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
-                  active
-                    ? "bg-primary/[0.08] font-semibold text-primary"
-                    : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-                )}
-              >
+          {navItems.map((item) => {
+            const href = campaignActive ? item.href : localeHref(locale, item.href);
+            const active =
+              !campaignActive && (pathname === href || pathname.startsWith(`${href}/`));
+            const className = cn(
+              "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
+              active
+                ? "bg-primary/[0.08] font-semibold text-primary"
+                : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+            );
+            return campaignActive ? (
+              <a key={`${item.href}-${item.label}`} href={href} className={className}>
+                <span>{item.label}</span>
+              </a>
+            ) : (
+              <Link key={`${item.href}-${item.label}`} href={href} className={className}>
                 <span>{item.label}</span>
                 {active && (
                   <motion.span
@@ -182,7 +197,11 @@ export function SiteHeader({
           />
 
           <Button size="lg" className="ml-1 hidden font-medium sm:inline-flex" asChild>
-            <Link href={localeHref(locale, "/contact")}>{dict.bookViewing}</Link>
+            {campaignActive ? (
+              <a href={ctaHref}>{ctaLabel}</a>
+            ) : (
+              <Link href={ctaHref}>{ctaLabel}</Link>
+            )}
           </Button>
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -204,25 +223,34 @@ export function SiteHeader({
               </SheetHeader>
 
               <nav className="flex flex-col gap-1 py-4">
-                {menu.map((item) => {
-                  const href = localeHref(locale, item.href);
-                  const active = pathname === href || pathname.startsWith(`${href}/`);
-                  return (
+                {navItems.map((item) => {
+                  const href = campaignActive ? item.href : localeHref(locale, item.href);
+                  const active =
+                    !campaignActive && (pathname === href || pathname.startsWith(`${href}/`));
+                  const className = cn(
+                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all",
+                    active
+                      ? "bg-primary/[0.08] font-semibold text-primary border-l-4 border-primary pl-3"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium",
+                  );
+                  return campaignActive ? (
+                    <a
+                      key={`${item.href}-${item.label}`}
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      className={className}
+                    >
+                      <span>{item.label}</span>
+                    </a>
+                  ) : (
                     <Link
                       key={`${item.href}-${item.label}`}
                       href={href}
                       onClick={() => setOpen(false)}
-                      className={cn(
-                        "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all",
-                        active
-                          ? "bg-primary/[0.08] font-semibold text-primary border-l-4 border-primary pl-3"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium",
-                      )}
+                      className={className}
                     >
                       <span>{item.label}</span>
-                      {active && (
-                        <span className="size-1.5 rounded-full bg-primary" />
-                      )}
+                      {active && <span className="size-1.5 rounded-full bg-primary" />}
                     </Link>
                   );
                 })}
@@ -237,9 +265,15 @@ export function SiteHeader({
                     {phone}
                   </a>
                 <Button size="lg" className="w-full" style={{ height: "42px" }} asChild>
-                  <Link href={localeHref(locale, "/contact")} onClick={() => setOpen(false)}>
-                    {dict.bookViewing}
-                  </Link>
+                  {campaignActive ? (
+                    <a href={ctaHref} onClick={() => setOpen(false)}>
+                      {ctaLabel}
+                    </a>
+                  ) : (
+                    <Link href={ctaHref} onClick={() => setOpen(false)}>
+                      {ctaLabel}
+                    </Link>
+                  )}
                 </Button>
               </div>
             </SheetContent>

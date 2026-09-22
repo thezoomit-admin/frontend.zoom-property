@@ -15,7 +15,7 @@ import type { ApiEnvelope, ApiMeta, QueryParams } from "./types";
 const BASE =
   process.env.API_URL ??
   process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:5008/api";
+  "http://localhost:5009/api";
 
 /**
  * The backstop refresh, in seconds.

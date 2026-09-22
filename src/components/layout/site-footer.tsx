@@ -1,14 +1,18 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 
 import { Icon } from "@/components/common/icon";
 import { AppContainer } from "@/components/common/app-container";
 import { Logo } from "@/components/layout/logo";
 import { Text } from "@/components/common/text";
+import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
+import { ZOOM_AL_ZAHARA_PATH } from "@/data/zoomalzahara";
 import { getProjects } from "@/server/features/projects";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { footerLinks } from "@/lib/footer-links";
 import { mailHref, socialProfiles, telHref } from "@/lib/contact";
+import { PATHNAME_HEADER } from "@/lib/not-found";
 
 /**
  * Footer.
@@ -28,6 +32,11 @@ import { mailHref, socialProfiles, telHref } from "@/lib/contact";
  * contact details into a cramped column.
  */
 export async function SiteFooter() {
+  const pathname = (await headers()).get(PATHNAME_HEADER) ?? "";
+  if (pathname.includes(ZOOM_AL_ZAHARA_PATH)) {
+    return <LandingFooter />;
+  }
+
   // The project column is whatever is published, not a list typed in here:
   // a footer that still advertises a delivered project is worse than one with
   // a shorter column. Four, because that is what the column has room for.
