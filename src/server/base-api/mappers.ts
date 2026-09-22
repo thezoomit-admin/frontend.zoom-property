@@ -20,6 +20,11 @@ const R2_PUBLIC_FALLBACK = "https://pub-fe014e73b16347aab5e799483354b483.r2.dev"
  */
 const STALE_R2_HOSTS = new Set(["pub-5b52277bf86041a0b4872bee7a979553.r2.dev"]);
 
+/**
+ * Prefer env when it points at a live bucket. Hosting still injects a retired
+ * `NEXT_PUBLIC_R2_PUBLIC_URL` on build — that made every key 404 and AppImage
+ * replaced CMS photos with its Unsplash default.
+ */
 const r2PublicBase = (): string => {
   const configured = String(process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "")
     .trim()

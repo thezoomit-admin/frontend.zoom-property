@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export interface AppImageProps extends Omit<NextImageProps, "src"> {
   src: NextImageProps["src"] | string | null | undefined;
+  /** Optional. Never defaults to a stock Unsplash photo — that hid real media. */
   fallbackSrc?: string;
 }
 
@@ -42,13 +43,17 @@ export function resolveImageSrc(src: string | null | undefined): string {
     return src;
   }
   const clean = src.replace(/^\/+/, "");
+  // Relative media keys belong on R2, not the API host (which 404s /uploads/…).
+  if (clean.includes("-") || /\.(avif|webp|jpe?g|png|gif)$/i.test(clean)) {
+    return `${R2_PUBLIC_FALLBACK}/${clean}`;
+  }
   return `${SERVER_URL}/${clean}`;
 }
 
 export function AppImage({
   src,
   alt = "",
-  fallbackSrc = "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80",
+  fallbackSrc,
   placeholder,
   blurDataURL,
   className,
@@ -57,13 +62,13 @@ export function AppImage({
 }: AppImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  // Safe fallback if src is missing or failed
   const resolved = typeof src === "string" ? resolveImageSrc(src) : src;
   const resolvedKey = typeof resolved === "string" ? resolved : "";
-  const imageSrc =
-    !resolved || failedSrc === resolvedKey ? fallbackSrc : resolved;
+  const primaryFailed = Boolean(resolvedKey && failedSrc === resolvedKey);
+  const imageSrc = primaryFailed
+    ? fallbackSrc || ""
+    : resolved || fallbackSrc || "";
 
-  // Resolve blur placeholder
   const resolvedBlur =
     placeholder === "blur" ? (blurDataURL ?? shimmerDataUrl()) : blurDataURL;
 
@@ -71,6 +76,17 @@ export function AppImage({
     if (resolvedKey) setFailedSrc(resolvedKey);
     onError?.(e);
   };
+
+  // No stock “default house” photo — missing/broken media stays empty muted.
+  if (!imageSrc) {
+    return (
+      <span
+        aria-hidden
+        className={cn("block size-full bg-muted", className)}
+        style={props.fill ? { position: "absolute", inset: 0 } : undefined}
+      />
+    );
+  }
 
   const isLocal =
     typeof imageSrc === "string" &&
