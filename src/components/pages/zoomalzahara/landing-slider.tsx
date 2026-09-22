@@ -70,10 +70,17 @@ export function LandingSlider({
     >
       <Carousel
         setApi={setApi}
-        opts={{ align: "start", loop: true, skipSnaps: false }}
-        className="px-0"
+        opts={{
+          align: "start",
+          loop: true,
+          skipSnaps: false,
+          duration: 22,
+          containScroll: "trimSnaps",
+        }}
+        className="cursor-grab px-0 touch-pan-x active:cursor-grabbing"
+        data-lenis-prevent
       >
-        <CarouselContent className="-ml-3">
+        <CarouselContent className="-ml-3 select-none">
           {items.map((child, index) => (
             <CarouselItem
               key={index}

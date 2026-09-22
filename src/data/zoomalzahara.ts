@@ -141,3 +141,6 @@ export const ZOOM_AL_ZAHARA_AMENITY_ICONS: IconName[] = [
 
 export const ZOOM_AL_ZAHARA_MAP_EMBED =
   "https://maps.google.com/maps?q=Basila%20Garden%20City%20Mohammadpur%20Dhaka&hl=en&z=16&output=embed";
+
+export const ZOOM_AL_ZAHARA_MAP_LINK =
+  "https://www.google.com/maps/search/?api=1&query=Basila%20Garden%20City%20Mohammadpur%20Dhaka";

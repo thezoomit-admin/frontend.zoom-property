@@ -27,11 +27,13 @@ import {
   ZOOM_AL_ZAHARA_AMENITY_ICONS,
   ZOOM_AL_ZAHARA_HERO,
   ZOOM_AL_ZAHARA_MAP_EMBED,
+  ZOOM_AL_ZAHARA_MAP_LINK,
   ZOOM_AL_ZAHARA_PHONES,
   ZOOM_AL_ZAHARA_STAT_ICONS,
 } from "@/data/zoomalzahara";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { telHref, whatsappHref } from "@/lib/contact";
+import { cn } from "@/lib/utils";
 
 export function ZoomAlZaharaLanding({
   dict,
@@ -424,17 +426,74 @@ function Place({
             </ol>
           </div>
         </div>
-        <div className={`min-h-64 overflow-hidden sm:min-h-88 lg:col-span-7 lg:min-h-full ${landingCardClass}`}>
-          <iframe
-            src={ZOOM_AL_ZAHARA_MAP_EMBED}
-            title={location.title}
-            width="100%"
-            height="100%"
-            className="h-full min-h-64 w-full sm:min-h-88 lg:min-h-160"
-            style={{ border: 0 }}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+        <div
+          className={cn(
+            "flex min-h-80 flex-col overflow-hidden sm:min-h-96 lg:col-span-7 lg:min-h-full",
+            "ring-1 ring-primary/25",
+            landingCardClass,
+          )}
+        >
+          <div className="flex items-center gap-3 border-b border-primary/15 bg-linear-to-r from-primary/12 via-card to-card px-4 py-3">
+            <span className="relative flex size-10 shrink-0 items-center justify-center">
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-full bg-primary/25 ring-4 ring-primary/15"
+              />
+              <span className="relative flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/30">
+                <Icon name="fa-solid fa-location-dot" size="sm" />
+              </span>
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
+                {location.eyebrow}
+              </p>
+              <p className="truncate font-heading text-sm font-extrabold text-foreground">
+                {location.title}
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm" className="shrink-0">
+              <a
+                href={ZOOM_AL_ZAHARA_MAP_LINK}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {location.mapOpen}
+                <Icon name="arrowUpRight" size="xs" />
+              </a>
+            </Button>
+          </div>
+          <div className="relative min-h-72 flex-1 overflow-hidden sm:min-h-88 lg:min-h-160">
+            <iframe
+              src={ZOOM_AL_ZAHARA_MAP_EMBED}
+              title={location.title}
+              width="100%"
+              height="100%"
+              allowFullScreen
+              data-lenis-prevent
+              className="absolute inset-0 size-full"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-primary/20"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-linear-to-b from-primary/10 to-transparent"
+            />
+            <div className="pointer-events-none absolute inset-x-3 bottom-3 sm:inset-x-4 sm:bottom-4">
+              <p className="inline-flex max-w-full items-center gap-2 rounded-lg border border-white/25 bg-background/90 px-3 py-2 text-xs font-semibold text-foreground shadow-lg shadow-black/10 backdrop-blur-md">
+                <Icon
+                  name="fa-solid fa-location-dot"
+                  size="xs"
+                  className="shrink-0 text-primary"
+                />
+                <span className="truncate">{location.mapHint}</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </Section>

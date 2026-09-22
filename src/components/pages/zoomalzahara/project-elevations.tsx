@@ -6,6 +6,7 @@ import { Icon } from "@/components/common/icon";
 import { ImageFrame } from "@/components/media/image-frame";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import { ImagePreview } from "@/components/pages/zoomalzahara/image-preview";
+import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
 import { ZOOM_AL_ZAHARA_ELEVATIONS } from "@/data/zoomalzahara";
 import { cn } from "@/lib/utils";
 
@@ -85,50 +86,47 @@ export function ProjectElevations({
           </div>
 
           {hasRail ? (
-            <ul
-              className={cn(
-                "az-thumb-scroll flex gap-2 overflow-x-auto snap-x snap-mandatory overscroll-x-contain",
-                "lg:h-120 lg:snap-none lg:flex-col lg:overflow-x-hidden",
-                railScrolls
-                  ? "lg:overflow-y-auto lg:pr-0.5"
-                  : "lg:overflow-hidden",
-              )}
-            >
-              {images.map((image, viewIndex) => {
-                const selected = viewIndex === index;
-                const itemCopy = views[viewIndex];
-
-                return (
+            <>
+              <div className="lg:hidden">
+                <ThumbRail desktop="none" className="mt-0">
+                  {images.map((image, viewIndex) => (
+                    <ElevationThumb
+                      key={`${viewIndex}-${image.src}`}
+                      image={image}
+                      label={views[viewIndex]?.label ?? image.alt}
+                      selected={viewIndex === index}
+                      onSelect={() => setIndex(viewIndex)}
+                      sizes="31vw"
+                      className="h-20"
+                    />
+                  ))}
+                </ThumbRail>
+              </div>
+              <ul
+                className={cn(
+                  "hidden lg:flex lg:h-120 lg:flex-col lg:gap-2",
+                  railScrolls
+                    ? "az-thumb-scroll-y lg:overflow-y-auto lg:pr-0.5"
+                    : "lg:overflow-hidden",
+                )}
+              >
+                {images.map((image, viewIndex) => (
                   <li
                     key={`${viewIndex}-${image.src}`}
-                    className="relative h-20 w-[31%] shrink-0 snap-start lg:h-[calc((100%-1.5rem)/4)] lg:w-auto lg:min-h-0 lg:shrink-0 lg:snap-normal"
+                    className="relative h-[calc((100%-1.5rem)/4)] min-h-0 shrink-0"
                   >
-                    <ImageFrame
-                      src={image.src}
-                      alt={image.alt}
-                      ratio="auto"
-                      rounded="md"
-                      hover="none"
-                      overlay
-                      sizes="(min-width: 1024px) 14vw, 31vw"
-                      className="size-full rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setIndex(viewIndex)}
-                      aria-pressed={selected}
-                      aria-label={itemCopy?.label ?? image.alt}
-                      className={cn(
-                        "absolute inset-0 z-20 cursor-pointer rounded-md ring-2 ring-inset transition-all",
-                        selected
-                          ? "ring-primary"
-                          : "ring-transparent hover:ring-foreground/30",
-                      )}
+                    <ElevationThumb
+                      image={image}
+                      label={views[viewIndex]?.label ?? image.alt}
+                      selected={viewIndex === index}
+                      onSelect={() => setIndex(viewIndex)}
+                      sizes="14vw"
+                      className="h-full"
                     />
                   </li>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
+            </>
           ) : null}
         </div>
       </div>
@@ -141,5 +139,48 @@ export function ProjectElevations({
         closeLabel={closeLabel}
       />
     </>
+  );
+}
+
+function ElevationThumb({
+  image,
+  label,
+  selected,
+  onSelect,
+  sizes,
+  className,
+}: {
+  image: { src: string; alt: string };
+  label: string;
+  selected: boolean;
+  onSelect: () => void;
+  sizes: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative overflow-hidden rounded-md", className)}>
+      <ImageFrame
+        src={image.src}
+        alt={image.alt}
+        ratio="auto"
+        rounded="md"
+        hover="none"
+        overlay
+        sizes={sizes}
+        className="size-full rounded-md"
+      />
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
+        aria-label={label}
+        className={cn(
+          "absolute inset-0 z-20 cursor-pointer rounded-md ring-2 ring-inset transition-all duration-300",
+          selected
+            ? "ring-primary"
+            : "ring-transparent hover:ring-foreground/30",
+        )}
+      />
+    </div>
   );
 }

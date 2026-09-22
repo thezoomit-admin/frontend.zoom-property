@@ -1200,6 +1200,8 @@
       "eyebrow": "Where it sits",
       "title": "Basila Garden City, Mohammadpur",
       "description": "Inside Dhaka, not a new-town access road. Dhanmondi 27 is 3.6 km — about 11 minutes. The times below are the ones Zoom published with the project.",
+      "mapOpen": "Open in Maps",
+      "mapHint": "Basila Garden City · Mohammadpur",
       "facts": [
         { "label": "Dhanmondi 27", "value": "11 minutes" },
         { "label": "Farmgate", "value": "19 minutes" },
