@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import { trackMeta } from "@/components/analytics/meta-pixel";
 import { submitContactForm } from "@/server/features/inquiries/action";
+import { cn } from "@/lib/utils";
 
 interface LeadFormDict {
   name: string;
@@ -35,12 +36,15 @@ export function ZoomAlZaharaLeadForm({
   source,
   path,
   variant = "default",
+  glass = false,
 }: {
   dict: LeadFormDict;
   projectName: string;
   source: string;
   path: string;
   variant?: "default" | "compact";
+  /** Frosted fields for the glassified landing hero. */
+  glass?: boolean;
 }) {
   const compact = variant === "compact";
   const id = compact ? "azh" : "az";
@@ -85,6 +89,10 @@ export function ZoomAlZaharaLeadForm({
     setSubmitting(false);
   }
 
+  const fieldClass = glass
+    ? "border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:border-white/40"
+    : undefined;
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -95,16 +103,17 @@ export function ZoomAlZaharaLeadForm({
       }
     >
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-        <Field id={`${id}-name`} label={dict.name} required>
+        <Field id={`${id}-name`} label={dict.name} required glass={glass}>
           <Input
             id={`${id}-name`}
             name="name"
             required
             autoComplete="name"
             placeholder={dict.namePlaceholder}
+            className={fieldClass}
           />
         </Field>
-        <Field id={`${id}-phone`} label={dict.phone} required>
+        <Field id={`${id}-phone`} label={dict.phone} required glass={glass}>
           <PhoneNumberInput
             id={`${id}-phone`}
             name="phone"
@@ -112,21 +121,23 @@ export function ZoomAlZaharaLeadForm({
             onChange={setPhone}
             required
             placeholder="01712-345678"
+            className={glass ? "PhoneNumberInput--glass" : undefined}
           />
         </Field>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-        <Field id={`${id}-email`} label={dict.email}>
+        <Field id={`${id}-email`} label={dict.email} glass={glass}>
           <Input
             id={`${id}-email`}
             name="email"
             type="email"
             autoComplete="email"
             placeholder="you@domain.com"
+            className={fieldClass}
           />
         </Field>
-        <Field id={`${id}-plan`} label={dict.plan || "Plan"}>
+        <Field id={`${id}-plan`} label={dict.plan || "Plan"} glass={glass}>
           <div className="relative">
             <Input
               id={`${id}-plan`}
@@ -134,23 +145,31 @@ export function ZoomAlZaharaLeadForm({
               value={projectName}
               readOnly
               tabIndex={-1}
-              className="cursor-pointer bg-muted/40 pr-10 font-medium text-foreground"
+              className={cn(
+                "cursor-pointer pr-10 font-medium",
+                glass
+                  ? "border-white/20 bg-white/15 text-white"
+                  : "bg-muted/40 text-foreground",
+              )}
             />
             <Icon
               name="building"
               size="sm"
-              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-primary"
+              className={cn(
+                "pointer-events-none absolute top-1/2 right-3 -translate-y-1/2",
+                glass ? "text-white/80" : "text-primary",
+              )}
             />
           </div>
         </Field>
       </div>
 
-      <Field id={`${id}-message`} label={dict.message}>
+      <Field id={`${id}-message`} label={dict.message} glass={glass}>
         <Textarea
           id={`${id}-message`}
           name="message"
           placeholder={dict.messagePlaceholder}
-          className={compact ? "min-h-20" : undefined}
+          className={cn(compact ? "min-h-20" : undefined, fieldClass)}
         />
       </Field>
 
@@ -159,7 +178,9 @@ export function ZoomAlZaharaLeadForm({
         <Icon name="arrowRight" size="xs" />
       </Button>
 
-      <p className="text-xs text-muted-foreground">{dict.privacy}</p>
+      <p className={cn("text-xs", glass ? "text-white/55" : "text-muted-foreground")}>
+        {dict.privacy}
+      </p>
     </form>
   );
 }
@@ -168,19 +189,21 @@ function Field({
   id,
   label,
   required,
+  glass,
   children,
 }: {
   id: string;
   label: string;
   required?: boolean;
+  glass?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>
+      <Label htmlFor={id} className={glass ? "text-white/80" : undefined}>
         {label}
         {required ? (
-          <span aria-hidden className="text-destructive">
+          <span aria-hidden className={glass ? "text-red-300" : "text-destructive"}>
             *
           </span>
         ) : null}

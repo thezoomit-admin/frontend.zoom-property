@@ -554,6 +554,27 @@ html.lenis body {
   background: color-mix(in oklab, var(--input) 50%, transparent);
 }
 
+/* Glass phone field (home hero frosted panel) */
+.PhoneNumberInput--glass .PhoneNumberInput-control.PhoneInput {
+  border-color: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.1);
+}
+.PhoneNumberInput--glass .PhoneNumberInput-control.PhoneInput:focus-within {
+  border-color: rgb(255 255 255 / 0.4);
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.12);
+}
+.PhoneNumberInput--glass .PhoneNumberInput-control .PhoneInputInput {
+  color: #fff;
+}
+.PhoneNumberInput--glass .PhoneNumberInput-control .PhoneInputInput::placeholder {
+  color: rgb(255 255 255 / 0.4);
+}
+.PhoneNumberInput--glass .PhoneInputCountryIcon,
+.PhoneNumberInput--glass .PhoneInputCountrySelectArrow {
+  opacity: 0.85;
+  filter: brightness(1.15);
+}
+
 /* Sonner — brand primary success toast (bottom-right) */
 [data-sonner-toaster][data-y-position="bottom"] {
   bottom: 1.25rem !important;

@@ -153,17 +153,35 @@ function Hero({ landing }: { landing: LandingView }) {
           className="absolute inset-0 h-full w-full object-cover object-[center_55%] sm:object-[center_68%]"
         />
       ) : null}
-      {/* Desktop wash — keep the photo visible on the right */}
-      <div className="absolute inset-0 hidden bg-linear-to-r from-black/62 via-black/38 to-black/12 lg:block" />
-      <div className="absolute inset-0 hidden bg-linear-to-t from-black/55 via-black/10 to-black/20 lg:block" />
-      {/* Mobile wash — darker + soft bottom blur so copy stays readable */}
+      {/* Desktop — primary heavy, black medium, secondary light (no blur) */}
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden bg-black/65 lg:block"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden bg-primary/55 lg:block"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden bg-secondary/12 lg:block"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden bg-linear-to-r from-black/40 via-primary/30 to-secondary/8 lg:block"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 hidden bg-linear-to-t from-black/65 via-primary/20 to-transparent lg:block"
+      />
+      {/* Mobile — same readable wash as before */}
       <div
         aria-hidden
         className="absolute inset-0 bg-linear-to-b from-black/55 via-black/50 to-black/78 lg:hidden"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-black/30 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,black_58%,transparent)] lg:hidden"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-black/30 lg:hidden [mask-image:linear-gradient(to_top,black_58%,transparent)]"
       />
 
       <AppContainer className="relative z-10 pb-8 pt-16 sm:pt-20 lg:pb-10">
@@ -175,16 +193,16 @@ function Hero({ landing }: { landing: LandingView }) {
               : "lg:grid-cols-1",
           )}
         >
-          <Reveal className="flex flex-col gap-4 text-white sm:gap-5 max-lg:rounded-xl max-lg:border max-lg:border-white/15 max-lg:bg-black/40 max-lg:p-4 max-lg:shadow-[0_12px_40px_rgba(0,0,0,0.35)] max-lg:backdrop-blur-md sm:max-lg:p-5">
+          <Reveal className="flex flex-col gap-4 text-white sm:gap-5 max-lg:rounded-xl max-lg:border max-lg:border-white/15 max-lg:bg-black/40 max-lg:p-4 max-lg:shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:max-lg:p-5">
             {hero.badge || hero.handover ? (
               <div className="flex flex-wrap items-center gap-2">
                 {hero.badge ? (
-                  <Badge className="border border-white/25 bg-white/15 text-white backdrop-blur-md">
+                  <Badge className="w-fit gap-1.5 border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold text-white">
                     {hero.badge}
                   </Badge>
                 ) : null}
                 {hero.handover ? (
-                  <Badge className="border border-white/25 bg-white/15 text-white backdrop-blur-md">
+                  <Badge className="w-fit gap-1.5 border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold text-white">
                     {hero.handover}
                   </Badge>
                 ) : null}
@@ -218,7 +236,7 @@ function Hero({ landing }: { landing: LandingView }) {
               </p>
             ) : null}
             {hero.ctaPrimary || hero.ctaSecondary ? (
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:hidden">
                 {hero.ctaPrimary ? (
                   <Button asChild className="h-10 px-5">
                     <a href="#enquire">
@@ -278,26 +296,26 @@ function Hero({ landing }: { landing: LandingView }) {
       </AppContainer>
 
       {hero.stats.length ? (
-        <div className="relative z-10 border-t border-white/10 bg-black/55 backdrop-blur-md lg:bg-black/35">
+        <div className="relative z-10 border-t border-primary/30 bg-primary">
           <AppContainer>
             <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.stats.map((stat, index) => (
                 <li
                   key={`${stat.label}-${index}`}
                   className={`flex items-center gap-2.5 px-3 py-3 sm:gap-3.5 sm:px-6 sm:py-5 ${
-                    index > 0 ? "lg:border-l lg:border-white/15" : ""
-                  } ${index % 2 === 1 ? "border-l border-white/15" : ""} ${
-                    index > 1 ? "border-t border-white/15 lg:border-t-0" : ""
+                    index > 0 ? "lg:border-l lg:border-white/20" : ""
+                  } ${index % 2 === 1 ? "border-l border-white/20" : ""} ${
+                    index > 1 ? "border-t border-white/20 lg:border-t-0" : ""
                   }`}
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-white/20 bg-white/15 text-white sm:size-10 sm:rounded-lg">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-white/25 bg-primary-foreground/15 text-primary-foreground sm:size-10 sm:rounded-lg">
                     <Icon name={stat.icon || "check"} size="sm" />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-heading text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+                    <p className="font-heading text-xl font-extrabold tracking-tight text-primary-foreground sm:text-2xl">
                       {stat.value}
                     </p>
-                    <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/80">
+                    <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.14em] text-primary-foreground/85">
                       {stat.label}
                     </p>
                   </div>

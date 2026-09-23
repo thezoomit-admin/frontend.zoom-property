@@ -44,6 +44,7 @@ export function HeroLeadForm({
   className,
   formClassName,
   trackName = "Home hero",
+  variant = "default",
 }: {
   dict: HeroLeadFormDict;
   title?: string;
@@ -53,10 +54,13 @@ export function HeroLeadForm({
   className?: string;
   formClassName?: string;
   trackName?: string;
+  /** `glass` — frosted panel for the home hero veil. */
+  variant?: "default" | "glass";
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
   const [lastSubmitAt, setLastSubmitAt] = useState(0);
+  const glass = variant === "glass";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -103,33 +107,45 @@ export function HeroLeadForm({
     setSubmitting(false);
   }
 
+  const fieldClass = glass
+    ? "border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:border-white/40"
+    : undefined;
+
   return (
     <div className={cn("w-full", className)}>
       <form
         onSubmit={handleSubmit}
         className={cn(
-          "relative z-20 flex w-full flex-col gap-3.5 rounded-2xl border border-border bg-card p-5 shadow-xs sm:gap-4 sm:p-6",
+          "relative z-20 flex w-full flex-col gap-3.5 rounded-2xl border p-5 sm:gap-4 sm:p-6",
+          glass
+            ? "border-white/15 bg-white/10 shadow-none backdrop-blur-md"
+            : "border-border bg-card shadow-xs",
           formClassName,
         )}
       >
         {(title || dict.title) && (
-          <span className="font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
+          <span
+            className={cn(
+              "font-heading text-xs font-bold tracking-wider uppercase",
+              glass ? "text-white/70" : "text-muted-foreground",
+            )}
+          >
             {title || dict.title}
           </span>
         )}
 
-        <Field id={`${idPrefix}-name`} label={dict.name} required>
+        <Field id={`${idPrefix}-name`} label={dict.name} required glass={glass}>
           <Input
             id={`${idPrefix}-name`}
             name="name"
             required
             autoComplete="name"
             placeholder={dict.namePlaceholder}
-            className="h-11"
+            className={cn("h-11", fieldClass)}
           />
         </Field>
 
-        <Field id={`${idPrefix}-phone`} label={dict.phone} required>
+        <Field id={`${idPrefix}-phone`} label={dict.phone} required glass={glass}>
           <PhoneNumberInput
             id={`${idPrefix}-phone`}
             name="phone"
@@ -137,26 +153,27 @@ export function HeroLeadForm({
             onChange={setPhone}
             required
             placeholder="01712-345678"
+            className={glass ? "PhoneNumberInput--glass" : undefined}
           />
         </Field>
 
-        <Field id={`${idPrefix}-email`} label={dict.email}>
+        <Field id={`${idPrefix}-email`} label={dict.email} glass={glass}>
           <Input
             id={`${idPrefix}-email`}
             name="email"
             type="email"
             autoComplete="email"
             placeholder="you@domain.com"
-            className="h-11"
+            className={cn("h-11", fieldClass)}
           />
         </Field>
 
-        <Field id={`${idPrefix}-message`} label={dict.message}>
+        <Field id={`${idPrefix}-message`} label={dict.message} glass={glass}>
           <Textarea
             id={`${idPrefix}-message`}
             name="message"
             placeholder={dict.messagePlaceholder}
-            className="min-h-24 resize-none"
+            className={cn("min-h-24 resize-none", fieldClass)}
             rows={3}
           />
         </Field>
@@ -171,7 +188,12 @@ export function HeroLeadForm({
           <Icon name="arrowRight" size="xs" />
         </Button>
 
-        <p className="text-[11px] leading-snug text-muted-foreground">
+        <p
+          className={cn(
+            "text-[11px] leading-snug",
+            glass ? "text-white/55" : "text-muted-foreground",
+          )}
+        >
           {dict.privacy}
         </p>
       </form>
@@ -183,19 +205,27 @@ function Field({
   id,
   label,
   required,
+  glass,
   children,
 }: {
   id: string;
   label: string;
   required?: boolean;
+  glass?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
-      <Label htmlFor={id} className="text-xs font-medium text-foreground">
+      <Label
+        htmlFor={id}
+        className={cn(
+          "text-xs font-medium",
+          glass ? "text-white/80" : "text-foreground",
+        )}
+      >
         {label}
         {required ? (
-          <span aria-hidden className="text-destructive">
+          <span aria-hidden className={glass ? "text-red-300" : "text-destructive"}>
             *
           </span>
         ) : null}
