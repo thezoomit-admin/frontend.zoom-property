@@ -65,6 +65,8 @@ export function ZoomAlZaharaLeadForm({
     formData.set("source", source);
     formData.set("subject", `${projectName} viewing`);
     formData.set("enquiry", "buy");
+    // Landing lead form → Bond CRM lead.
+    formData.set("createLead", "1");
 
     const res = await submitContactForm(formData);
 
