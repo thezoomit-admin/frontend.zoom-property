@@ -12,7 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <TooltipProvider delayDuration={200}>
         <SmoothScrollProvider>{children}</SmoothScrollProvider>
-        <Toaster position="top-center" richColors />
+        <Toaster />
       </TooltipProvider>
     </ThemeProvider>
   );
