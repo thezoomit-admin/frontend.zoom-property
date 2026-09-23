@@ -19,6 +19,7 @@ export function ProjectReviews({
     role: string;
     quote: string;
     avatar?: string;
+    poster?: string;
     videoUrl?: string;
   }[];
   playLabel: string;
@@ -41,7 +42,9 @@ export function ProjectReviews({
             provider === "youtube"
               ? parseVideoId(videoUrl, "youtube")
               : "";
-          const thumb = youtubeId ? youtubeThumbnail(youtubeId) : "";
+          const thumb =
+            card.poster?.trim() ||
+            (youtubeId ? youtubeThumbnail(youtubeId) : "");
           const fbPreview = isFacebook
             ? facebookEmbedUrl(videoUrl, {
                 width: 90,
@@ -99,14 +102,7 @@ export function ProjectReviews({
                       "ring-1 ring-border transition-all duration-300 hover:ring-2 hover:ring-primary",
                     )}
                   >
-                    {fbPreview ? (
-                      <iframe
-                        src={fbPreview}
-                        title=""
-                        className="pointer-events-none absolute inset-0 size-full scale-110 border-none"
-                        tabIndex={-1}
-                      />
-                    ) : thumb ? (
+                    {thumb ? (
                       <Image
                         src={thumb}
                         alt=""
@@ -114,6 +110,13 @@ export function ProjectReviews({
                         unoptimized
                         sizes="90px"
                         className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : fbPreview ? (
+                      <iframe
+                        src={fbPreview}
+                        title=""
+                        className="pointer-events-none absolute inset-0 size-full scale-110 border-none"
+                        tabIndex={-1}
                       />
                     ) : null}
                     <span

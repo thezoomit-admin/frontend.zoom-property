@@ -1,7 +1,7 @@
 "use client";
 
 import NextImage, { type ImageProps as NextImageProps } from "next/image";
-import { useEffect, useMemo, useState, type SyntheticEvent } from "react";
+import { useMemo, useState, type SyntheticEvent } from "react";
 
 import { shimmerDataUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
@@ -18,10 +18,10 @@ const SERVER_URL = (
   "http://localhost:5008"
 ).replace(/\/+$/, "");
 
-/** Buckets that have held Zoom Property public media (older + newer). */
+/** Buckets that have held Zoom Property public media (current + older). */
 const R2_PUBLIC_HOSTS = [
-  "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev",
   "https://pub-fe014e73b16347aab5e799483354b483.r2.dev",
+  "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev",
 ] as const;
 
 const R2_PUBLIC_FALLBACK =
@@ -76,8 +76,6 @@ export function AppImage({
   onError,
   ...props
 }: AppImageProps) {
-  const [attempt, setAttempt] = useState(0);
-
   const candidates = useMemo(() => {
     const resolved = typeof src === "string" ? resolveImageSrc(src) : "";
     const list: string[] = [];
@@ -91,9 +89,10 @@ export function AppImage({
     return list;
   }, [src, fallbackSrc]);
 
-  useEffect(() => {
-    setAttempt(0);
-  }, [src, fallbackSrc]);
+  const resetKey = `${typeof src === "string" ? src : ""}::${fallbackSrc ?? ""}`;
+  const [retry, setRetry] = useState({ key: resetKey, n: 0 });
+  // When src/fallback changes, treat attempt as 0 without an effect setState.
+  const attempt = retry.key === resetKey ? retry.n : 0;
 
   const imageSrc = candidates[attempt] || "";
   const exhausted = !imageSrc;
@@ -102,7 +101,10 @@ export function AppImage({
     placeholder === "blur" ? (blurDataURL ?? shimmerDataUrl()) : blurDataURL;
 
   const handleError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    setAttempt((n) => n + 1);
+    setRetry((prev) => ({
+      key: resetKey,
+      n: (prev.key === resetKey ? prev.n : 0) + 1,
+    }));
     onError?.(e);
   };
 

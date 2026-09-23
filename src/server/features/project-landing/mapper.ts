@@ -242,6 +242,7 @@ export function toLandingView(
             title: pick(locale, item.title, item.titleBn) || projectName,
             caption: pick(locale, item.caption, item.captionBn),
             url,
+            poster: mediaUrl(item.poster as never),
             provider,
           };
         })
@@ -313,6 +314,7 @@ export function toLandingView(
           role: pick(locale, item.role, item.roleBn),
           quote: pick(locale, item.quote, item.quoteBn),
           avatar: mediaUrl(item.avatar as never),
+          poster: mediaUrl(item.poster as never),
           videoUrl: String(item.videoUrl || "").trim(),
         }))
         .filter(

@@ -41,15 +41,7 @@ function FilmCard({
     <article className={cn("flex flex-col overflow-hidden", landingCardClass)}>
       <div data-video-embed data-lenis-prevent className="overflow-hidden bg-black">
         <div className="relative aspect-9/16 w-full">
-          {isFacebook && previewSrc ? (
-            <iframe
-              src={previewSrc}
-              title={title}
-              allow="clipboard-write; encrypted-media; picture-in-picture; web-share"
-              className="pointer-events-none absolute inset-0 size-full border-none"
-              tabIndex={-1}
-            />
-          ) : thumb ? (
+          {thumb ? (
             <Image
               src={thumb}
               alt=""
@@ -57,6 +49,14 @@ function FilmCard({
               unoptimized
               sizes="(min-width: 1024px) 22vw, 78vw"
               className="object-cover object-center"
+            />
+          ) : isFacebook && previewSrc ? (
+            <iframe
+              src={previewSrc}
+              title={title}
+              allow="clipboard-write; encrypted-media; picture-in-picture; web-share"
+              className="pointer-events-none absolute inset-0 size-full border-none"
+              tabIndex={-1}
             />
           ) : (
             <span aria-hidden className="absolute inset-0 bg-zinc-900" />
@@ -72,7 +72,7 @@ function FilmCard({
               aria-hidden
               className={cn(
                 "absolute inset-0",
-                isFacebook ? "bg-black/35" : "bg-black/25",
+                isFacebook && !thumb ? "bg-black/35" : "bg-black/25",
               )}
             />
             <span
@@ -110,6 +110,7 @@ export function ProjectFilms({
   films: {
     title: string;
     url: string;
+    poster?: string;
     provider?: "facebook" | "youtube" | "vimeo";
   }[];
   playLabel: string;
@@ -135,7 +136,9 @@ export function ProjectFilms({
           })
         : undefined;
 
-      const thumb = youtubeId ? youtubeThumbnail(youtubeId) : "";
+      const thumb =
+        film.poster?.trim() ||
+        (youtubeId ? youtubeThumbnail(youtubeId) : "");
 
       return (
         <FilmCard
