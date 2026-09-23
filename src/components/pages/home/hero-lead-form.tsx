@@ -80,6 +80,8 @@ export function HeroLeadForm({
     formData.set("source", source);
     formData.set("subject", subject);
     formData.set("enquiry", "buy");
+    // Home + site CTA lead forms → Bond CRM lead (contact page does not).
+    formData.set("createLead", "1");
 
     const res = await submitContactForm(formData);
 

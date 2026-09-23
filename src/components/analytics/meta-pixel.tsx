@@ -64,7 +64,7 @@ export function MetaPixel() {
       ) {
         trackMeta("Contact");
       } else if (/^\/(?:bn|en)\/contact(?:[/?#]|$)/.test(href)) {
-        trackMeta("Lead");
+        trackMeta("Contact");
       }
     };
 
