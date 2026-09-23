@@ -7,6 +7,7 @@ import { Icon } from "@/components/common/icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneNumberInput } from "@/components/ui/phone-input";
 import { Textarea } from "@/components/ui/textarea";
 import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
 import { trackMeta } from "@/components/analytics/meta-pixel";
@@ -44,13 +45,19 @@ export function ZoomAlZaharaLeadForm({
   const compact = variant === "compact";
   const id = compact ? "azh" : "az";
   const [submitting, setSubmitting] = useState(false);
+  const [phone, setPhone] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!phone || phone.length < 8) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
     setSubmitting(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    formData.set("phone", phone);
     const note = String(formData.get("message") ?? "").trim();
     const planLine = `Plan: ${projectName}`;
     formData.set("budget", projectName);
@@ -68,6 +75,7 @@ export function ZoomAlZaharaLeadForm({
       });
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
+      setPhone("");
     } else {
       toast.error(res.error || "Failed to submit request");
     }
@@ -95,14 +103,13 @@ export function ZoomAlZaharaLeadForm({
           />
         </Field>
         <Field id={`${id}-phone`} label={dict.phone} required>
-          <Input
+          <PhoneNumberInput
             id={`${id}-phone`}
             name="phone"
-            type="tel"
+            value={phone}
+            onChange={setPhone}
             required
-            autoComplete="tel"
-            inputMode="tel"
-            placeholder="+880 1XXX XXXXXX"
+            placeholder="01712-345678"
           />
         </Field>
       </div>
