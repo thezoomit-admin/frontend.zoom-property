@@ -33,9 +33,12 @@ const FADE_MS = 1400;
  */
 export function HeroBackdrop({
   images,
+  fallbackImages,
   className,
 }: {
   images: string[];
+  /** Used when a CMS/R2 URL 404s — keeps the hero photographic. */
+  fallbackImages?: string[];
   className?: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -56,7 +59,7 @@ export function HeroBackdrop({
     <div className={cn("relative size-full", className)}>
       {images.map((src, position) => (
         <div
-          key={src}
+          key={`${src}-${position}`}
           aria-hidden={position !== index}
           className="absolute inset-0 transition-opacity ease-out"
           style={{
@@ -72,6 +75,9 @@ export function HeroBackdrop({
             sizes="100vw"
             placeholder="blur"
             blurDataURL={shimmerDataUrl()}
+            fallbackSrc={
+              fallbackImages?.[position % (fallbackImages.length || 1)]
+            }
             className="object-cover object-center"
           />
         </div>

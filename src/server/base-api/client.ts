@@ -104,13 +104,25 @@ export async function post<T>(
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
+    const json = (await res.json().catch(() => null)) as ApiEnvelope<T> | null;
+
     if (!res.ok) {
       console.warn(`[api] ${res.status} ${url}`);
-      return null;
+      return (
+        json ?? {
+          success: false,
+          message:
+            res.status === 429
+              ? "Too many enquiries. Please wait about an hour and try again."
+              : "Something went wrong",
+          data: null as T,
+        }
+      );
     }
 
-    const json = (await res.json()) as ApiEnvelope<T>;
-    return json?.success ? json : null;
+    return json?.success != null
+      ? json
+      : { success: false, message: "Something went wrong", data: null as T };
   } catch (err) {
     console.warn(`[api] failed POST ${url}:`, (err as Error).message);
     return null;

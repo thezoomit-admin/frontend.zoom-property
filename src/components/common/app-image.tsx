@@ -1,7 +1,7 @@
 "use client";
 
 import NextImage, { type ImageProps as NextImageProps } from "next/image";
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useMemo, useState, type SyntheticEvent } from "react";
 
 import { shimmerDataUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
@@ -18,32 +18,48 @@ const SERVER_URL = (
   "http://localhost:5008"
 ).replace(/\/+$/, "");
 
-/** Live media bucket. Retire stale pub-* hosts that 404 every key. */
-const R2_PUBLIC_FALLBACK = "https://pub-fe014e73b16347aab5e799483354b483.r2.dev";
-const STALE_R2_HOSTS = new Set(["pub-5b52277bf86041a0b4872bee7a979553.r2.dev"]);
+/** Buckets that have held Zoom Property public media (older + newer). */
+const R2_PUBLIC_HOSTS = [
+  "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev",
+  "https://pub-fe014e73b16347aab5e799483354b483.r2.dev",
+] as const;
 
-const rewriteStaleR2Url = (url: string): string => {
+const R2_PUBLIC_FALLBACK =
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL?.replace(/\/+$/, "") ||
+  R2_PUBLIC_HOSTS[0];
+
+/** If a key 404s on one public bucket, try the other — media spans both. */
+function alternateR2Url(url: string): string | undefined {
   try {
     const parsed = new URL(url);
-    if (!STALE_R2_HOSTS.has(parsed.hostname.toLowerCase())) return url;
+    if (!parsed.hostname.toLowerCase().endsWith(".r2.dev")) return undefined;
     const key = parsed.pathname.replace(/^\/+/, "");
-    return key ? `${R2_PUBLIC_FALLBACK}/${key}` : R2_PUBLIC_FALLBACK;
+    if (!key) return undefined;
+    const current = `${parsed.protocol}//${parsed.host}`;
+    const other = R2_PUBLIC_HOSTS.find(
+      (base) => base.toLowerCase() !== current.toLowerCase(),
+    );
+    return other ? `${other}/${key}` : undefined;
   } catch {
-    return url;
+    return undefined;
   }
-};
+}
 
 export function resolveImageSrc(src: string | null | undefined): string {
   if (!src) return "";
   if (typeof src !== "string") return src;
-  if (/^(https?:)?\/\//i.test(src) || src.startsWith("data:") || src.startsWith("blob:")) {
-    return rewriteStaleR2Url(src);
+  // Absolute URLs stay as stored in CMS/admin — do not rewrite hosts.
+  if (
+    /^(https?:)?\/\//i.test(src) ||
+    src.startsWith("data:") ||
+    src.startsWith("blob:")
+  ) {
+    return src.startsWith("//") ? `https:${src}` : src;
   }
   if (src.startsWith("/") && !src.startsWith("/uploads")) {
     return src;
   }
   const clean = src.replace(/^\/+/, "");
-  // Relative media keys belong on R2, not the API host (which 404s /uploads/…).
   if (clean.includes("-") || /\.(avif|webp|jpe?g|png|gif)$/i.test(clean)) {
     return `${R2_PUBLIC_FALLBACK}/${clean}`;
   }
@@ -60,25 +76,37 @@ export function AppImage({
   onError,
   ...props
 }: AppImageProps) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
-  const resolved = typeof src === "string" ? resolveImageSrc(src) : src;
-  const resolvedKey = typeof resolved === "string" ? resolved : "";
-  const primaryFailed = Boolean(resolvedKey && failedSrc === resolvedKey);
-  const imageSrc = primaryFailed
-    ? fallbackSrc || ""
-    : resolved || fallbackSrc || "";
+  const candidates = useMemo(() => {
+    const resolved = typeof src === "string" ? resolveImageSrc(src) : "";
+    const list: string[] = [];
+    const push = (value?: string | null) => {
+      const v = String(value || "").trim();
+      if (v && !list.includes(v)) list.push(v);
+    };
+    push(resolved);
+    if (resolved) push(alternateR2Url(resolved));
+    push(fallbackSrc);
+    return list;
+  }, [src, fallbackSrc]);
+
+  useEffect(() => {
+    setAttempt(0);
+  }, [src, fallbackSrc]);
+
+  const imageSrc = candidates[attempt] || "";
+  const exhausted = !imageSrc;
 
   const resolvedBlur =
     placeholder === "blur" ? (blurDataURL ?? shimmerDataUrl()) : blurDataURL;
 
   const handleError = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    if (resolvedKey) setFailedSrc(resolvedKey);
+    setAttempt((n) => n + 1);
     onError?.(e);
   };
 
-  // No stock “default house” photo — missing/broken media stays empty muted.
-  if (!imageSrc) {
+  if (exhausted) {
     return (
       <span
         aria-hidden
@@ -89,13 +117,13 @@ export function AppImage({
   }
 
   const isLocal =
-    typeof imageSrc === "string" &&
-    (imageSrc.startsWith("http://localhost") ||
-      imageSrc.startsWith("http://127.0.0.1") ||
-      imageSrc.startsWith("/"));
+    imageSrc.startsWith("http://localhost") ||
+    imageSrc.startsWith("http://127.0.0.1") ||
+    imageSrc.startsWith("/");
 
   return (
     <NextImage
+      key={imageSrc}
       src={imageSrc}
       alt={alt}
       placeholder={placeholder}

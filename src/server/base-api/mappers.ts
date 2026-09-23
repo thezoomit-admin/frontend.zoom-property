@@ -11,44 +11,16 @@ import type { ApiMedia } from "./types";
  * in each feature folder.
  */
 
-const R2_PUBLIC_FALLBACK = "https://pub-fe014e73b16347aab5e799483354b483.r2.dev";
+/** Public CDN for relative keys when env is unset. */
+const R2_PUBLIC_FALLBACK =
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL?.replace(/\/+$/, "") ||
+  "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev";
 
-/**
- * Stale public buckets that no longer hold uploaded keys. Live used to point
- * `NEXT_PUBLIC_R2_PUBLIC_URL` here — every residence image 404'd and
- * `AppImage` fell back to the same Unsplash toy-house for all thumbs.
- */
-const STALE_R2_HOSTS = new Set(["pub-5b52277bf86041a0b4872bee7a979553.r2.dev"]);
-
-/**
- * Prefer env when it points at a live bucket. Hosting still injects a retired
- * `NEXT_PUBLIC_R2_PUBLIC_URL` on build — that made every key 404 and AppImage
- * replaced CMS photos with its Unsplash default.
- */
 const r2PublicBase = (): string => {
   const configured = String(process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "")
     .trim()
     .replace(/\/+$/, "");
-  if (!configured) return R2_PUBLIC_FALLBACK;
-  try {
-    const host = new URL(configured).hostname.toLowerCase();
-    if (STALE_R2_HOSTS.has(host)) return R2_PUBLIC_FALLBACK;
-  } catch {
-    return R2_PUBLIC_FALLBACK;
-  }
-  return configured;
-};
-
-/** Rewrite absolute URLs that still point at a retired public bucket. */
-const rewriteStaleR2Url = (url: string): string => {
-  try {
-    const parsed = new URL(url);
-    if (!STALE_R2_HOSTS.has(parsed.hostname.toLowerCase())) return url;
-    const key = parsed.pathname.replace(/^\/+/, "");
-    return key ? `${R2_PUBLIC_FALLBACK}/${key}` : R2_PUBLIC_FALLBACK;
-  } catch {
-    return url;
-  }
+  return configured || R2_PUBLIC_FALLBACK;
 };
 
 /**
@@ -60,19 +32,23 @@ const rewriteStaleR2Url = (url: string): string => {
  */
 export type MediaLike = ApiMedia | string | null;
 
-/** The address of a media document. Resolves url, key, or fallback R2 endpoint. */
+/**
+ * The address of a media document.
+ * Absolute URLs are left untouched (admin CMS stores full working R2 URLs).
+ * Relative keys use the configured public bucket.
+ */
 export const mediaUrl = (m?: MediaLike): string => {
   if (!m) return "";
   if (typeof m === "string") {
     if (!m.trim()) return "";
-    if (/^(https?:)?\/\//i.test(m)) return rewriteStaleR2Url(m);
+    if (/^(https?:)?\/\//i.test(m)) return m;
     return `${r2PublicBase()}/${m.replace(/^\/+/, "")}`;
   }
   if (m.url && typeof m.url === "string" && m.url.trim()) {
-    return rewriteStaleR2Url(m.url);
+    return m.url.trim();
   }
   if (m.key && typeof m.key === "string" && m.key.trim()) {
-    if (/^(https?:)?\/\//i.test(m.key)) return rewriteStaleR2Url(m.key);
+    if (/^(https?:)?\/\//i.test(m.key)) return m.key.trim();
     return `${r2PublicBase()}/${m.key.replace(/^\/+/, "")}`;
   }
   return "";

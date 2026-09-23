@@ -5,16 +5,9 @@ import { Text } from "@/components/common/text";
 import { Parallax } from "@/components/motion/parallax";
 import { Reveal } from "@/components/motion/reveal";
 import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
-import { PropertyCalculator } from "@/components/pages/home/property-calculator";
+import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
 import { Badge } from "@/components/ui/badge";
-import { propertyTypes as fallbackTypes } from "@/data/properties";
-import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { getAreas } from "@/server/features/areas";
-import {
-  getProperties,
-  getPropertyTypes,
-  type ApiPropertyType,
-} from "@/server/features/properties";
+import { getDictionary } from "@/i18n/dictionaries";
 
 const photo = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=2000&q=80`;
@@ -38,47 +31,18 @@ const HERO_IMAGES = [
 ];
 
 export async function HeroSection() {
-  const [dict, locale, areas, properties, rawTypes] = await Promise.all([
-    getDictionary(),
-    getLocale(),
-    getAreas(60),
-    getProperties(100),
-    getPropertyTypes(),
-  ]);
+  const dict = await getDictionary();
 
-  const isBn = locale === "bn";
-
-  type BannerTypeSource = {
-    name?: string;
-    value?: string;
-    nameBn?: string;
-    description?: string;
-    label?: string;
-  };
-  const sourceTypes: BannerTypeSource[] = rawTypes.length
-    ? rawTypes.map((type: ApiPropertyType) => type)
-    : fallbackTypes.map((type) => type);
-
-  const types = sourceTypes.map((t) => ({
-    value: t.name ?? t.value ?? "",
-    label:
-      isBn && t.nameBn
-        ? t.nameBn
-        : t.description || t.label || t.name || t.value || "",
-    count: properties.filter(
-      (property) => property.type === (t.name ?? t.value),
-    ).length,
-  }));
-
-  const images = dict.hero.backgroundImages?.length
-    ? dict.hero.backgroundImages
-    : HERO_IMAGES;
+  const cmsImages = (dict.hero.backgroundImages ?? []).filter(
+    (url): url is string => typeof url === "string" && url.trim().length > 0,
+  );
+  const images = cmsImages.length > 0 ? cmsImages : HERO_IMAGES;
 
   return (
-    <section className="relative z-10 isolate flex min-h-[80svh] items-end overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <Parallax speed={0.18} zoom className="absolute inset-0">
-          <HeroBackdrop images={images} />
+    <section className="relative z-10 flex min-h-[80svh] items-end overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Parallax speed={0.18} zoom className="absolute inset-0 size-full">
+          <HeroBackdrop images={images} fallbackImages={HERO_IMAGES} />
         </Parallax>
 
         <div
@@ -87,11 +51,10 @@ export async function HeroSection() {
         />
       </div>
 
-      <AppContainer className="pb-20 pt-16 sm:pb-24 sm:pt-20">
-        {/* Copy left, calculator right. They stack under `lg`, where two
-            columns would leave the search box too narrow to type an area into. */}
-        <div className="grid items-center gap-10 lg:grid-cols-[1fr_minmax(0,26rem)] lg:gap-14">
-          <div className="flex flex-col gap-6">
+      <AppContainer className="relative z-10 w-full pb-20 pt-16 sm:pb-24 sm:pt-20">
+        {/* Left = copy, right = lead form (side-by-side from md up). */}
+        <div className="flex flex-col gap-10 md:flex-row md:items-end md:gap-12 lg:gap-14">
+          <div className="flex min-w-0 flex-1 flex-col gap-6">
             <Reveal>
               <Badge className="w-fit gap-1.5 px-3 py-1 text-xs font-semibold">
                 <Icon name="approved" size="xs" />
@@ -104,19 +67,19 @@ export async function HeroSection() {
             </Heading>
 
             <Reveal delay={0.12}>
-              <Text size="lead" className="max-w-2xl leading-relaxed text-white/80">
+              <Text size="lead" className="max-w-xl leading-relaxed text-white/80 lg:max-w-2xl">
                 {dict.hero.lead}
               </Text>
             </Reveal>
           </div>
 
-          <Reveal delay={0.2}>
-            <PropertyCalculator
-              dict={dict.calculator}
-              locale={locale}
-              areas={areas}
-              properties={properties}
-              types={types}
+          <Reveal
+            delay={0.2}
+            className="w-full shrink-0 md:w-[32rem] lg:w-[34rem]"
+          >
+            <HeroLeadForm
+              dict={dict.contact.form}
+              title={dict.contact.formTitle}
             />
           </Reveal>
         </div>

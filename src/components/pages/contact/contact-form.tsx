@@ -7,6 +7,7 @@ import { Icon } from "@/components/common/icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneNumberInput } from "@/components/ui/phone-input";
 import {
   Select,
   SelectContent,
@@ -15,30 +16,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { submitContactForm } from "@/server/features/inquiries/action";
+import { cn } from "@/lib/utils";
 
 const ENQUIRY_VALUES = ["buy", "rent", "sell", "landowner", "nrb"] as const;
-
-/**
- * Budget bands, in the units people here quote — crore, not digits.
- *
- * Bands rather than a free number field: an advisor only needs to know which
- * shelf to pull from, and a typed figure invites a precision nobody has at the
- * enquiry stage. `any` is first and is the default, so the form never insists
- * on an answer someone has not worked out yet.
- */
-const BUDGET_VALUES = [
-  "any",
-  "under1",
-  "1to2",
-  "2to5",
-  "5to10",
-  "over10",
-] as const;
-
-/** Value the area select carries when the visitor has no area in mind. */
 const AREA_ANY = "any";
 
+/** Client cooldown between submits (server also limits to 5/hour). */
+const CLIENT_COOLDOWN_MS = 45_000;
+
 export interface AreaOption {
+  value: string;
+  label: string;
+}
+
+export interface BudgetOption {
   value: string;
   label: string;
 }
@@ -52,7 +44,7 @@ interface FormDict {
   area: string;
   areaAny: string;
   budget: string;
-  budgetOptions: Record<(typeof BUDGET_VALUES)[number], string>;
+  budgetOptions?: Record<string, string>;
   message: string;
   messagePlaceholder: string;
   submit: string;
@@ -63,48 +55,77 @@ interface FormDict {
   options: Record<(typeof ENQUIRY_VALUES)[number], string>;
 }
 
-/**
- * Enquiry form.
- *
- * Area and budget are asked as selects rather than left to the free-text box:
- * they are the two things an advisor needs before they can answer at all, and
- * a shortlist cannot be built from "somewhere in Dhaka, reasonable price".
- * Both default to "not decided", so neither blocks someone who only wants to
- * start a conversation.
- *
- * `areas` comes in as a prop rather than being imported here: this is a client
- * component, and the page already knows the locale, so only the id and the name
- * in the right language cross the boundary.
- *
- * No backend yet — submit shows a confirmation and clears. Wire `onSubmit` to
- * a server action when the API exists; the field names already match the shape
- * an enquiry endpoint would want.
- */
-import { submitContactForm } from "@/server/features/inquiries/action";
-
 export function ContactForm({
   dict,
   areas,
+  budgets = [],
+  source = "Contact Page",
+  className,
 }: {
   dict: FormDict;
   areas: AreaOption[];
+  budgets?: BudgetOption[];
+  source?: string;
+  className?: string;
 }) {
   const [submitting, setSubmitting] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [lastSubmitAt, setLastSubmitAt] = useState(0);
+
+  const budgetOptions =
+    budgets.length > 0
+      ? budgets
+      : Object.entries(dict.budgetOptions || {}).map(([value, label]) => ({
+          value,
+          label,
+        }));
+
+  const defaultBudget =
+    budgetOptions.find((b) => b.value === "any")?.value ||
+    budgetOptions[0]?.value ||
+    "any";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!phone || phone.length < 8) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    const now = Date.now();
+    if (lastSubmitAt && now - lastSubmitAt < CLIENT_COOLDOWN_MS) {
+      const wait = Math.ceil((CLIENT_COOLDOWN_MS - (now - lastSubmitAt)) / 1000);
+      toast.error(`Please wait ${wait}s before sending another enquiry.`);
+      return;
+    }
+
     setSubmitting(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    formData.set("phone", phone);
+    formData.set("source", source);
+    if (!formData.get("subject")) {
+      formData.set("subject", "Website Enquiry");
+    }
 
     const res = await submitContactForm(formData);
 
     if (res.success) {
+      setLastSubmitAt(Date.now());
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
+      setPhone("");
     } else {
-      toast.error(res.error || "Failed to submit message");
+      const msg = res.error || "Failed to submit message";
+      const rateLimited =
+        /too many|wait an hour|rate|try again/i.test(msg);
+      toast.error(
+        rateLimited
+          ? "Too many enquiries from this device. Please wait about an hour and try again."
+          : msg,
+      );
     }
 
     setSubmitting(false);
@@ -113,33 +134,38 @@ export function ContactForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-5 rounded-xl border border-border bg-card p-6 sm:p-8"
+      className={cn(
+        "flex flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-xs sm:p-8",
+        className,
+      )}
     >
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field id="name" label={dict.name} required>
-          <Input id="name" name="name" required autoComplete="name" placeholder={dict.namePlaceholder} />
+        <Field id="lead-name" label={dict.name} required>
+          <Input
+            id="lead-name"
+            name="name"
+            required
+            autoComplete="name"
+            placeholder={dict.namePlaceholder}
+          />
         </Field>
 
-        <Field id="phone" label={dict.phone} required>
-          <Input
-            id="phone"
+        <Field id="lead-phone" label={dict.phone} required>
+          <PhoneNumberInput
+            id="lead-phone"
             name="phone"
-            type="tel"
+            value={phone}
+            onChange={setPhone}
             required
-            autoComplete="tel"
-            inputMode="tel"
-            placeholder="+880 1XXX XXXXXX"
+            placeholder="01712-345678"
           />
         </Field>
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        {/* Not required: a phone number is what an advisor actually calls back
-            on, and half the enquiries here come from people who do not use
-            email. `type="email"` still checks the shape of whatever is typed. */}
-        <Field id="email" label={dict.email}>
+        <Field id="lead-email" label={dict.email}>
           <Input
-            id="email"
+            id="lead-email"
             name="email"
             type="email"
             autoComplete="email"
@@ -147,9 +173,9 @@ export function ContactForm({
           />
         </Field>
 
-        <Field id="enquiry" label={dict.enquiry}>
+        <Field id="lead-enquiry" label={dict.enquiry}>
           <Select name="enquiry" defaultValue="buy">
-            <SelectTrigger id="enquiry" className="w-full">
+            <SelectTrigger id="lead-enquiry" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -164,9 +190,9 @@ export function ContactForm({
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field id="area" label={dict.area}>
+        <Field id="lead-area" label={dict.area}>
           <Select name="area" defaultValue={AREA_ANY}>
-            <SelectTrigger id="area" className="w-full">
+            <SelectTrigger id="lead-area" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -180,15 +206,15 @@ export function ContactForm({
           </Select>
         </Field>
 
-        <Field id="budget" label={dict.budget}>
-          <Select name="budget" defaultValue="any">
-            <SelectTrigger id="budget" className="w-full">
+        <Field id="lead-budget" label={dict.budget}>
+          <Select name="budget" defaultValue={defaultBudget}>
+            <SelectTrigger id="lead-budget" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {BUDGET_VALUES.map((value) => (
-                <SelectItem key={value} value={value}>
-                  {dict.budgetOptions[value]}
+              {budgetOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -196,22 +222,25 @@ export function ContactForm({
         </Field>
       </div>
 
-      <Field id="message" label={dict.message}>
+      <Field id="lead-message" label={dict.message}>
         <Textarea
-          id="message"
+          id="lead-message"
           name="message"
           placeholder={dict.messagePlaceholder}
         />
       </Field>
 
-      <Button type="submit" size="lg" disabled={submitting} className="w-full sm:w-fit sm:px-8">
+      <Button
+        type="submit"
+        size="lg"
+        disabled={submitting}
+        className="w-full bg-primary sm:w-fit sm:px-8"
+      >
         {submitting ? dict.submitting : dict.submit}
         <Icon name="arrowRight" size="xs" />
       </Button>
 
-      <p className="text-xs text-muted-foreground">
-{dict.privacy}
-      </p>
+      <p className="text-xs text-muted-foreground">{dict.privacy}</p>
     </form>
   );
 }
@@ -224,7 +253,6 @@ function Field({
 }: {
   id: string;
   label: string;
-  /** Draws the asterisk. The input still carries its own `required`. */
   required?: boolean;
   children: React.ReactNode;
 }) {
@@ -233,8 +261,6 @@ function Field({
       <Label htmlFor={id}>
         {label}
         {required ? (
-          // Decorative: assistive tech reads `required` off the control itself,
-          // so an announced "star" would only be noise.
           <span aria-hidden className="text-destructive">
             *
           </span>
