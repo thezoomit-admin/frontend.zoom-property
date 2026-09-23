@@ -18,18 +18,21 @@ const areas = createResource<ApiArea, Area>({
 /**
  * The areas picked for the home page.
  *
- * `limit` is a ceiling, not a target. If nobody has ticked "on home page" the
- * caller gets the built-in list rather than an empty grid — an unconfigured
- * site should still look finished.
+ * Uses the API only. Demo fallback only when the API is unreachable — an empty
+ * panel choice must not resurrect the built-in list.
  */
 export async function getHomeAreas(limit = 10): Promise<Area[]> {
-  const picked = await areas.query({ isHome: true, limit });
-  return picked ?? fallback.slice(0, limit);
+  const page = await areas.paginate({ isHome: true, limit });
+  if (page) return page.rows;
+  return fallback.slice(0, limit);
 }
 
-/** Every service area, in the desk's order, for `/areas`. */
-export const getAreas = (limit = 60) => areas.list({ limit });
-
+/** Every live service area from the API (demo fallback only if API is down). */
+export async function getAreas(limit = 60): Promise<Area[]> {
+  const page = await areas.paginate({ limit });
+  if (page) return page.rows;
+  return limit > 0 ? fallback.slice(0, limit) : fallback;
+}
 /** One area by its slug, or `null` when there is none. */
 export async function getAreaBySlug(slug: string): Promise<Area | null> {
   return areas.bySlug(slug);

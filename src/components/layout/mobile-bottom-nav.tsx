@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", icon: "grid", en: "Home", bn: "হোম" },
-  { href: "/properties", icon: "building", en: "Properties", bn: "প্রপার্টি" },
   { href: "/projects", icon: "construction", en: "Projects", bn: "প্রজেক্ট" },
   { href: "/areas", icon: "location", en: "Areas", bn: "এলাকা" },
   { href: "/contact", icon: "mail", en: "Contact", bn: "যোগাযোগ" },
