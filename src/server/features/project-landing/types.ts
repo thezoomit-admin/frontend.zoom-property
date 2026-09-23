@@ -124,6 +124,7 @@ export interface ApiProjectLanding {
   sections?: Partial<Record<LandingSectionKey, ApiLandingFlag>>;
   hero?: {
     image?: ApiMedia | string | null;
+    images?: Array<ApiMedia | string | null>;
     badge?: string;
     badgeBn?: string;
     handover?: string;
@@ -384,6 +385,8 @@ export interface LandingView {
   sections: Record<LandingSectionKey, boolean>;
   hero: {
     image: string;
+    /** Full-bleed slideshow (falls back to `[image]` when empty). */
+    images: string[];
     badge: string;
     handover: string;
     eyebrow: string;

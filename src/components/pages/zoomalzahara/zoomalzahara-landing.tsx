@@ -7,6 +7,7 @@ import { Section } from "@/components/common/section";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
+import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
 import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
 import { ZoomAlZaharaLeadForm } from "@/components/pages/zoomalzahara/lead-form";
 import { LandingStickyCta } from "@/components/pages/zoomalzahara/landing-sticky-cta";
@@ -139,9 +140,15 @@ function Hero({ landing }: { landing: LandingView }) {
   const hero = landing.hero;
   const enquire = landing.enquire;
   const showForm = landing.sections.enquire;
+  const images =
+    hero.images?.length > 0
+      ? hero.images
+      : hero.image
+        ? [hero.image]
+        : [];
 
   if (
-    !hero.image &&
+    !images.length &&
     !hero.title &&
     !hero.lead &&
     !hero.stats.length &&
@@ -152,16 +159,10 @@ function Hero({ landing }: { landing: LandingView }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-[#1b2318]">
-      {hero.image ? (
-        <Image
-          src={hero.image}
-          alt={hero.title}
-          fill
-          priority
-          quality={90}
-          sizes="100vw"
-          className="absolute inset-0 h-full w-full object-cover object-[center_55%] sm:object-[center_68%]"
-        />
+      {images.length ? (
+        <div className="absolute inset-0">
+          <HeroBackdrop images={images} />
+        </div>
       ) : null}
       {/* Desktop — primary heavy, black medium, secondary light (no blur) */}
       <div
