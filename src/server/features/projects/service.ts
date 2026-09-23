@@ -28,6 +28,7 @@ export interface ProjectFilters {
   page?: number | string;
   limit?: number | string;
   area?: string;
+  subArea?: string;
   city?: string;
   isFooter?: boolean;
   sort?: string;

@@ -9,6 +9,8 @@
 
 export interface Area {
   id: string;
+  /** Mongo ObjectId when loaded from the API — used for project filters. */
+  refId?: string;
   name: string;
   nameBn: string;
   city: string;

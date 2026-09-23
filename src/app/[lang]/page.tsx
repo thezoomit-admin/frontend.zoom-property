@@ -29,8 +29,8 @@ export default async function Home() {
 
       <HeroSection />
 
-      <ListingsSection variant="preview" limit={6} />
-
+      {/* <ListingsSection variant="preview" limit={6} /> */}
+      <AreasSection />
 
       <CinematicShowcase
         poster={dict.showcase.poster || showcase.poster}
@@ -38,16 +38,17 @@ export default async function Home() {
         dict={dict.showcase}
       />
 
-      <AreasSection />
-      <div className="relative z-10 -my-8 md:-my-16 lg:-my-24">
-        <ContactCta tone="surface" noBackground />
-      </div>
+      
+     
       <ProjectsSection />
       {/* <div className="mb-8 md:mb-16 lg:mb-20"> */}
       <StatsBanner />
       {/* </div> */}
       <TestimonialsBento />
       <VideoSection />
+      <div className="relative z-10 -mb-8 md:-mb-16 lg:-mb-24">
+        <ContactCta tone="surface" noBackground />
+      </div>
       <HomeBlogSection />
     </>
   );  
