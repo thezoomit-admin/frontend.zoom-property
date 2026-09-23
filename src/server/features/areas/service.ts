@@ -32,6 +32,5 @@ export const getAreas = (limit = 60) => areas.list({ limit });
 
 /** One area by its slug, or `null` when there is none. */
 export async function getAreaBySlug(slug: string): Promise<Area | null> {
-  const all = await getAreas();
-  return all.find((a) => a.id === slug) ?? null;
+  return areas.bySlug(slug);
 }

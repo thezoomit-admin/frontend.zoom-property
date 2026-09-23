@@ -14,6 +14,7 @@ import type { ApiArea } from "./types";
  */
 export const toArea = (a: ApiArea): Area => ({
   id: a.slug || a._id,
+  refId: a._id,
   name: a.name,
   nameBn: a.nameBn || a.name,
   city: a.city || "Dhaka",

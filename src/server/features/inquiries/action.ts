@@ -20,6 +20,7 @@ export async function submitContactForm(formData: FormData) {
     type: createLead ? "Lead" : "General",
     enquiry: data.enquiry,
     area: data.area,
+    subArea: data.subArea,
     budget: data.budget,
     source: data.source || "Contact Page",
     createLead,
