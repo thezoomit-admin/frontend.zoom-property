@@ -160,8 +160,8 @@ function Hero({ landing }: { landing: LandingView }) {
   return (
     <section className="relative isolate overflow-hidden bg-[#1b2318]">
       {images.length ? (
-        <div className="absolute inset-0">
-          <HeroBackdrop images={images} />
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <HeroBackdrop images={images} className="absolute inset-0 size-full" />
         </div>
       ) : null}
       {/* Desktop — primary heavy, black medium, secondary light (no blur) */}

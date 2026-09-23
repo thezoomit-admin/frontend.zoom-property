@@ -36,12 +36,15 @@ export type MediaLike = ApiMedia | string | null;
  * The address of a media document.
  * Absolute URLs are left untouched (admin CMS stores full working R2 URLs).
  * Relative keys use the configured public bucket.
+ * Bare Mongo ObjectIds (unpopulated refs) return "" — never invent a fake R2 path.
  */
 export const mediaUrl = (m?: MediaLike): string => {
   if (!m) return "";
   if (typeof m === "string") {
     if (!m.trim()) return "";
     if (/^(https?:)?\/\//i.test(m)) return m;
+    // Unpopulated ObjectId — not a storage key.
+    if (/^[a-f0-9]{24}$/i.test(m.trim())) return "";
     return `${r2PublicBase()}/${m.replace(/^\/+/, "")}`;
   }
   if (m.url && typeof m.url === "string" && m.url.trim()) {
@@ -49,6 +52,7 @@ export const mediaUrl = (m?: MediaLike): string => {
   }
   if (m.key && typeof m.key === "string" && m.key.trim()) {
     if (/^(https?:)?\/\//i.test(m.key)) return m.key.trim();
+    if (/^[a-f0-9]{24}$/i.test(m.key.trim())) return "";
     return `${r2PublicBase()}/${m.key.replace(/^\/+/, "")}`;
   }
   return "";
