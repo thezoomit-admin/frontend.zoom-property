@@ -106,6 +106,8 @@ export function ContactForm({
     const formData = new FormData(form);
     formData.set("phone", phone);
     formData.set("source", source);
+    // Contact page = inquiry only — never create a Bond CRM lead.
+    formData.set("createLead", "0");
     if (!formData.get("subject")) {
       formData.set("subject", "Website Enquiry");
     }
