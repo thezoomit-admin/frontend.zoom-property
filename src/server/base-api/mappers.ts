@@ -11,10 +11,13 @@ import type { ApiMedia } from "./types";
  * in each feature folder.
  */
 
-/** Public CDN for relative keys when env is unset. */
+/**
+ * Public CDN for relative keys when env is unset.
+ * Prefer the production upload bucket (admin/server); older keys may still
+ * live on the alternate host — AppImage retries the other on 404.
+ */
 const R2_PUBLIC_FALLBACK =
-  process.env.NEXT_PUBLIC_R2_PUBLIC_URL?.replace(/\/+$/, "") ||
-  "https://pub-5b52277bf86041a0b4872bee7a979553.r2.dev";
+  "https://pub-fe014e73b16347aab5e799483354b483.r2.dev";
 
 const r2PublicBase = (): string => {
   const configured = String(process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "")
@@ -22,6 +25,8 @@ const r2PublicBase = (): string => {
     .replace(/\/+$/, "");
   return configured || R2_PUBLIC_FALLBACK;
 };
+
+const isObjectId = (value: string) => /^[a-f0-9]{24}$/i.test(value.trim());
 
 /**
  * What this accepts.
@@ -36,7 +41,8 @@ export type MediaLike = ApiMedia | string | null;
  * The address of a media document.
  * Absolute URLs are left untouched (admin CMS stores full working R2 URLs).
  * Relative keys use the configured public bucket.
- * Bare Mongo ObjectIds (unpopulated refs) return "" — never invent a fake R2 path.
+ * Bare Mongo ObjectIds / `_id`-only docs (unpopulated refs) return "" —
+ * never invent a fake R2 path.
  */
 export const mediaUrl = (m?: MediaLike): string => {
   if (!m) return "";
@@ -44,7 +50,7 @@ export const mediaUrl = (m?: MediaLike): string => {
     if (!m.trim()) return "";
     if (/^(https?:)?\/\//i.test(m)) return m;
     // Unpopulated ObjectId — not a storage key.
-    if (/^[a-f0-9]{24}$/i.test(m.trim())) return "";
+    if (isObjectId(m)) return "";
     return `${r2PublicBase()}/${m.replace(/^\/+/, "")}`;
   }
   if (m.url && typeof m.url === "string" && m.url.trim()) {
@@ -52,9 +58,10 @@ export const mediaUrl = (m?: MediaLike): string => {
   }
   if (m.key && typeof m.key === "string" && m.key.trim()) {
     if (/^(https?:)?\/\//i.test(m.key)) return m.key.trim();
-    if (/^[a-f0-9]{24}$/i.test(m.key.trim())) return "";
+    if (isObjectId(m.key)) return "";
     return `${r2PublicBase()}/${m.key.replace(/^\/+/, "")}`;
   }
+  // Populated shape missing key/url, or lean `_id` only — not usable.
   return "";
 };
 

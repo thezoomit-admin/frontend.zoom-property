@@ -440,6 +440,7 @@ export interface LandingView {
       title: string;
       caption: string;
       url: string;
+      poster: string;
       provider: "facebook" | "youtube" | "vimeo";
     }[];
   };
@@ -496,6 +497,7 @@ export interface LandingView {
       role: string;
       quote: string;
       avatar: string;
+      poster: string;
       videoUrl: string;
     }[];
   };
