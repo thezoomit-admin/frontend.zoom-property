@@ -171,7 +171,7 @@ function Hero({ landing }: { landing: LandingView }) {
       />
       <div
         aria-hidden
-        className="absolute inset-0 hidden bg-primary/55 lg:block"
+        className="absolute inset-0 hidden bg-primary/35 lg:block"
       />
       <div
         aria-hidden
