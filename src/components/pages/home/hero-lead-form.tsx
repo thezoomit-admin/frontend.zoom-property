@@ -13,6 +13,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { submitContactForm } from "@/server/features/inquiries/action";
 import { cn } from "@/lib/utils";
 
+/** Client cooldown between submits (server also limits to 5/hour). */
+const CLIENT_COOLDOWN_MS = 45_000;
+
 export interface HeroLeadFormDict {
   title?: string;
   name: string;
@@ -29,20 +32,31 @@ export interface HeroLeadFormDict {
 }
 
 /**
- * Home hero lead form — same card width as the old property calculator.
- * Kept compact so the hero title stays low in the viewport.
+ * Simple lead form — same fields as the home hero:
+ * name, phone, email, question/message.
  */
 export function HeroLeadForm({
   dict,
   title,
+  source = "home-hero",
+  subject = "Home page enquiry",
+  idPrefix = "hero",
   className,
+  formClassName,
+  trackName = "Home hero",
 }: {
   dict: HeroLeadFormDict;
   title?: string;
+  source?: string;
+  subject?: string;
+  idPrefix?: string;
   className?: string;
+  formClassName?: string;
+  trackName?: string;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
+  const [lastSubmitAt, setLastSubmitAt] = useState(0);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,24 +64,38 @@ export function HeroLeadForm({
       toast.error("Please enter a valid phone number");
       return;
     }
+
+    const now = Date.now();
+    if (lastSubmitAt && now - lastSubmitAt < CLIENT_COOLDOWN_MS) {
+      const wait = Math.ceil((CLIENT_COOLDOWN_MS - (now - lastSubmitAt)) / 1000);
+      toast.error(`Please wait ${wait}s before sending another enquiry.`);
+      return;
+    }
+
     setSubmitting(true);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
     formData.set("phone", phone);
-    formData.set("source", "home-hero");
-    formData.set("subject", "Home page enquiry");
+    formData.set("source", source);
+    formData.set("subject", subject);
     formData.set("enquiry", "buy");
 
     const res = await submitContactForm(formData);
 
     if (res.success) {
-      trackMeta("Lead", { content_name: "Home hero" });
+      setLastSubmitAt(Date.now());
+      trackMeta("Lead", { content_name: trackName });
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
       setPhone("");
     } else {
-      toast.error(res.error || "Failed to submit enquiry");
+      const msg = res.error || "Failed to submit enquiry";
+      toast.error(
+        /too many|wait an hour|rate|try again/i.test(msg)
+          ? "Too many enquiries from this device. Please wait about an hour and try again."
+          : msg,
+      );
     }
 
     setSubmitting(false);
@@ -77,39 +105,42 @@ export function HeroLeadForm({
     <div className={cn("w-full", className)}>
       <form
         onSubmit={handleSubmit}
-        className="relative z-20 flex w-full flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-2xl sm:gap-3.5 sm:p-6"
+        className={cn(
+          "relative z-20 flex w-full flex-col gap-3.5 rounded-2xl border border-border bg-card p-5 shadow-xs sm:gap-4 sm:p-6",
+          formClassName,
+        )}
       >
-        <span className="font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
-          {title || dict.title || "Send an enquiry"}
-        </span>
+        {(title || dict.title) && (
+          <span className="font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
+            {title || dict.title}
+          </span>
+        )}
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field id="hero-name" label={dict.name} required>
-            <Input
-              id="hero-name"
-              name="name"
-              required
-              autoComplete="name"
-              placeholder={dict.namePlaceholder}
-              className="h-11"
-            />
-          </Field>
-
-          <Field id="hero-phone" label={dict.phone} required>
-            <PhoneNumberInput
-              id="hero-phone"
-              name="phone"
-              value={phone}
-              onChange={setPhone}
-              required
-              placeholder="01712-345678"
-            />
-          </Field>
-        </div>
-
-        <Field id="hero-email" label={dict.email}>
+        <Field id={`${idPrefix}-name`} label={dict.name} required>
           <Input
-            id="hero-email"
+            id={`${idPrefix}-name`}
+            name="name"
+            required
+            autoComplete="name"
+            placeholder={dict.namePlaceholder}
+            className="h-11"
+          />
+        </Field>
+
+        <Field id={`${idPrefix}-phone`} label={dict.phone} required>
+          <PhoneNumberInput
+            id={`${idPrefix}-phone`}
+            name="phone"
+            value={phone}
+            onChange={setPhone}
+            required
+            placeholder="01712-345678"
+          />
+        </Field>
+
+        <Field id={`${idPrefix}-email`} label={dict.email}>
+          <Input
+            id={`${idPrefix}-email`}
             name="email"
             type="email"
             autoComplete="email"
@@ -118,13 +149,13 @@ export function HeroLeadForm({
           />
         </Field>
 
-        <Field id="hero-message" label={dict.message}>
+        <Field id={`${idPrefix}-message`} label={dict.message}>
           <Textarea
-            id="hero-message"
+            id={`${idPrefix}-message`}
             name="message"
             placeholder={dict.messagePlaceholder}
-            className="min-h-16 resize-none"
-            rows={2}
+            className="min-h-24 resize-none"
+            rows={3}
           />
         </Field>
 
@@ -132,7 +163,7 @@ export function HeroLeadForm({
           type="submit"
           size="lg"
           disabled={submitting}
-          className="h-11 w-full font-semibold"
+          className="h-11 w-full bg-primary font-semibold"
         >
           {submitting ? dict.submitting : dict.submit}
           <Icon name="arrowRight" size="xs" />

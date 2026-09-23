@@ -12,6 +12,7 @@ import { ContactForm } from "@/components/pages/contact/contact-form";
 import { FaqSection } from "@/components/pages/shared/faq-section";
 import { areas } from "@/data/areas";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { getBudgetOptions } from "@/server/features/budget-ranges/service";
 import { localeAlternates } from "@/i18n/alternates";
 import {
   mailHref,
@@ -33,7 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const [dict, locale, faq] = await Promise.all([getDictionary(), getLocale(), faqSchema()]);
+  const [dict, locale, faq] = await Promise.all([
+    getDictionary(),
+    getLocale(),
+    faqSchema(),
+  ]);
+  const budgetOptions = await getBudgetOptions(locale);
   const c = dict.contact.channels;
   // The numbers, the addresses and the profile links all come from the
   // panel — the labels beside them always did. Nothing on this column is
@@ -164,7 +170,12 @@ export default async function ContactPage() {
                 {dict.contact.formTitle}
               </Heading>
               <Text size="sm">{dict.contact.formLead}</Text>
-              <ContactForm dict={dict.contact.form} areas={areaOptions} />
+              <ContactForm
+                dict={dict.contact.form}
+                areas={areaOptions}
+                budgets={budgetOptions}
+                source="contact-page"
+              />
             </div>
           </Reveal>
         </div>

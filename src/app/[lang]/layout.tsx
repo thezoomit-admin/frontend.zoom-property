@@ -6,6 +6,8 @@ import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteLeadMount } from "@/components/layout/site-lead-mount";
+import { SiteLeadSection } from "@/components/common/site-lead-section";
 import { CampaignMain } from "@/components/layout/campaign-main";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
@@ -138,6 +140,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             }))}
           />
           <CampaignMain campaignPaths={campaignHrefs}>{children}</CampaignMain>
+          <SiteLeadMount campaignPaths={campaignHrefs}>
+            <SiteLeadSection />
+          </SiteLeadMount>
           <SiteFooter />
           <MobileBottomNav locale={locale} campaignPaths={campaignHrefs} />
           <ContactDock />
