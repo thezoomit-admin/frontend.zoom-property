@@ -37,6 +37,9 @@ export interface ApiLandingPoint {
   body?: string;
   bodyBn?: string;
   icon?: string;
+  mapUrl?: string;
+  distance?: string;
+  distanceBn?: string;
 }
 
 export interface ApiLandingHighlight {
@@ -441,7 +444,13 @@ export interface LandingView {
     eyebrow: string;
     title: string;
     description: string;
-    items: { title: string; body: string; icon: string }[];
+    items: {
+      title: string;
+      body: string;
+      icon: string;
+      mapUrl: string;
+      distance: string;
+    }[];
   };
   gallery: {
     eyebrow: string;

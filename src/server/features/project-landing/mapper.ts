@@ -250,6 +250,8 @@ export function toLandingView(
           title: pick(locale, item.title, item.titleBn),
           body: pick(locale, item.body, item.bodyBn),
           icon: String(item.icon || "").trim(),
+          mapUrl: String(item.mapUrl || "").trim(),
+          distance: pick(locale, item.distance, item.distanceBn),
         }))
         .filter((item) => item.title || item.body),
     },

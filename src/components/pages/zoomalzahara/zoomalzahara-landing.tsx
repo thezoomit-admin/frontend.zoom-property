@@ -24,6 +24,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { telHref, whatsappHref } from "@/lib/contact";
+import { resolveAmenityMaps } from "@/lib/maps-distance";
 import { cn } from "@/lib/utils";
 import type { LandingView } from "@/server/features/project-landing/types";
 
@@ -51,6 +52,15 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
         <Lifestyle
           amenities={show("amenities") ? landing.amenities : null}
           gallery={show("gallery") ? landing.gallery : null}
+          projectMapUrl={
+            landing.location.mapLinkUrl || landing.location.mapEmbedUrl || ""
+          }
+          projectAddress={
+            landing.location.mapHint ||
+            landing.location.title ||
+            landing.hero.location ||
+            ""
+          }
         />
       ) : null}
       {show("location") || show("process") ? (
@@ -156,7 +166,7 @@ function Hero({ landing }: { landing: LandingView }) {
       {/* Desktop — primary heavy, black medium, secondary light (no blur) */}
       <div
         aria-hidden
-        className="absolute inset-0 hidden bg-black/65 lg:block"
+        className="absolute inset-0 hidden bg-black/75 lg:block"
       />
       <div
         aria-hidden
@@ -172,7 +182,7 @@ function Hero({ landing }: { landing: LandingView }) {
       />
       <div
         aria-hidden
-        className="absolute inset-0 hidden bg-linear-to-t from-black/65 via-primary/20 to-transparent lg:block"
+        className="absolute inset-0 hidden bg-linear-to-t from-black/70 via-primary/20 to-transparent lg:block"
       />
       {/* Mobile — same readable wash as before */}
       <div
@@ -468,9 +478,13 @@ function Reviews({ dict }: { dict: LandingView["reviews"] }) {
 function Lifestyle({
   amenities,
   gallery,
+  projectMapUrl = "",
+  projectAddress = "",
 }: {
   amenities: LandingView["amenities"] | null;
   gallery: LandingView["gallery"] | null;
+  projectMapUrl?: string;
+  projectAddress?: string;
 }) {
   const showAmenities = Boolean(amenities?.items.length);
   const showGallery = Boolean(gallery?.shots.length);
@@ -489,28 +503,75 @@ function Lifestyle({
             />
           ) : null}
           <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {amenities.items.map((item, index) => (
-              <li
-                key={`${item.title}-${index}`}
-                className={`flex h-full gap-3 p-4 ${landingCardClass}`}
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Icon name={item.icon || "check"} size="sm" />
-                </span>
-                <div>
-                  {item.title ? (
-                    <h3 className="font-heading text-sm font-extrabold text-foreground">
-                      {item.title}
-                    </h3>
+            {amenities.items.map((item, index) => {
+              const mapUrl = item.mapUrl?.trim() || "";
+              // Pin only when admin pasted a Maps link.
+              if (!mapUrl && !item.title && !item.body) return null;
+
+              const bn = /[\u0980-\u09FF]/.test(item.title || item.body || "");
+              const { href, distance } = mapUrl
+                ? resolveAmenityMaps({
+                    projectMapUrl,
+                    projectAddress,
+                    placeMapUrl: mapUrl,
+                    placeName: item.title,
+                    manualDistance: item.distance,
+                    bn,
+                  })
+                : { href: "", distance: item.distance?.trim() || "" };
+
+              return (
+                <li
+                  key={`${item.title}-${index}`}
+                  className={cn(
+                    `relative flex h-full gap-3 p-4 ${landingCardClass}`,
+                    mapUrl && href && "pr-14",
+                  )}
+                >
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Icon name={item.icon || "check"} size="sm" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    {item.title ? (
+                      <h3 className="font-heading text-sm font-extrabold text-foreground">
+                        {item.title}
+                      </h3>
+                    ) : null}
+                    {distance ? (
+                      <p className="mt-0.5 inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+                        <Icon name="fa-solid fa-route" size="xs" />
+                        {bn ? "প্রজেক্ট থেকে" : "From project"} {distance}
+                      </p>
+                    ) : null}
+                    {item.body ? (
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                        {item.body}
+                      </p>
+                    ) : null}
+                  </div>
+                  {mapUrl && href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={
+                        distance
+                          ? `${item.title} — ${distance}`
+                          : `${item.title || "Place"} on Google Maps`
+                      }
+                      title={
+                        bn
+                          ? "প্রজেক্ট থেকে দূরত্ব / রুট দেখুন"
+                          : "See route from project"
+                      }
+                      className="absolute top-3.5 right-3.5 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 hover:bg-primary/90"
+                    >
+                      <Icon name="fa-solid fa-location-dot" size="sm" />
+                    </a>
                   ) : null}
-                  {item.body ? (
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                      {item.body}
-                    </p>
-                  ) : null}
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </>
       ) : null}
