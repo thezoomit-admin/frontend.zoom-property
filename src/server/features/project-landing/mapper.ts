@@ -4,7 +4,7 @@ import type { Locale } from "@/i18n/config";
 import { landingHref } from "@/lib/landing";
 import { resolveVideoProvider } from "@/lib/video";
 
-import { mediaUrl } from "../../base-api";
+import { mediaUrl, mediaUrls } from "../../base-api";
 import { LANDING_SECTIONS } from "./types";
 import type {
   ApiLandingChrome,
@@ -161,9 +161,7 @@ export function toLandingView(
     hero: {
       image: mediaUrl(hero.image as never),
       images: (() => {
-        const fromGallery = (hero.images || [])
-          .map((img) => mediaUrl(img as never))
-          .filter(Boolean);
+        const fromGallery = mediaUrls(hero.images as never);
         if (fromGallery.length) return fromGallery;
         const single = mediaUrl(hero.image as never);
         return single ? [single] : [];
