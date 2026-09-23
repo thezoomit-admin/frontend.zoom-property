@@ -160,6 +160,14 @@ export function toLandingView(
     ) as Record<LandingSectionKey, boolean>,
     hero: {
       image: mediaUrl(hero.image as never),
+      images: (() => {
+        const fromGallery = (hero.images || [])
+          .map((img) => mediaUrl(img as never))
+          .filter(Boolean);
+        if (fromGallery.length) return fromGallery;
+        const single = mediaUrl(hero.image as never);
+        return single ? [single] : [];
+      })(),
       badge: pick(locale, hero.badge, hero.badgeBn),
       handover: pick(locale, hero.handover, hero.handoverBn),
       eyebrow: pick(locale, hero.eyebrow, hero.eyebrowBn),
@@ -250,6 +258,8 @@ export function toLandingView(
           title: pick(locale, item.title, item.titleBn),
           body: pick(locale, item.body, item.bodyBn),
           icon: String(item.icon || "").trim(),
+          mapUrl: String(item.mapUrl || "").trim(),
+          distance: pick(locale, item.distance, item.distanceBn),
         }))
         .filter((item) => item.title || item.body),
     },

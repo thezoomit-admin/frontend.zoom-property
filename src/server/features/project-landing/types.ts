@@ -37,6 +37,9 @@ export interface ApiLandingPoint {
   body?: string;
   bodyBn?: string;
   icon?: string;
+  mapUrl?: string;
+  distance?: string;
+  distanceBn?: string;
 }
 
 export interface ApiLandingHighlight {
@@ -121,6 +124,7 @@ export interface ApiProjectLanding {
   sections?: Partial<Record<LandingSectionKey, ApiLandingFlag>>;
   hero?: {
     image?: ApiMedia | string | null;
+    images?: Array<ApiMedia | string | null>;
     badge?: string;
     badgeBn?: string;
     handover?: string;
@@ -381,6 +385,8 @@ export interface LandingView {
   sections: Record<LandingSectionKey, boolean>;
   hero: {
     image: string;
+    /** Full-bleed slideshow (falls back to `[image]` when empty). */
+    images: string[];
     badge: string;
     handover: string;
     eyebrow: string;
@@ -441,7 +447,13 @@ export interface LandingView {
     eyebrow: string;
     title: string;
     description: string;
-    items: { title: string; body: string; icon: string }[];
+    items: {
+      title: string;
+      body: string;
+      icon: string;
+      mapUrl: string;
+      distance: string;
+    }[];
   };
   gallery: {
     eyebrow: string;
