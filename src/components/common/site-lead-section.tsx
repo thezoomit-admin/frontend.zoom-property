@@ -4,7 +4,8 @@ import { Icon, type IconName } from "@/components/common/icon";
 import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
 import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
-import { getDictionary } from "@/i18n/dictionaries";
+import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { getLeadAreaOptions } from "@/server/features/areas";
 import {
   mailHref,
   socialProfiles,
@@ -27,7 +28,8 @@ export async function SiteLeadSection({
 }: {
   source?: string;
 }) {
-  const dict = await getDictionary();
+  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const areaOptions = await getLeadAreaOptions(locale, 60);
 
   const c = dict.contact.channels;
   const d = dict.contact.details;
@@ -167,6 +169,11 @@ export async function SiteLeadSection({
                   namePlaceholder: f.namePlaceholder,
                   phone: f.phone,
                   email: f.email,
+                  area: f.area,
+                  areaAny: f.areaAny,
+                  subArea: f.subArea,
+                  subAreaAny: f.subAreaAny,
+                  subAreaPickArea: f.subAreaPickArea,
                   message: f.message,
                   messagePlaceholder: f.messagePlaceholder,
                   submit: f.submit,
@@ -175,6 +182,7 @@ export async function SiteLeadSection({
                   successTitle: f.successTitle,
                   successBody: f.successBody,
                 }}
+                areas={areaOptions}
                 source={source}
                 subject="Website lead enquiry"
                 idPrefix="site-lead"
