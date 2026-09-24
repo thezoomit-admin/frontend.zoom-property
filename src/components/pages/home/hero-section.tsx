@@ -41,7 +41,7 @@ export async function HeroSection() {
   const images = cmsImages.length > 0 ? cmsImages : HERO_IMAGES;
 
   return (
-    <section className="relative z-10 flex min-h-[80svh] items-end overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
+    <section className="relative z-10 flex min-h-[80svh] items-center overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Parallax speed={0.18} zoom className="absolute inset-0 size-full">
           <HeroBackdrop images={images} fallbackImages={HERO_IMAGES} />
@@ -55,7 +55,7 @@ export async function HeroSection() {
 
       <AppContainer className="relative z-10 w-full pb-20 pt-16 sm:pb-24 sm:pt-20">
         {/* Left = copy, right = lead form (side-by-side from md up). */}
-        <div className="flex flex-col gap-10 md:flex-row md:items-end md:gap-12 lg:gap-14">
+        <div className="flex flex-col gap-10 md:flex-row md:items-center md:gap-12 lg:gap-14">
           <div className="flex min-w-0 flex-1 flex-col gap-6">
             <Reveal>
               <Badge className="w-fit gap-1.5 px-3 py-1 text-xs font-semibold">
