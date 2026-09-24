@@ -85,7 +85,7 @@ export function BlogFeaturedOverlayCard({
           size="h3"
           className="text-balance font-extrabold text-white transition-colors duration-200 group-hover:text-brand-green-light"
         >
-          <Link href={href} className="focus:outline-none focus:underline">
+          <Link href={href} prefetch className="focus:outline-none focus:underline">
             {title}
           </Link>
         </Heading>
@@ -152,7 +152,7 @@ export function BlogStandardCard({
       )}
     >
       {/* ── Photo ─────────────────────────────────────────────────── */}
-      <Link href={href} tabIndex={-1} aria-hidden className="block">
+      <Link href={href} prefetch tabIndex={-1} aria-hidden className="block">
         <ImageFrame
           src={insight.image}
           alt=""
@@ -194,7 +194,9 @@ export function BlogStandardCard({
           weight="bold"
           className="line-clamp-2 text-foreground transition-colors duration-200 group-hover:text-primary"
         >
-          <Link href={href}>{title}</Link>
+          <Link href={href} prefetch>
+            {title}
+          </Link>
         </Heading>
 
         <Text size="sm" className="line-clamp-2 leading-relaxed text-muted-foreground">

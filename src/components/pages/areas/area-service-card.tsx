@@ -65,6 +65,7 @@ export function AreaServiceCard({
   return (
     <Link
       href={localeHref(locale, `/areas/${area.id}`)}
+      prefetch
       className={cn(
         "group relative isolate flex h-full min-h-36 flex-col overflow-hidden rounded-lg border border-gray-200 p-3.5 transition-all duration-300 ease-out",
         "shadow-[0_1px_2px_rgba(27,35,24,0.05),0_11px_30px_-8px_rgba(75,128,45,0.25)] hover:border-primary/40 hover:bg-primary/[0.03] hover:shadow-[0_2px_4px_rgba(27,35,24,0.07),0_24px_44px_-12px_rgba(75,128,45,0.36)]",

@@ -70,6 +70,7 @@ export function PropertyCard({
     <Link
       href={localeHref(locale, `/properties/${property.slug}`)}
       aria-label={`${title}, ${displayArea}`}
+      prefetch
       className="block h-full"
     >
       <article

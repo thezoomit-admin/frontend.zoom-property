@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import type { Locale } from "@/i18n/config";
 
 import { baseApi, CACHE_TAGS } from "../../base-api";
@@ -81,11 +83,12 @@ const clone = <T,>(value: T): T =>
  *
  * Untouched when nothing is stored, so the cost of the CMS on a site nobody
  * has edited yet is one cached request.
+ *
+ * Cached per (locale) within a request so layout + page share one CMS fan-out.
  */
-export async function applyCmsOverrides<T extends object>(
-  dictionary: T,
-  locale: Locale,
-): Promise<T> {
+export const applyCmsOverrides = cache(async function applyCmsOverrides<
+  T extends object,
+>(dictionary: T, locale: Locale): Promise<T> {
   const groups = await Promise.all(
     GROUPS.map((group) =>
       baseApi.list<CmsRow>(`dynamic-content/by-group/${group}`, undefined, {
@@ -137,4 +140,4 @@ export async function applyCmsOverrides<T extends object>(
   }
 
   return applied ? (merged as T) : dictionary;
-}
+});

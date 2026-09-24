@@ -13,6 +13,9 @@ import { LOCALES } from "@/i18n/config";
 
 type Params = { lang: string; slug: string };
 
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 /** Prebuild every area detail so card clicks hit a warm page. */
 export async function generateStaticParams() {
   const list = await getAreas(100);

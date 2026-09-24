@@ -31,6 +31,9 @@ import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
 
 /** Prebuild every project detail so card clicks hit a warm page — no loading UI. */
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   const list = await getProjects(100);
   return LOCALES.flatMap((lang) =>
