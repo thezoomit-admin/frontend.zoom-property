@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useTransition } from "react";
+import { useMemo, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 import { Heading } from "@/components/common/heading";
@@ -10,7 +10,6 @@ import { Reveal } from "@/components/motion/reveal";
 import { BlogCategoryFilter } from "./blog-category-filter";
 import { BlogGridCard } from "./blog-grid-card";
 import { BlogPagination } from "./blog-pagination";
-import { BlogGridSkeleton } from "@/components/skeleton/blog-skeleton";
 
 interface BlogFeedProps {
   insights: Insight[];
@@ -42,7 +41,6 @@ export function BlogFeed({ insights, backendCategories, totalPages, locale, t }:
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
 
   const activeCategory = searchParams.get("category") || "All";
   const searchQuery = searchParams.get("search") || "";
@@ -85,9 +83,7 @@ export function BlogFeed({ insights, backendCategories, totalPages, locale, t }:
       }
     });
 
-    startTransition(() => {
-      router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-    });
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
   const selectCategory = (categoryId: string) => {
@@ -99,9 +95,7 @@ export function BlogFeed({ insights, backendCategories, totalPages, locale, t }:
   };
 
   const reset = () => {
-    startTransition(() => {
-      router.push(pathname, { scroll: false });
-    });
+    router.push(pathname, { scroll: false });
   };
 
   const goToPage = (next: number) => {
@@ -146,13 +140,7 @@ export function BlogFeed({ insights, backendCategories, totalPages, locale, t }:
         </div>
       ) : null}
 
-      {isPending ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-6 lg:gap-y-12">
-          {Array.from({ length: Math.min(insights.length, PER_PAGE) || 3 }).map((_, i) => (
-            <BlogGridSkeleton key={`skel-${i}`} />
-          ))}
-        </div>
-      ) : insights.length === 0 ? (
+      {insights.length === 0 ? (
         <p className="py-16 text-center text-muted-foreground">{t.noResults}</p>
       ) : (
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-6 lg:gap-y-12">

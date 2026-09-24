@@ -12,7 +12,6 @@ import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 import type { LandownerBlock } from "@/server/features/landowners";
-import { LandownerBlockSkeleton } from "@/components/skeleton/landowner-skeleton";
 
 const ANCHOR = "landowner-blocks";
 
@@ -66,52 +65,48 @@ export function LandownerFeed({
 
   return (
     <Section id={ANCHOR} className="border-t border-border bg-background scroll-mt-24">
-      <div className="flex flex-col gap-16 lg:gap-24">
-        {isPending ? (
-          // Skeleton loading state
-          Array.from({ length: Math.min(blocks.length, 5) || 5 }).map((_, index) => {
-            const flipped = (from - 1 + index) % 2 === 1;
-            return <LandownerBlockSkeleton key={`skel-${index}`} flipped={flipped} />;
-          })
-        ) : (
-          // Actual blocks
-          blocks.map((block, index) => {
-            const flipped = (from - 1 + index) % 2 === 1;
-
-            return (
-              <Reveal key={block.id}>
-                <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
-                  {block.image ? (
-                    <div className={cn(flipped && "lg:order-2")}>
-                      <ImageFrame
-                        src={block.image}
-                        alt={isBn ? block.titleBn : block.title}
-                        ratio="4/3"
-                        rounded="2xl"
-                        sizes="half"
-                        className="shadow-lg"
-                      />
-                    </div>
-                  ) : null}
-
-                  <div
-                    className={cn(
-                      "flex flex-col gap-4",
-                      flipped && "lg:order-1",
-                      !block.image && "lg:col-span-2"
-                    )}
-                  >
-                    <Heading as="h2" size="h2" className="text-balance">
-                      {isBn ? block.titleBn : block.title}
-                    </Heading>
-
-                    <RichText html={isBn ? block.descriptionBn : block.description} />
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })
+      <div
+        className={cn(
+          "flex flex-col gap-16 lg:gap-24 transition-opacity duration-200",
+          isPending && "pointer-events-none opacity-60",
         )}
+      >
+        {blocks.map((block, index) => {
+          const flipped = (from - 1 + index) % 2 === 1;
+
+          return (
+            <Reveal key={block.id}>
+              <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+                {block.image ? (
+                  <div className={cn(flipped && "lg:order-2")}>
+                    <ImageFrame
+                      src={block.image}
+                      alt={isBn ? block.titleBn : block.title}
+                      ratio="4/3"
+                      rounded="2xl"
+                      sizes="half"
+                      className="shadow-lg"
+                    />
+                  </div>
+                ) : null}
+
+                <div
+                  className={cn(
+                    "flex flex-col gap-4",
+                    flipped && "lg:order-1",
+                    !block.image && "lg:col-span-2",
+                  )}
+                >
+                  <Heading as="h2" size="h2" className="text-balance">
+                    {isBn ? block.titleBn : block.title}
+                  </Heading>
+
+                  <RichText html={isBn ? block.descriptionBn : block.description} />
+                </div>
+              </div>
+            </Reveal>
+          );
+        })}
       </div>
 
       {totalPages > 1 ? (
