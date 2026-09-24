@@ -5,6 +5,8 @@ import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteFooterSwitch } from "@/components/layout/site-footer-switch";
+import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteLeadMount } from "@/components/layout/site-lead-mount";
 import { SiteLeadSection } from "@/components/common/site-lead-section";
@@ -143,7 +145,13 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
           <SiteLeadMount campaignPaths={campaignHrefs}>
             <SiteLeadSection />
           </SiteLeadMount>
-          <SiteFooter />
+          <SiteFooterSwitch
+            normal={<SiteFooter />}
+            landings={campaigns.map((chrome) => ({
+              href: chrome.href,
+              node: <LandingFooter key={chrome.path} chrome={chrome} />,
+            }))}
+          />
           <MobileBottomNav locale={locale} campaignPaths={campaignHrefs} />
           <ContactDock />
           <ScrollToTop />
