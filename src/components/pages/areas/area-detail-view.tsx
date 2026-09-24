@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Heading } from "@/components/common/heading";
@@ -27,6 +27,7 @@ import type { Locale } from "@/i18n/config";
 import { localeHref } from "@/i18n/href";
 import { cn } from "@/lib/utils";
 import { submitContactForm } from "@/server/features/inquiries/action";
+import { fetchProjectsForSubArea } from "@/server/features/projects/action";
 import type { SubArea } from "@/server/features/sub-areas";
 import Link from "next/link";
 
@@ -59,19 +60,16 @@ export interface AreaDetailCopy {
 }
 
 /**
- * Area detail: sub-area cards → lead modal → projects for that pocket.
+ * Area detail: sub-area table → lead modal → fetch projects for that pocket.
  */
 export function AreaDetailView({
   area,
   subAreas,
-  projectsBySubArea,
   locale,
   copy,
 }: {
   area: Area;
   subAreas: SubArea[];
-  /** Preloaded projects keyed by sub-area refId. */
-  projectsBySubArea: Record<string, Project[]>;
   locale: Locale;
   copy: AreaDetailCopy;
 }) {
@@ -81,15 +79,31 @@ export function AreaDetailView({
 
   const [active, setActive] = useState<SubArea | null>(null);
   const [unlockedId, setUnlockedId] = useState<string | null>(null);
+  const [unlockedProjects, setUnlockedProjects] = useState<Project[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const unlockedProjects = useMemo(() => {
-    if (!unlockedId) return [];
-    return projectsBySubArea[unlockedId] || [];
-  }, [unlockedId, projectsBySubArea]);
-
   const unlockedSub = subAreas.find((s) => s.refId === unlockedId);
+
+  async function unlockProjects(sub: SubArea) {
+    setUnlockedId(sub.refId);
+    setLoadingProjects(true);
+    try {
+      const rows = await fetchProjectsForSubArea(sub.refId);
+      setUnlockedProjects(rows);
+      requestAnimationFrame(() => {
+        document
+          .getElementById("area-projects")
+          ?.scrollIntoView({ behavior: "smooth" });
+      });
+    } catch {
+      setUnlockedProjects([]);
+      toast.error("Could not load projects");
+    } finally {
+      setLoadingProjects(false);
+    }
+  }
 
   async function handleLeadSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -121,10 +135,11 @@ export function AreaDetailView({
     if (res.success) {
       trackMeta("Lead", { content_name: `Area ${area.name} / ${active.name}` });
       toast.success(copy.leadSuccess);
-      setUnlockedId(active.refId);
+      const unlocked = active;
       setActive(null);
       setPhone("");
       form.reset();
+      await unlockProjects(unlocked);
     } else {
       toast.error(res.error || "Failed to submit");
     }
@@ -152,101 +167,88 @@ export function AreaDetailView({
             </Text>
           ) : null}
         </div>
-        <Button asChild variant="outline" className="w-fit">
-          <Link href={localeHref(locale, "/areas")}>
-            <Icon name="arrowLeft" size="xs" />
-            {copy.backToAreas}
-          </Link>
-        </Button>
+        <Link
+          href={localeHref(locale, "/areas")}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        >
+          <Icon name="arrowLeft" size="xs" />
+          {copy.backToAreas}
+        </Link>
       </div>
 
       <section>
         <Heading as="h2" size="h4">
           {copy.subAreasTitle}
         </Heading>
-        <Text size="sm" className="mt-2 max-w-2xl text-muted-foreground">
-          {copy.subAreasLead}
-        </Text>
+        {copy.subAreasLead ? (
+          <Text size="sm" className="mt-2 max-w-2xl text-muted-foreground">
+            {copy.subAreasLead}
+          </Text>
+        ) : null}
 
         {subAreas.length === 0 ? (
           <p className="mt-6 text-sm text-muted-foreground">
             {copy.projectsEmpty}
           </p>
         ) : (
-          <div className="mt-6 overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+          <div className="mt-6 overflow-hidden rounded-xl border border-border">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/50">
-                    <th className="w-14 px-4 py-3 font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                      {copy.colNo}
-                    </th>
-                    <th className="px-4 py-3 font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                      {copy.colSubArea}
-                    </th>
-                    <th className="hidden px-4 py-3 font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase md:table-cell">
-                      {copy.colTagline}
-                    </th>
-                    <th className="w-28 px-4 py-3 text-center font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                      {copy.colProjects}
-                    </th>
-                    <th className="w-40 px-4 py-3 text-right font-heading text-xs font-bold tracking-wider text-muted-foreground uppercase">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">{copy.colNo}</th>
+                    <th className="px-4 py-3 font-medium">{copy.colSubArea}</th>
+                    <th className="px-4 py-3 font-medium">{copy.colTagline}</th>
+                    <th className="px-4 py-3 font-medium">{copy.colProjects}</th>
+                    <th className="px-4 py-3 text-right font-medium">
                       {copy.colAction}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {subAreas.map((sub, index) => {
-                    const name = isBn && sub.nameBn ? sub.nameBn : sub.name;
-                    const tagline =
-                      isBn && sub.taglineBn ? sub.taglineBn : sub.tagline;
                     const selected = unlockedId === sub.refId;
+                    const name = isBn && sub.nameBn ? sub.nameBn : sub.name;
+                    const note =
+                      isBn && sub.taglineBn ? sub.taglineBn : sub.tagline;
+                    const countLabel = copy.projectCount.replace(
+                      "{count}",
+                      String(sub.projectCount ?? 0),
+                    );
                     return (
                       <tr
                         key={sub.refId}
                         className={cn(
-                          "border-b border-border last:border-b-0 transition-colors",
-                          selected ? "bg-primary/5" : "hover:bg-muted/40",
+                          "border-t border-border transition-colors",
+                          selected && "bg-primary/5",
                         )}
                       >
-                        <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
-                          {String(index + 1).padStart(2, "0")}
+                        <td className="px-4 py-2.5 text-muted-foreground">
+                          {index + 1}
                         </td>
                         <td className="px-4 py-2.5">
-                          <div className="flex items-center gap-2.5">
-                            <span className="relative block size-8 shrink-0 overflow-hidden rounded border border-border bg-muted">
+                          <div className="flex items-center gap-3">
+                            <span className="relative size-10 shrink-0 overflow-hidden rounded-md bg-muted">
                               {sub.image ? (
                                 <Image
                                   src={sub.image}
                                   alt=""
-                                  width={32}
-                                  height={32}
-                                  sizes="32px"
-                                  className="size-8 object-cover"
+                                  fill
+                                  sizes="40px"
+                                  className="object-cover"
                                 />
-                              ) : (
-                                <span className="absolute inset-0 grid place-items-center text-muted-foreground">
-                                  <Icon name="location" size="xs" />
-                                </span>
-                              )}
-                            </span>
-                            <span className="min-w-0">
-                              <span className="block font-heading text-sm font-bold text-foreground">
-                                {name}
-                              </span>
-                              {tagline ? (
-                                <span className="mt-0.5 line-clamp-1 text-xs text-muted-foreground md:hidden">
-                                  {tagline}
-                                </span>
                               ) : null}
+                            </span>
+                            <span className="font-medium text-foreground">
+                              {name}
                             </span>
                           </div>
                         </td>
-                        <td className="hidden max-w-xs px-4 py-2.5 text-muted-foreground md:table-cell">
-                          <span className="line-clamp-2">{tagline || "—"}</span>
+                        <td className="max-w-xs px-4 py-2.5 text-muted-foreground">
+                          <span className="line-clamp-2">{note || "—"}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-center tabular-nums font-medium text-foreground">
-                          {sub.projectCount ?? 0}
+                        <td className="px-4 py-2.5 text-muted-foreground">
+                          {countLabel}
                         </td>
                         <td className="px-4 py-2.5 text-right">
                           <Button
@@ -292,7 +294,16 @@ export function AreaDetailView({
               </span>
             ) : null}
           </Heading>
-          {unlockedProjects.length === 0 ? (
+          {loadingProjects ? (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-56 animate-pulse rounded-xl border border-border bg-muted/60"
+                />
+              ))}
+            </div>
+          ) : unlockedProjects.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
               {copy.projectsEmpty}
             </p>

@@ -8,7 +8,6 @@ import { pageBanners } from "@/data/page-banners";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getAreaBySlug } from "@/server/features/areas";
-import { getProjects } from "@/server/features/projects";
 import { getSubAreasByArea } from "@/server/features/sub-areas";
 
 type Params = { lang: string; slug: string };
@@ -38,33 +37,25 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Area detail — only area + sub-areas on first paint.
+ * Projects load after the lead gate (see AreaDetailView), so card → page
+ * navigation stays fast.
+ */
 export default async function AreaDetailPage({
   params,
 }: {
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const [dict, locale, area] = await Promise.all([
+  const [dict, locale, area, subAreas] = await Promise.all([
     getDictionary(),
     getLocale(),
     getAreaBySlug(slug),
+    getSubAreasByArea(slug, 80),
   ]);
 
   if (!area) notFound();
-
-  // One bulk fetch for the whole area, grouped by sub-area in memory —
-  // firing one request per sub-area (up to 80 of them) meant an area page
-  // could hold on 80 parallel round trips just to render.
-  const [subAreas, areaProjects] = await Promise.all([
-    getSubAreasByArea(area.refId || area.id, 80),
-    getProjects({ area: area.refId || area.id, limit: 200, sort: "order" }),
-  ]);
-
-  const projectsBySubArea: Record<string, typeof areaProjects> = {};
-  for (const project of areaProjects) {
-    if (!project.subAreaRefId) continue;
-    (projectsBySubArea[project.subAreaRefId] ??= []).push(project);
-  }
 
   const form = dict.contact.form;
   const detail = (dict.areas as { detail?: Record<string, string> }).detail || {};
@@ -87,7 +78,6 @@ export default async function AreaDetailPage({
         <AreaDetailView
           area={area}
           subAreas={subAreas}
-          projectsBySubArea={projectsBySubArea}
           locale={locale}
           copy={{
             eyebrow: detail.eyebrow || dict.areas.badge,

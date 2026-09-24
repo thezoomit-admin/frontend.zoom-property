@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { areas as fallback, type Area } from "@/data/areas";
 
 import { CACHE_TAGS, createResource } from "../../base-api";
@@ -36,10 +38,10 @@ export async function getAreas(limit = 60): Promise<Area[]> {
   if (page?.rows?.length) return page.rows;
   return limit > 0 ? fallback.slice(0, limit) : fallback;
 }
-/** One area by its slug, or `null` when there is none. */
-export async function getAreaBySlug(slug: string): Promise<Area | null> {
+/** One area by its slug, or `null` when there is none. Deduped per request. */
+export const getAreaBySlug = cache(async (slug: string): Promise<Area | null> => {
   return areas.bySlug(slug);
-}
+});
 
 /**
  * Areas + nested sub-areas for enquiry forms (hero, site CTA, contact).
