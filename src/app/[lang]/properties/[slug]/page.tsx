@@ -20,22 +20,32 @@ import {
   similarProperties,
 } from "@/data/properties";
 import { localeAlternates } from "@/i18n/alternates";
-import type { Locale } from "@/i18n/config";
+import { LOCALES, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
-import { getPropertyBySlug } from "@/server/features/properties";
+import { getProperties, getPropertyBySlug } from "@/server/features/properties";
 import { telHref } from "@/lib/contact";
 import { formatArea, formatBdt, formatKatha, formatRent } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, propertySchema } from "@/lib/seo";
 import { ContactCta } from "@/components/common/contact-cta";
 
+/** Prebuild listing details so card clicks hit a warm page. */
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const list = await getProperties(100);
+  return LOCALES.flatMap((lang) =>
+    list.map((property) => ({ lang, slug: property.slug })),
+  );
+}
+
 /**
  * One listing.
  *
- * Listings live in the CMS and can be added or retired at any time. Each
- * detail route therefore renders on demand and uses the API cache tag for
- * revalidation, avoiding stale demo routes in production builds.
+ * Detail routes are prerendered at build (see generateStaticParams) and
+ * refreshed via the properties cache tag when the desk edits a listing.
  *
  * The page answers, in order, the questions a buyer here actually asks — what
  * does it cost, what does it look like, how big is it, are the papers clean,
@@ -76,11 +86,14 @@ export default async function PropertyDetailPage({
   params: Promise<{ lang: Locale; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const property = (await getPropertyBySlug(slug)) ?? propertyBySlug(slug);
+  const [fetchedProperty, dict] = await Promise.all([
+    getPropertyBySlug(slug),
+    getDictionary(),
+  ]);
+  const property = fetchedProperty ?? propertyBySlug(slug);
 
   if (!property) notFound();
 
-  const dict = await getDictionary();
   const t = dict.property;
   const displayTitle = lang === "bn" && property.titleBn ? property.titleBn : property.title;
   const displayArea = lang === "bn" && property.areaBn ? property.areaBn : property.area;

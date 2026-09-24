@@ -7,11 +7,22 @@ import { AreaDetailView } from "@/components/pages/areas/area-detail-view";
 import { pageBanners } from "@/data/page-banners";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { getAreaBySlug } from "@/server/features/areas";
-import { getProjects } from "@/server/features/projects";
+import { getAreaBySlug, getAreas } from "@/server/features/areas";
 import { getSubAreasByArea } from "@/server/features/sub-areas";
+import { LOCALES } from "@/i18n/config";
 
 type Params = { lang: string; slug: string };
+
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+/** Prebuild every area detail so card clicks hit a warm page. */
+export async function generateStaticParams() {
+  const list = await getAreas(100);
+  return LOCALES.flatMap((lang) =>
+    list.map((area) => ({ lang, slug: area.id })),
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -38,34 +49,25 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Area detail — only area + sub-areas on first paint.
+ * Projects load after the lead gate (see AreaDetailView), so card → page
+ * navigation stays fast.
+ */
 export default async function AreaDetailPage({
   params,
 }: {
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const [dict, locale, area] = await Promise.all([
+  const [dict, locale, area, subAreas] = await Promise.all([
     getDictionary(),
     getLocale(),
     getAreaBySlug(slug),
+    getSubAreasByArea(slug, 80),
   ]);
 
   if (!area) notFound();
-
-  const subAreas = await getSubAreasByArea(area.refId || area.id, 80);
-
-  const projectsBySubArea: Record<string, Awaited<ReturnType<typeof getProjects>>> =
-    {};
-  await Promise.all(
-    subAreas.map(async (sub) => {
-      const rows = await getProjects({
-        subArea: sub.refId,
-        limit: 40,
-        sort: "order",
-      });
-      projectsBySubArea[sub.refId] = rows;
-    }),
-  );
 
   const form = dict.contact.form;
   const detail = (dict.areas as { detail?: Record<string, string> }).detail || {};
@@ -88,7 +90,6 @@ export default async function AreaDetailPage({
         <AreaDetailView
           area={area}
           subAreas={subAreas}
-          projectsBySubArea={projectsBySubArea}
           locale={locale}
           copy={{
             eyebrow: detail.eyebrow || dict.areas.badge,

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { projects as fallback, type Project } from "@/data/projects";
 
 import { CACHE_TAGS, createResource, type QueryParams } from "../../base-api";
@@ -49,21 +51,27 @@ export const getProjects = (params?: number | ProjectFilters) => {
  * *and* the units on the market inside it, so the envelope is unwrapped by
  * hand. A development switched off in the panel is not found rather than
  * rendered empty, so `/projects/[slug]` can 404 properly.
+ *
+ * Cached per request so metadata + page share one fetch.
  */
-export async function getProjectBySlug(
-  slug: string,
-): Promise<{ project: Project; listingSlugs: string[] } | null> {
-  const res = await projects.raw<ApiProjectDetail>(
-    `projects/public/${encodeURIComponent(slug)}`,
-  );
+export const getProjectBySlug = cache(
+  async (
+    slug: string,
+  ): Promise<{ project: Project; listingSlugs: string[] } | null> => {
+    const res = await projects.raw<ApiProjectDetail>(
+      `projects/public/${encodeURIComponent(slug)}`,
+    );
 
-  if (res?.data?.project) {
-    return {
-      project: projects.map(res.data.project),
-      listingSlugs: (res.data.listings ?? []).map((l) => l.slug).filter(Boolean),
-    };
-  }
+    if (res?.data?.project) {
+      return {
+        project: projects.map(res.data.project),
+        listingSlugs: (res.data.listings ?? [])
+          .map((l) => l.slug)
+          .filter(Boolean),
+      };
+    }
 
-  const local = fallback.find((p) => p.slug === slug);
-  return local ? { project: local, listingSlugs: [] } : null;
-}
+    const local = fallback.find((p) => p.slug === slug);
+    return local ? { project: local, listingSlugs: [] } : null;
+  },
+);

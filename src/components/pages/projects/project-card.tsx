@@ -46,6 +46,7 @@ export function ProjectCard({
     <Link
       href={localeHref(locale, `/projects/${project.slug}`)}
       aria-label={`${displayName}, ${project.area}`}
+      prefetch
       className="block h-full"
     >
       <article

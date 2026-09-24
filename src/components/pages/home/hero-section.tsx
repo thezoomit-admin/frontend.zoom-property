@@ -32,8 +32,14 @@ const HERO_IMAGES = [
 ];
 
 export async function HeroSection() {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
-  const areaOptions = await getLeadAreaOptions(locale, 60);
+  // `getLocale()` just reads the route param — no network cost — so it
+  // resolves first and the two real fetches below run in parallel instead of
+  // one gating the other.
+  const locale = await getLocale();
+  const [dict, areaOptions] = await Promise.all([
+    getDictionary(),
+    getLeadAreaOptions(locale, 60),
+  ]);
 
   const cmsImages = (dict.hero.backgroundImages ?? []).filter(
     (url): url is string => typeof url === "string" && url.trim().length > 0,

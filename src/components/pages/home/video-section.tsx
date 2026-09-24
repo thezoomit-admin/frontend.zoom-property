@@ -13,7 +13,11 @@ import { getDictionary, getLocale } from "@/i18n/dictionaries";
  * cinematic home backdrop. The catalogue card design is used on inner pages.
  */
 export async function VideoSection() {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const [dict, locale, videos] = await Promise.all([
+    getDictionary(),
+    getLocale(),
+    getHomeVideos(),
+  ]);
   const t = dict.videoSection;
   return (
     <section
@@ -37,7 +41,7 @@ export async function VideoSection() {
         <SectionHeading title={t.title} align="center" tone="inverse" />
         <OrnamentDivider tone="inverse" className="mt-7" />
         <div className="mt-8 sm:mt-12">
-          <VideoCarousel videos={await getHomeVideos()} locale={locale} dict={t} />
+          <VideoCarousel videos={videos} locale={locale} dict={t} />
         </div>
       </AppContainer>
     </section>

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 
 import { fontVariables } from "../fonts";
@@ -143,7 +144,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
           />
           <CampaignMain campaignPaths={campaignHrefs}>{children}</CampaignMain>
           <SiteLeadMount campaignPaths={campaignHrefs}>
-            <SiteLeadSection />
+            <Suspense fallback={null}>
+              <SiteLeadSection />
+            </Suspense>
           </SiteLeadMount>
           <SiteFooterSwitch
             normal={<SiteFooter />}

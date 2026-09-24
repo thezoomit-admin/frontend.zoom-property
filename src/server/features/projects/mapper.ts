@@ -18,6 +18,7 @@ export const toProject = (p: ApiProject): Project => ({
   name: p.name,
   nameBn: p.nameBn,
   area: p.area?.name || "",
+  subAreaRefId: p.subArea?._id,
   city: p.city || "Dhaka",
   progress: p.progress ?? 0,
   handover: p.handover || "",

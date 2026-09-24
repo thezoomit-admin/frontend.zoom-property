@@ -34,12 +34,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const [dict, locale, faq] = await Promise.all([
+  const locale = await getLocale();
+  const [dict, faq, areaOptions, budgetOptions] = await Promise.all([
     getDictionary(),
-    getLocale(),
     faqSchema(),
-  ]);
-  const [areaOptions, budgetOptions] = await Promise.all([
     getLeadAreaOptions(locale, 60),
     getBudgetOptions(locale),
   ]);

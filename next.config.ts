@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
     // sits under a dynamic segment (`app/[lang]/layout.tsx`), so a URL that
     // matches no route has no layout to render a `not-found.tsx` inside.
     globalNotFound: true,
+    // Keep soft-nav RSC payloads warm so card → detail feels instant after
+    // the first visit (and after Link prefetch).
+    staleTimes: {
+      dynamic: 30,
+      static: 300,
+    },
   },
 
   images: {

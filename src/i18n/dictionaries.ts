@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { lang } from "next/root-params";
 import { notFound } from "next/navigation";
 
@@ -32,19 +33,20 @@ const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
   bn: () => import("./messages/bn.json").then((m) => m.default as Dictionary),
 };
 
-export async function getLocale(): Promise<Locale> {
+export const getLocale = cache(async (): Promise<Locale> => {
   const value = await lang();
   if (!value || !isLocale(value)) notFound();
   return value;
-}
+});
 
-export async function getDictionary(): Promise<Dictionary> {
+/** One CMS-merged dictionary per request — layout + page + sections share it. */
+export const getDictionary = cache(async (): Promise<Dictionary> => {
   const locale = await getLocale();
   const dictionary = await dictionaries[locale]();
   // Whatever the desk has edited in the panel wins over the JSON. Nothing
   // edited, or no API to ask, and this hands back the dictionary unchanged.
   return applyCmsOverrides(dictionary, locale);
-}
+});
 
 /**
  * Load a dictionary for an explicitly given locale.
@@ -54,7 +56,9 @@ export async function getDictionary(): Promise<Dictionary> {
  * Boundaries that render *because* a route did not match resolve their own
  * locale (falling back to the default) and come through here instead.
  */
-export async function getDictionaryFor(locale: Locale): Promise<Dictionary> {
-  const dictionary = await dictionaries[locale]();
-  return applyCmsOverrides(dictionary, locale);
-}
+export const getDictionaryFor = cache(
+  async (locale: Locale): Promise<Dictionary> => {
+    const dictionary = await dictionaries[locale]();
+    return applyCmsOverrides(dictionary, locale);
+  },
+);

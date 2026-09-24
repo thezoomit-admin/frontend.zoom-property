@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { Heading } from "@/components/common/heading";
 import { Icon, type IconName } from "@/components/common/icon";
@@ -10,10 +11,9 @@ import { Section } from "@/components/common/section";
 import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
 import { VideoEmbed } from "@/components/media/video-embed";
-import { Stagger, StaggerItem } from "@/components/motion/stagger";
-import { ProjectCard } from "@/components/pages/projects/project-card";
 import { ProjectProgress } from "@/components/pages/projects/project-progress";
 import { ProjectShowcase } from "@/components/pages/projects/project-showcase";
+import { RelatedProjects } from "@/components/pages/projects/related-projects";
 import { ConsultantCard } from "@/components/pages/properties/consultant-card";
 import { AreaFacts } from "@/components/pages/properties/area-facts";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { ContactCta } from "@/components/common/contact-cta";
 
 import { localeAlternates } from "@/i18n/alternates";
-import type { Locale } from "@/i18n/config";
+import { LOCALES, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { getProjectBySlug, getProjects } from "@/server/features/projects";
@@ -29,6 +29,17 @@ import { telHref } from "@/lib/contact";
 import { formatBdt } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
+
+/** Prebuild every project detail so card clicks hit a warm page — no loading UI. */
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const list = await getProjects(100);
+  return LOCALES.flatMap((lang) =>
+    list.map((project) => ({ lang, slug: project.slug })),
+  );
+}
 
 /**
  * One development.
@@ -72,19 +83,17 @@ export default async function ProjectDetailPage({
   params: Promise<{ lang: Locale; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const found = await getProjectBySlug(slug);
+  const [found, dict] = await Promise.all([
+    getProjectBySlug(slug),
+    getDictionary(),
+  ]);
 
   if (!found) notFound();
 
   const { project } = found;
-  const dict = await getDictionary();
   const t = dict.projectDetail;
 
   const agent = project.agent;
-  // The rest of the pipeline, minus this one. Three is what the row holds.
-  const others = (await getProjects(12))
-    .filter((item) => item.slug !== project.slug)
-    .slice(0, 3);
   const path = `/${lang}/projects/${slug}`;
 
   const sold = project.units - project.unitsLeft;
@@ -285,10 +294,6 @@ export default async function ProjectDetailPage({
             <Text className="max-w-2xl text-white/70">{t.videoLead}</Text>
           </div>
 
-          {/* Lite embed: the poster is ours and YouTube's player is only
-              fetched once someone presses play, so the page does not carry a
-              megabyte of third-party script for a video most visitors scroll
-              past. */}
           <VideoEmbed
             url={project.video.youtubeUrl}
             title={lang === "bn" ? project.video.titleBn : project.video.title}
@@ -306,7 +311,7 @@ export default async function ProjectDetailPage({
           <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
             <iframe
               src={project.mapUrl.includes("/embed") ? project.mapUrl : (
-                project.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) 
+                project.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
                   ? `https://maps.google.com/maps?q=${project.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1]},${project.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2]}&hl=${lang}&z=14&output=embed`
                   : project.mapUrl.match(/\/place\/([^/]+)/)
                     ? `https://maps.google.com/maps?q=${project.mapUrl.match(/\/place\/([^/]+)/)?.[1]}&hl=${lang}&z=14&output=embed`
@@ -323,21 +328,13 @@ export default async function ProjectDetailPage({
         </Section>
       ) : null}
 
-      {others.length > 0 ? (
-        <Section className="border-t border-border bg-muted/30">
-          <Heading as="h2" size="h3">
-            {t.others}
-          </Heading>
-
-          <Stagger className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {others.map((item) => (
-              <StaggerItem key={item.id}>
-                <ProjectCard project={item} locale={lang} />
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </Section>
-      ) : null}
+      <Suspense fallback={null}>
+        <RelatedProjects
+          excludeSlug={project.slug}
+          locale={lang}
+          title={t.others}
+        />
+      </Suspense>
 
       <ContactCta tone="surface" />
     </>

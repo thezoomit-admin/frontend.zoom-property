@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, useTransition, useEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/common/icon";
 import { ProjectCard } from "./project-card";
 import type { Project } from "@/data/projects";
@@ -9,10 +9,26 @@ import type { Locale } from "@/i18n/config";
 import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
-import { ProjectGridSkeleton } from "@/components/skeleton/project-skeleton";
 
 export type ProjectStageFilter = "all" | "Completed" | "Planning" | "Processing";
 const PAGE_SIZE = 6;
+
+function stageFromParam(val?: string | null): ProjectStageFilter {
+  if (!val) return "all";
+  const lower = val.toLowerCase();
+  if (lower === "completed" || lower === "done" || lower === "complete") {
+    return "Completed";
+  }
+  if (lower === "planning") return "Planning";
+  if (
+    lower === "processing" ||
+    lower === "under construction" ||
+    lower === "in progress"
+  ) {
+    return "Processing";
+  }
+  return "all";
+}
 
 export function InteractiveProjects({
   projects = [],
@@ -27,51 +43,39 @@ export function InteractiveProjects({
   initialSearch?: string;
   initialPage?: number;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Normalize initial stage
-  const getStageFromParam = (val?: string | null): ProjectStageFilter => {
-    if (!val) return "all";
-    const lower = val.toLowerCase();
-    if (lower === "completed" || lower === "done" || lower === "complete") return "Completed";
-    if (lower === "planning") return "Planning";
-    if (lower === "processing" || lower === "under construction" || lower === "in progress") return "Processing";
-    return "all";
-  };
-
-  const selectedStage = getStageFromParam(searchParams.get("stage") ?? initialStage);
-  const urlQ = searchParams.get("q") ?? initialSearch ?? "";
-  const [searchQuery, setSearchQuery] = useState<string>(urlQ);
+  const [selectedStage, setSelectedStage] = useState<ProjectStageFilter>(() =>
+    stageFromParam(initialStage),
+  );
+  const [searchQuery, setSearchQuery] = useState(initialSearch ?? "");
+  const [page, setPage] = useState(
+    initialPage && initialPage > 0 ? initialPage : 1,
+  );
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const page = searchParams.get("page") ? Number(searchParams.get("page")) : (initialPage ?? 1);
-  const [isPending, startTransition] = useTransition();
 
-  const updateUrl = (newStage: ProjectStageFilter, newSearch: string, newPage: number) => {
+  const syncUrl = (
+    stage: ProjectStageFilter,
+    search: string,
+    nextPage: number,
+  ) => {
     const params = new URLSearchParams();
-    if (newStage !== "all") params.set("stage", newStage.toLowerCase());
-    if (newSearch.trim()) params.set("q", newSearch.trim());
-    if (newPage > 1) params.set("page", String(newPage));
-
+    if (stage !== "all") params.set("stage", stage.toLowerCase());
+    if (search.trim()) params.set("q", search.trim());
+    if (nextPage > 1) params.set("page", String(nextPage));
     const qs = params.toString();
-    const targetUrl = qs ? `${pathname}?${qs}` : pathname;
-    
-    startTransition(() => {
-      router.replace(targetUrl, { scroll: false });
-    });
+    // Client-only — no RSC refetch, no loading shell.
+    window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
   };
 
   useEffect(() => {
-    if (debouncedSearchQuery !== (searchParams.get("q") ?? "")) {
-      updateUrl(selectedStage, debouncedSearchQuery, 1);
-    }
+    setPage(1);
+    syncUrl(selectedStage, debouncedSearchQuery, 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchQuery]);
 
   const isBn = locale === "bn";
 
-  // Calculate live counts for each stage
   const counts = useMemo(() => {
     return {
       all: projects.length,
@@ -81,7 +85,8 @@ export function InteractiveProjects({
           p.status?.toLowerCase() === "done" ||
           p.status?.toLowerCase() === "complete",
       ).length,
-      Planning: projects.filter((p) => p.status?.toLowerCase() === "planning").length,
+      Planning: projects.filter((p) => p.status?.toLowerCase() === "planning")
+        .length,
       Processing: projects.filter(
         (p) =>
           p.status?.toLowerCase() === "processing" ||
@@ -91,10 +96,8 @@ export function InteractiveProjects({
     };
   }, [projects]);
 
-  // Filter projects by stage and search query
   const filtered = useMemo(() => {
     return projects.filter((project) => {
-      // Stage filter
       if (selectedStage !== "all") {
         const pStatus = (project.status || "").toLowerCase();
         if (
@@ -116,10 +119,10 @@ export function InteractiveProjects({
         }
       }
 
-      // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const haystack = `${project.name} ${project.area} ${project.city} ${project.status}`.toLowerCase();
+        const haystack =
+          `${project.name} ${project.area} ${project.city} ${project.status}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
 
@@ -127,27 +130,35 @@ export function InteractiveProjects({
     });
   }, [projects, selectedStage, searchQuery]);
 
-  // Reset page when filter changes
   const handleStageChange = (stage: ProjectStageFilter) => {
-    updateUrl(stage, searchQuery, 1);
+    setSelectedStage(stage);
+    setPage(1);
+    syncUrl(stage, searchQuery, 1);
   };
 
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
   };
+
   const handlePageChange = (newPage: number) => {
-    updateUrl(selectedStage, searchQuery, newPage);
+    setPage(newPage);
+    syncUrl(selectedStage, searchQuery, newPage);
     window.scrollTo({ top: 380, behavior: "smooth" });
   };
 
-  // Pagination calculation
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedStage("all");
+    setPage(1);
+    syncUrl("all", "", 1);
+  };
+
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
   const paginated = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  // Tabs ordered: All, Completed, Planning, Processing
   const stagesTabs: {
     id: ProjectStageFilter;
     labelEn: string;
@@ -182,7 +193,7 @@ export function InteractiveProjects({
     },
     {
       id: "Processing",
-      labelEn: "Processing",
+      labelEn: "Under Construction",
       labelBn: "চলমান নির্মাণ",
       count: counts.Processing,
       icon: "construction",
@@ -192,10 +203,8 @@ export function InteractiveProjects({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* 1. Filter Tabs Bar & Search Box */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        {/* Status Filter Tabs (Completed, Planning, Processing, All) */}
-        <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-secondary-100/80 dark:bg-card border border-border/80 shadow-xs">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border/80 bg-secondary-100/80 p-1.5 shadow-xs dark:bg-card">
           {stagesTabs.map((tab) => {
             const isActive = selectedStage === tab.id;
             return (
@@ -204,10 +213,10 @@ export function InteractiveProjects({
                 type="button"
                 onClick={() => handleStageChange(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer select-none",
+                  "flex cursor-pointer select-none items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all sm:text-sm",
                   isActive
-                    ? `${tab.activeColor} shadow-sm scale-[1.02]`
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/80",
+                    ? `${tab.activeColor} scale-[1.02] shadow-sm`
+                    : "text-muted-foreground hover:bg-background/80 hover:text-foreground",
                 )}
               >
                 <Icon name={tab.icon} size="xs" />
@@ -227,33 +236,35 @@ export function InteractiveProjects({
           })}
         </div>
 
-        {/* Quick Search */}
         <div className="relative w-full lg:w-72">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder={isBn ? "প্রজেক্টের নাম বা এলাকা খুঁজুন..." : "Search project or area..."}
-            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 pl-10 text-xs sm:text-sm text-foreground shadow-xs outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+            placeholder={
+              isBn
+                ? "প্রজেক্টের নাম বা এলাকা খুঁজুন..."
+                : "Search project or area..."
+            }
+            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 pl-10 text-xs text-foreground shadow-xs outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm"
           />
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-muted-foreground">
             <Icon name="search" size="xs" />
           </span>
-          {searchQuery && (
+          {searchQuery ? (
             <button
               type="button"
               onClick={() => handleSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-xs text-muted-foreground hover:text-foreground"
             >
               ✕
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 
-      {/* 2. Results Header */}
       <div className="flex items-center justify-between border-b border-border pb-3">
-        <span className="text-xs sm:text-sm font-medium text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground sm:text-sm">
           {isBn
             ? `মোট ${filtered.length}টি প্রজেক্ট পাওয়া গেছে`
             : `Showing ${filtered.length} ${filtered.length === 1 ? "project" : "projects"}`}
@@ -261,58 +272,49 @@ export function InteractiveProjects({
         {selectedStage !== "all" || searchQuery ? (
           <button
             type="button"
-            onClick={() => {
-              setSearchQuery("");
-              updateUrl("all", "", 1);
-            }}
-            className="text-xs font-semibold text-primary hover:underline cursor-pointer flex items-center gap-1"
+            onClick={resetFilters}
+            className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
             {isBn ? "ফিল্টার রিসেট করুন" : "Reset filters"}
           </button>
         ) : null}
       </div>
 
-      {/* 3. Projects Grid */}
       {paginated.length > 0 ? (
-        <Stagger key={`${selectedStage}-${page}-${searchQuery}`} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {isPending ? (
-            <ProjectGridSkeleton count={Math.min(paginated.length || 6, 6)} />
-          ) : (
-            paginated.map((project) => (
-              <StaggerItem key={project.id}>
-                <ProjectCard project={project} locale={locale} />
-              </StaggerItem>
-            ))
-          )}
+        <Stagger
+          key={`${selectedStage}-${page}-${searchQuery}`}
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+        >
+          {paginated.map((project) => (
+            <StaggerItem key={project.id}>
+              <ProjectCard project={project} locale={locale} />
+            </StaggerItem>
+          ))}
         </Stagger>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16 text-center">
-          <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
+          <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <Icon name="construction" size="sm" />
           </div>
           <h3 className="text-base font-semibold text-foreground">
             {isBn ? "কোনো প্রজেক্ট পাওয়া যায়নি" : "No projects found"}
           </h3>
-          <p className="mt-1 text-xs text-muted-foreground max-w-sm">
+          <p className="mt-1 max-w-sm text-xs text-muted-foreground">
             {isBn
               ? "নির্বাচিত স্ট্যাটাস বা সার্চের সাথে মিলে এমন কোনো প্রজেক্ট এই মুহূর্তে নেই।"
               : "No projects match the selected status filter or search query."}
           </p>
           <button
             type="button"
-            onClick={() => {
-              setSearchQuery("");
-              updateUrl("all", "", 1);
-            }}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90 cursor-pointer"
+            onClick={resetFilters}
+            className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
           >
             {isBn ? "সকল প্রজেক্ট দেখুন" : "View all projects"}
           </button>
         </div>
       )}
 
-      {/* 4. Pagination */}
-      {totalPages > 1 && (
+      {totalPages > 1 ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
           <p className="text-xs text-muted-foreground">
             {isBn
@@ -325,7 +327,7 @@ export function InteractiveProjects({
               type="button"
               disabled={page <= 1}
               onClick={() => handlePageChange(Math.max(1, page - 1))}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs transition hover:border-primary disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Icon name="arrowLeft" size="xs" />
               <span>{isBn ? "আগের" : "Previous"}</span>
@@ -337,7 +339,7 @@ export function InteractiveProjects({
                 type="button"
                 onClick={() => handlePageChange(p)}
                 className={cn(
-                  "flex size-8 items-center justify-center rounded-md text-xs font-bold transition shadow-xs cursor-pointer",
+                  "flex size-8 cursor-pointer items-center justify-center rounded-md text-xs font-bold shadow-xs transition",
                   p === page
                     ? "bg-primary text-primary-foreground"
                     : "border border-border bg-card text-foreground hover:border-primary",
@@ -351,14 +353,14 @@ export function InteractiveProjects({
               type="button"
               disabled={page >= totalPages}
               onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs transition hover:border-primary disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span>{isBn ? "পরের" : "Next"}</span>
               <Icon name="arrowRight" size="xs" />
             </button>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

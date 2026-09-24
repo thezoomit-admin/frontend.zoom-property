@@ -28,8 +28,11 @@ export async function SiteLeadSection({
 }: {
   source?: string;
 }) {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
-  const areaOptions = await getLeadAreaOptions(locale, 60);
+  const locale = await getLocale();
+  const [dict, areaOptions] = await Promise.all([
+    getDictionary(),
+    getLeadAreaOptions(locale, 60),
+  ]);
 
   const c = dict.contact.channels;
   const d = dict.contact.details;

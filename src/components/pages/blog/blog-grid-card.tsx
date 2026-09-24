@@ -50,7 +50,7 @@ export function BlogGridCard({
 
   return (
     <article className={cn("group flex h-full flex-col gap-4", className)}>
-      <Link href={href} className="relative block">
+      <Link href={href} prefetch className="relative block">
         <ImageFrame
           src={insight.image}
           alt=""
@@ -79,7 +79,7 @@ export function BlogGridCard({
         size="h6"
         className="font-heading leading-snug font-bold text-foreground transition-colors duration-200 group-hover:text-primary"
       >
-        <Link href={href} className="line-clamp-2">
+        <Link href={href} prefetch className="line-clamp-2">
           {title}
         </Link>
       </Heading>

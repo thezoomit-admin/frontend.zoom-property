@@ -19,11 +19,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RichText } from "@/components/common/rich-text";
 import { getInsightBySlug, getInsights } from "@/server/features/insights";
 import { localeAlternates } from "@/i18n/alternates";
-import { LOCALE_TAGS, type Locale } from "@/i18n/config";
+import { LOCALES, LOCALE_TAGS, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { relatedInsights } from "@/lib/related-insights";
 import { absoluteUrl, articleSchema, breadcrumbSchema } from "@/lib/seo";
+
+/** Prebuild every article so blog card clicks are instant. */
+export const dynamic = "force-static";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const list = await getInsights(100);
+  return LOCALES.flatMap((lang) =>
+    list.map((insight) => ({ lang, slug: insight.id })),
+  );
+}
 
 /**
  * One article.
@@ -77,13 +88,16 @@ export default async function BlogPostPage({
   params: Promise<{ lang: Locale; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const found = await getInsightBySlug(slug);
+  const [found, dict, allInsights] = await Promise.all([
+    getInsightBySlug(slug),
+    getDictionary(),
+    getInsights(60),
+  ]);
 
   if (!found) notFound();
 
   const { insight, content, contentBn } = found;
 
-  const dict = await getDictionary();
   const t = dict.blog;
   const a = t.article;
   const isBn = lang === "bn";
@@ -103,7 +117,7 @@ export default async function BlogPostPage({
   });
   const formattedDate = dateFormatter.format(new Date(insight.date));
 
-  const related = relatedInsights(insight, await getInsights(60), 3);
+  const related = relatedInsights(insight, allInsights, 3);
 
   const blogHref = localeHref(lang, "/blog");
   const articleUrl = absoluteUrl(`/${lang}/blog/${slug}`);

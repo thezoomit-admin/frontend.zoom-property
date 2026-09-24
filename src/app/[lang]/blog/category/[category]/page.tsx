@@ -45,11 +45,11 @@ export default async function BlogCategoryPage({
 }: {
   params: Promise<{ lang: Locale; category: string }>;
 }) {
-  const [{ lang, category }, insights] = await Promise.all([
+  const [{ lang, category }, insights, dict] = await Promise.all([
     params,
     getInsights(60),
+    getDictionary(),
   ]);
-  const dict = await getDictionary();
   const t = dict.blog;
   const config = getCategoryConfig(category);
 
