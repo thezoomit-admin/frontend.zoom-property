@@ -30,8 +30,6 @@ import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, propertySchema } from "@/lib/seo";
 import { ContactCta } from "@/components/common/contact-cta";
 
-export const dynamic = "force-dynamic";
-
 /**
  * One listing.
  *

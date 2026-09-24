@@ -22,12 +22,39 @@ import { cn } from "@/lib/utils";
 
 const ENQUIRY_VALUES = ["buy", "rent", "sell", "landowner", "nrb"] as const;
 const AREA_ANY = "any";
-const SUB_ANY = "any";
+/** Joins an area and sub-area value into one combined option value. */
+const AREA_SUB_SEP = ":::";
 
 /** Client cooldown between submits (server also limits to 5/hour). */
 const CLIENT_COOLDOWN_MS = 45_000;
 
 export type AreaOption = LeadAreaOption;
+
+type CombinedAreaOption = {
+  value: string;
+  label: string;
+  area: string;
+  subArea: string;
+};
+
+/**
+ * One select instead of two cascading ones: every sub-area becomes its own
+ * option labelled "Area (Sub-area)", and an area with no sub-areas keeps a
+ * single plain option. The lead still records both values — the combined
+ * value just carries them together for the picker.
+ */
+function buildCombinedAreaOptions(areas: LeadAreaOption[]): CombinedAreaOption[] {
+  return areas.flatMap((area) =>
+    area.subAreas.length > 0
+      ? area.subAreas.map((sub) => ({
+          value: `${area.value}${AREA_SUB_SEP}${sub.value}`,
+          label: `${area.label} (${sub.label})`,
+          area: area.value,
+          subArea: sub.value,
+        }))
+      : [{ value: area.value, label: area.label, area: area.value, subArea: "" }],
+  );
+}
 
 export interface BudgetOption {
   value: string;
@@ -72,8 +99,7 @@ export function ContactForm({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
-  const [area, setArea] = useState(AREA_ANY);
-  const [subArea, setSubArea] = useState(SUB_ANY);
+  const [combinedArea, setCombinedArea] = useState(AREA_ANY);
   const [lastSubmitAt, setLastSubmitAt] = useState(0);
 
   const budgetOptions =
@@ -89,17 +115,16 @@ export function ContactForm({
     budgetOptions[0]?.value ||
     "any";
 
-  const selectedArea = useMemo(
-    () => areas.find((row) => row.value === area),
-    [areas, area],
+  const combinedAreaOptions = useMemo(
+    () => buildCombinedAreaOptions(areas),
+    [areas],
   );
-  const subOptions = selectedArea?.subAreas ?? [];
-  const hasSubAreas = subOptions.length > 0;
-
-  function onAreaChange(next: string) {
-    setArea(next);
-    setSubArea(SUB_ANY);
-  }
+  const selectedCombined = useMemo(
+    () => combinedAreaOptions.find((row) => row.value === combinedArea),
+    [combinedAreaOptions, combinedArea],
+  );
+  const area = selectedCombined?.area ?? "";
+  const subArea = selectedCombined?.subArea ?? "";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -127,12 +152,12 @@ export function ContactForm({
     if (!formData.get("subject")) {
       formData.set("subject", "Website Enquiry");
     }
-    if (area && area !== AREA_ANY) {
+    if (area) {
       formData.set("area", area);
     } else {
       formData.delete("area");
     }
-    if (subArea && subArea !== SUB_ANY && hasSubAreas) {
+    if (subArea) {
       formData.set("subArea", subArea);
     } else {
       formData.delete("subArea");
@@ -145,8 +170,7 @@ export function ContactForm({
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
       setPhone("");
-      setArea(AREA_ANY);
-      setSubArea(SUB_ANY);
+      setCombinedArea(AREA_ANY);
     } else {
       const msg = res.error || "Failed to submit message";
       const rateLimited =
@@ -160,11 +184,6 @@ export function ContactForm({
 
     setSubmitting(false);
   }
-
-  const subPlaceholder =
-    area === AREA_ANY
-      ? dict.subAreaPickArea || "Pick an area first"
-      : dict.subAreaAny || "Any sub-area";
 
   return (
     <form
@@ -226,33 +245,13 @@ export function ContactForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="lead-area" label={dict.area}>
-          <Select value={area} onValueChange={onAreaChange}>
+          <Select value={combinedArea} onValueChange={setCombinedArea}>
             <SelectTrigger id="lead-area" className="w-full">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
               <SelectItem value={AREA_ANY}>{dict.areaAny}</SelectItem>
-              {areas.map((row) => (
-                <SelectItem key={row.slug || row.value} value={row.value}>
-                  {row.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
-
-        <Field id="lead-sub-area" label={dict.subArea || "Sub-area"}>
-          <Select
-            value={subArea}
-            onValueChange={setSubArea}
-            disabled={area === AREA_ANY || !hasSubAreas}
-          >
-            <SelectTrigger id="lead-sub-area" className="w-full">
-              <SelectValue placeholder={subPlaceholder} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={SUB_ANY}>{subPlaceholder}</SelectItem>
-              {subOptions.map((row) => (
+              {combinedAreaOptions.map((row) => (
                 <SelectItem key={row.value} value={row.value}>
                   {row.label}
                 </SelectItem>
@@ -260,22 +259,22 @@ export function ContactForm({
             </SelectContent>
           </Select>
         </Field>
-      </div>
 
-      <Field id="lead-budget" label={dict.budget}>
-        <Select name="budget" defaultValue={defaultBudget}>
-          <SelectTrigger id="lead-budget" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {budgetOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Field>
+        <Field id="lead-budget" label={dict.budget}>
+          <Select name="budget" defaultValue={defaultBudget}>
+            <SelectTrigger id="lead-budget" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {budgetOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+      </div>
 
       <Field id="lead-message" label={dict.message}>
         <Textarea

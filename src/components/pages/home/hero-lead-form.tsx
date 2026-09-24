@@ -24,9 +24,36 @@ import { cn } from "@/lib/utils";
 /** Client cooldown between submits (server also limits to 5/hour). */
 const CLIENT_COOLDOWN_MS = 45_000;
 const AREA_ANY = "any";
-const SUB_ANY = "any";
+/** Joins an area and sub-area value into one combined option value. */
+const AREA_SUB_SEP = ":::";
 
 export type HeroLeadAreaOption = LeadAreaOption;
+
+type CombinedAreaOption = {
+  value: string;
+  label: string;
+  area: string;
+  subArea: string;
+};
+
+/**
+ * One select instead of two cascading ones: every sub-area becomes its own
+ * option labelled "Area (Sub-area)", and an area with no sub-areas keeps a
+ * single plain option. The lead still records both values — the combined
+ * value just carries them together for the picker.
+ */
+function buildCombinedAreaOptions(areas: LeadAreaOption[]): CombinedAreaOption[] {
+  return areas.flatMap((area) =>
+    area.subAreas.length > 0
+      ? area.subAreas.map((sub) => ({
+          value: `${area.value}${AREA_SUB_SEP}${sub.value}`,
+          label: `${area.label} (${sub.label})`,
+          area: area.value,
+          subArea: sub.value,
+        }))
+      : [{ value: area.value, label: area.label, area: area.value, subArea: "" }],
+  );
+}
 
 export interface HeroLeadFormDict {
   title?: string;
@@ -77,22 +104,20 @@ export function HeroLeadForm({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
-  const [area, setArea] = useState(AREA_ANY);
-  const [subArea, setSubArea] = useState(SUB_ANY);
+  const [combinedArea, setCombinedArea] = useState(AREA_ANY);
   const [lastSubmitAt, setLastSubmitAt] = useState(0);
   const glass = variant === "glass";
 
-  const selectedArea = useMemo(
-    () => areas.find((row) => row.value === area),
-    [areas, area],
+  const combinedAreaOptions = useMemo(
+    () => buildCombinedAreaOptions(areas),
+    [areas],
   );
-  const subOptions = selectedArea?.subAreas ?? [];
-  const hasSubAreas = subOptions.length > 0;
-
-  function onAreaChange(next: string) {
-    setArea(next);
-    setSubArea(SUB_ANY);
-  }
+  const selectedCombined = useMemo(
+    () => combinedAreaOptions.find((row) => row.value === combinedArea),
+    [combinedAreaOptions, combinedArea],
+  );
+  const area = selectedCombined?.area ?? "";
+  const subArea = selectedCombined?.subArea ?? "";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,12 +143,12 @@ export function HeroLeadForm({
     formData.set("enquiry", "buy");
     // Home + site CTA lead forms → Bond CRM lead (contact page does not).
     formData.set("createLead", "1");
-    if (area && area !== AREA_ANY) {
+    if (area) {
       formData.set("area", area);
     } else {
       formData.delete("area");
     }
-    if (subArea && subArea !== SUB_ANY && hasSubAreas) {
+    if (subArea) {
       formData.set("subArea", subArea);
     } else {
       formData.delete("subArea");
@@ -137,8 +162,7 @@ export function HeroLeadForm({
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
       setPhone("");
-      setArea(AREA_ANY);
-      setSubArea(SUB_ANY);
+      setCombinedArea(AREA_ANY);
     } else {
       const msg = res.error || "Failed to submit enquiry";
       toast.error(
@@ -160,11 +184,6 @@ export function HeroLeadForm({
     glass &&
       "border-white/20 bg-white/10 text-white [&_svg]:text-white/70 data-placeholder:text-white/40",
   );
-
-  const subPlaceholder =
-    area === AREA_ANY
-      ? dict.subAreaPickArea || "Pick an area first"
-      : dict.subAreaAny || "Any sub-area";
 
   return (
     <div className={cn("w-full", className)}>
@@ -223,58 +242,27 @@ export function HeroLeadForm({
           />
         </Field>
 
-        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-3">
-          <Field
-            id={`${idPrefix}-area`}
-            label={dict.area || "Area"}
-            glass={glass}
-          >
-            <Select value={area} onValueChange={onAreaChange}>
-              <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
-                <SelectValue
-                  placeholder={dict.areaAny || "Select area"}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={AREA_ANY}>
-                  {dict.areaAny || "Any area"}
+        <Field
+          id={`${idPrefix}-area`}
+          label={dict.area || "Area"}
+          glass={glass}
+        >
+          <Select value={combinedArea} onValueChange={setCombinedArea}>
+            <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
+              <SelectValue placeholder={dict.areaAny || "Select area"} />
+            </SelectTrigger>
+            <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
+              <SelectItem value={AREA_ANY}>
+                {dict.areaAny || "Any area"}
+              </SelectItem>
+              {combinedAreaOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
-                {areas.map((option) => (
-                  <SelectItem key={option.slug || option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-
-          <Field
-            id={`${idPrefix}-sub-area`}
-            label={dict.subArea || "Sub-area"}
-            glass={glass}
-          >
-            <Select
-              value={subArea}
-              onValueChange={setSubArea}
-              disabled={area === AREA_ANY || !hasSubAreas}
-            >
-              <SelectTrigger
-                id={`${idPrefix}-sub-area`}
-                className={selectTriggerClass}
-              >
-                <SelectValue placeholder={subPlaceholder} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={SUB_ANY}>{subPlaceholder}</SelectItem>
-                {subOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        </div>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
 
         <Field id={`${idPrefix}-message`} label={dict.message} glass={glass}>
           <Textarea
