@@ -10,8 +10,8 @@ import { pageBanners } from "@/data/page-banners";
 import { Reveal } from "@/components/motion/reveal";
 import { ContactForm } from "@/components/pages/contact/contact-form";
 import { FaqSection } from "@/components/pages/shared/faq-section";
-import { areas } from "@/data/areas";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { getLeadAreaOptions } from "@/server/features/areas";
 import { getBudgetOptions } from "@/server/features/budget-ranges/service";
 import { localeAlternates } from "@/i18n/alternates";
 import {
@@ -39,21 +39,16 @@ export default async function ContactPage() {
     getLocale(),
     faqSchema(),
   ]);
-  const budgetOptions = await getBudgetOptions(locale);
+  const [areaOptions, budgetOptions] = await Promise.all([
+    getLeadAreaOptions(locale, 60),
+    getBudgetOptions(locale),
+  ]);
   const c = dict.contact.channels;
   // The numbers, the addresses and the profile links all come from the
   // panel — the labels beside them always did. Nothing on this column is
   // typed into the code any more.
   const d = dict.contact.details;
   const socials = socialProfiles(dict.contact.social);
-
-  // The enquiry form asks which area, and the answer has to be one of the areas
-  // we actually cover — so the options are the same list the areas section and
-  // `/areas` render, not a second copy that can drift.
-  const areaOptions = areas.map((area) => ({
-    value: area.id,
-    label: locale === "bn" && area.nameBn ? area.nameBn : area.name,
-  }));
 
   const channels: {
     icon: IconName;

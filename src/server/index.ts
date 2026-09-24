@@ -28,7 +28,13 @@ import "server-only";
  * for the few callers that need several.
  */
 
-export { getAreaBySlug, getAreas, getHomeAreas } from "./features/areas";
+export {
+  getAreaBySlug,
+  getAreas,
+  getHomeAreas,
+  getLeadAreaOptions,
+} from "./features/areas";
+export type { LeadAreaOption, LeadSubAreaOption } from "./features/areas";
 export { applyCmsOverrides } from "./features/cms";
 export {
   getHomeInsights,

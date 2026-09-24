@@ -368,6 +368,9 @@
       "enquiry": "What is this about?",
       "area": "Which area?",
       "areaAny": "Any area — not decided yet",
+      "subArea": "Sub-area",
+      "subAreaAny": "Any sub-area",
+      "subAreaPickArea": "Pick an area first",
       "budget": "Budget range",
       "budgetOptions": {
         "any": "Not sure yet",

@@ -22,6 +22,12 @@ export async function getSubAreasByArea(
   return rows ?? [];
 }
 
+/** All active public sub-areas (for lead-form nesting). */
+export async function getAllPublicSubAreas(limit = 200): Promise<SubArea[]> {
+  const rows = await subAreas.query({ limit, sort: "order" });
+  return rows ?? [];
+}
+
 export async function getSubAreaBySlugs(
   areaSlug: string,
   subSlug: string,

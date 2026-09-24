@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Icon } from "@/components/common/icon";
@@ -17,18 +17,17 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitContactForm } from "@/server/features/inquiries/action";
+import type { LeadAreaOption } from "@/server/features/areas/lead-options";
 import { cn } from "@/lib/utils";
 
 const ENQUIRY_VALUES = ["buy", "rent", "sell", "landowner", "nrb"] as const;
 const AREA_ANY = "any";
+const SUB_ANY = "any";
 
 /** Client cooldown between submits (server also limits to 5/hour). */
 const CLIENT_COOLDOWN_MS = 45_000;
 
-export interface AreaOption {
-  value: string;
-  label: string;
-}
+export type AreaOption = LeadAreaOption;
 
 export interface BudgetOption {
   value: string;
@@ -43,6 +42,9 @@ interface FormDict {
   enquiry: string;
   area: string;
   areaAny: string;
+  subArea?: string;
+  subAreaAny?: string;
+  subAreaPickArea?: string;
   budget: string;
   budgetOptions?: Record<string, string>;
   message: string;
@@ -63,13 +65,15 @@ export function ContactForm({
   className,
 }: {
   dict: FormDict;
-  areas: AreaOption[];
+  areas: LeadAreaOption[];
   budgets?: BudgetOption[];
   source?: string;
   className?: string;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
+  const [area, setArea] = useState(AREA_ANY);
+  const [subArea, setSubArea] = useState(SUB_ANY);
   const [lastSubmitAt, setLastSubmitAt] = useState(0);
 
   const budgetOptions =
@@ -84,6 +88,18 @@ export function ContactForm({
     budgetOptions.find((b) => b.value === "any")?.value ||
     budgetOptions[0]?.value ||
     "any";
+
+  const selectedArea = useMemo(
+    () => areas.find((row) => row.value === area),
+    [areas, area],
+  );
+  const subOptions = selectedArea?.subAreas ?? [];
+  const hasSubAreas = subOptions.length > 0;
+
+  function onAreaChange(next: string) {
+    setArea(next);
+    setSubArea(SUB_ANY);
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -111,6 +127,16 @@ export function ContactForm({
     if (!formData.get("subject")) {
       formData.set("subject", "Website Enquiry");
     }
+    if (area && area !== AREA_ANY) {
+      formData.set("area", area);
+    } else {
+      formData.delete("area");
+    }
+    if (subArea && subArea !== SUB_ANY && hasSubAreas) {
+      formData.set("subArea", subArea);
+    } else {
+      formData.delete("subArea");
+    }
 
     const res = await submitContactForm(formData);
 
@@ -119,6 +145,8 @@ export function ContactForm({
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
       setPhone("");
+      setArea(AREA_ANY);
+      setSubArea(SUB_ANY);
     } else {
       const msg = res.error || "Failed to submit message";
       const rateLimited =
@@ -132,6 +160,11 @@ export function ContactForm({
 
     setSubmitting(false);
   }
+
+  const subPlaceholder =
+    area === AREA_ANY
+      ? dict.subAreaPickArea || "Pick an area first"
+      : dict.subAreaAny || "Any sub-area";
 
   return (
     <form
@@ -193,36 +226,56 @@ export function ContactForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="lead-area" label={dict.area}>
-          <Select name="area" defaultValue={AREA_ANY}>
+          <Select value={area} onValueChange={onAreaChange}>
             <SelectTrigger id="lead-area" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={AREA_ANY}>{dict.areaAny}</SelectItem>
-              {areas.map((area) => (
-                <SelectItem key={area.value} value={area.value}>
-                  {area.label}
+              {areas.map((row) => (
+                <SelectItem key={row.slug || row.value} value={row.value}>
+                  {row.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </Field>
 
-        <Field id="lead-budget" label={dict.budget}>
-          <Select name="budget" defaultValue={defaultBudget}>
-            <SelectTrigger id="lead-budget" className="w-full">
-              <SelectValue />
+        <Field id="lead-sub-area" label={dict.subArea || "Sub-area"}>
+          <Select
+            value={subArea}
+            onValueChange={setSubArea}
+            disabled={area === AREA_ANY || !hasSubAreas}
+          >
+            <SelectTrigger id="lead-sub-area" className="w-full">
+              <SelectValue placeholder={subPlaceholder} />
             </SelectTrigger>
             <SelectContent>
-              {budgetOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+              <SelectItem value={SUB_ANY}>{subPlaceholder}</SelectItem>
+              {subOptions.map((row) => (
+                <SelectItem key={row.value} value={row.value}>
+                  {row.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </Field>
       </div>
+
+      <Field id="lead-budget" label={dict.budget}>
+        <Select name="budget" defaultValue={defaultBudget}>
+          <SelectTrigger id="lead-budget" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {budgetOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
 
       <Field id="lead-message" label={dict.message}>
         <Textarea

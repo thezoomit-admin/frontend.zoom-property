@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Icon } from "@/components/common/icon";
@@ -18,16 +18,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { submitContactForm } from "@/server/features/inquiries/action";
+import type { LeadAreaOption } from "@/server/features/areas/lead-options";
 import { cn } from "@/lib/utils";
 
 /** Client cooldown between submits (server also limits to 5/hour). */
 const CLIENT_COOLDOWN_MS = 45_000;
 const AREA_ANY = "any";
+const SUB_ANY = "any";
 
-export interface HeroLeadAreaOption {
-  value: string;
-  label: string;
-}
+export type HeroLeadAreaOption = LeadAreaOption;
 
 export interface HeroLeadFormDict {
   title?: string;
@@ -37,6 +36,9 @@ export interface HeroLeadFormDict {
   email: string;
   area?: string;
   areaAny?: string;
+  subArea?: string;
+  subAreaAny?: string;
+  subAreaPickArea?: string;
   message: string;
   messagePlaceholder: string;
   submit: string;
@@ -47,7 +49,7 @@ export interface HeroLeadFormDict {
 }
 
 /**
- * Home hero lead form — name, phone, email, area, message.
+ * Home / site CTA lead form — name, phone, email, area → sub-area, message.
  */
 export function HeroLeadForm({
   dict,
@@ -63,7 +65,7 @@ export function HeroLeadForm({
 }: {
   dict: HeroLeadFormDict;
   title?: string;
-  areas?: HeroLeadAreaOption[];
+  areas?: LeadAreaOption[];
   source?: string;
   subject?: string;
   idPrefix?: string;
@@ -76,8 +78,21 @@ export function HeroLeadForm({
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
   const [area, setArea] = useState(AREA_ANY);
+  const [subArea, setSubArea] = useState(SUB_ANY);
   const [lastSubmitAt, setLastSubmitAt] = useState(0);
   const glass = variant === "glass";
+
+  const selectedArea = useMemo(
+    () => areas.find((row) => row.value === area),
+    [areas, area],
+  );
+  const subOptions = selectedArea?.subAreas ?? [];
+  const hasSubAreas = subOptions.length > 0;
+
+  function onAreaChange(next: string) {
+    setArea(next);
+    setSubArea(SUB_ANY);
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -108,6 +123,11 @@ export function HeroLeadForm({
     } else {
       formData.delete("area");
     }
+    if (subArea && subArea !== SUB_ANY && hasSubAreas) {
+      formData.set("subArea", subArea);
+    } else {
+      formData.delete("subArea");
+    }
 
     const res = await submitContactForm(formData);
 
@@ -118,6 +138,7 @@ export function HeroLeadForm({
       form.reset();
       setPhone("");
       setArea(AREA_ANY);
+      setSubArea(SUB_ANY);
     } else {
       const msg = res.error || "Failed to submit enquiry";
       toast.error(
@@ -139,6 +160,11 @@ export function HeroLeadForm({
     glass &&
       "border-white/20 bg-white/10 text-white [&_svg]:text-white/70 data-placeholder:text-white/40",
   );
+
+  const subPlaceholder =
+    area === AREA_ANY
+      ? dict.subAreaPickArea || "Pick an area first"
+      : dict.subAreaAny || "Any sub-area";
 
   return (
     <div className={cn("w-full", className)}>
@@ -186,24 +212,24 @@ export function HeroLeadForm({
           />
         </Field>
 
-        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-3">
-          <Field id={`${idPrefix}-email`} label={dict.email} glass={glass}>
-            <Input
-              id={`${idPrefix}-email`}
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@domain.com"
-              className={cn("h-11", fieldClass)}
-            />
-          </Field>
+        <Field id={`${idPrefix}-email`} label={dict.email} glass={glass}>
+          <Input
+            id={`${idPrefix}-email`}
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@domain.com"
+            className={cn("h-11", fieldClass)}
+          />
+        </Field>
 
+        <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-3">
           <Field
             id={`${idPrefix}-area`}
             label={dict.area || "Area"}
             glass={glass}
           >
-            <Select value={area} onValueChange={setArea}>
+            <Select value={area} onValueChange={onAreaChange}>
               <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
                 <SelectValue
                   placeholder={dict.areaAny || "Select area"}
@@ -214,6 +240,33 @@ export function HeroLeadForm({
                   {dict.areaAny || "Any area"}
                 </SelectItem>
                 {areas.map((option) => (
+                  <SelectItem key={option.slug || option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field
+            id={`${idPrefix}-sub-area`}
+            label={dict.subArea || "Sub-area"}
+            glass={glass}
+          >
+            <Select
+              value={subArea}
+              onValueChange={setSubArea}
+              disabled={area === AREA_ANY || !hasSubAreas}
+            >
+              <SelectTrigger
+                id={`${idPrefix}-sub-area`}
+                className={selectTriggerClass}
+              >
+                <SelectValue placeholder={subPlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={SUB_ANY}>{subPlaceholder}</SelectItem>
+                {subOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

@@ -8,7 +8,7 @@ import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
 import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
 import { Badge } from "@/components/ui/badge";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { getAreas } from "@/server/features/areas";
+import { getLeadAreaOptions } from "@/server/features/areas";
 
 const photo = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=2000&q=80`;
@@ -32,21 +32,13 @@ const HERO_IMAGES = [
 ];
 
 export async function HeroSection() {
-  const [dict, locale, areas] = await Promise.all([
-    getDictionary(),
-    getLocale(),
-    getAreas(60),
-  ]);
+  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const areaOptions = await getLeadAreaOptions(locale, 60);
 
   const cmsImages = (dict.hero.backgroundImages ?? []).filter(
     (url): url is string => typeof url === "string" && url.trim().length > 0,
   );
   const images = cmsImages.length > 0 ? cmsImages : HERO_IMAGES;
-
-  const areaOptions = areas.map((area) => ({
-    value: area.name,
-    label: locale === "bn" && area.nameBn ? area.nameBn : area.name,
-  }));
 
   return (
     <section className="relative z-10 flex min-h-[80svh] items-end overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
