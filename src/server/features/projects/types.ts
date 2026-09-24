@@ -23,6 +23,7 @@ export interface ApiProject {
   name: string;
   nameBn?: string;
   area?: { name?: string } | null;
+  subArea?: { _id?: string; name?: string; nameBn?: string; slug?: string } | null;
   city?: string;
   progress?: number;
   /** "Planning" | "Processing" | "Completed", as the panel names it. */

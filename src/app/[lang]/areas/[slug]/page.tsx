@@ -52,20 +52,19 @@ export default async function AreaDetailPage({
 
   if (!area) notFound();
 
-  const subAreas = await getSubAreasByArea(area.refId || area.id, 80);
+  // One bulk fetch for the whole area, grouped by sub-area in memory —
+  // firing one request per sub-area (up to 80 of them) meant an area page
+  // could hold on 80 parallel round trips just to render.
+  const [subAreas, areaProjects] = await Promise.all([
+    getSubAreasByArea(area.refId || area.id, 80),
+    getProjects({ area: area.refId || area.id, limit: 200, sort: "order" }),
+  ]);
 
-  const projectsBySubArea: Record<string, Awaited<ReturnType<typeof getProjects>>> =
-    {};
-  await Promise.all(
-    subAreas.map(async (sub) => {
-      const rows = await getProjects({
-        subArea: sub.refId,
-        limit: 40,
-        sort: "order",
-      });
-      projectsBySubArea[sub.refId] = rows;
-    }),
-  );
+  const projectsBySubArea: Record<string, typeof areaProjects> = {};
+  for (const project of areaProjects) {
+    if (!project.subAreaRefId) continue;
+    (projectsBySubArea[project.subAreaRefId] ??= []).push(project);
+  }
 
   const form = dict.contact.form;
   const detail = (dict.areas as { detail?: Record<string, string> }).detail || {};

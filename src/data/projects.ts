@@ -31,6 +31,10 @@ export interface Project {
   name: string;
   nameBn?: string;
   area: string;
+  /** The sub-area's own id, when the project has one — lets an area detail
+   * page group a single bulk fetch by sub-area instead of firing one request
+   * per sub-area. */
+  subAreaRefId?: string;
   city: string;
   /** Completion, 0–100. */
   progress: number;
