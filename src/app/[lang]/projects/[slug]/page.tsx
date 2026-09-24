@@ -30,8 +30,6 @@ import { formatBdt } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-
 /**
  * One development.
  *

@@ -251,7 +251,7 @@ export function HeroLeadForm({
             <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
               <SelectValue placeholder={dict.areaAny || "Select area"} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
               <SelectItem value={AREA_ANY}>
                 {dict.areaAny || "Any area"}
               </SelectItem>

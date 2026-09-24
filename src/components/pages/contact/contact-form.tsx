@@ -249,7 +249,7 @@ export function ContactForm({
             <SelectTrigger id="lead-area" className="w-full">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
               <SelectItem value={AREA_ANY}>{dict.areaAny}</SelectItem>
               {combinedAreaOptions.map((row) => (
                 <SelectItem key={row.value} value={row.value}>
