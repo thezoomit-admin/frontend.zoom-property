@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Icon } from "@/components/common/icon";
 import { PropertyCard } from "./property-card";
@@ -12,7 +12,6 @@ import { formatBdt } from "@/lib/format";
 import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
-import { PropertyGridSkeleton } from "@/components/skeleton/property-skeleton";
 import {
   Sheet,
   SheetContent,
@@ -62,7 +61,6 @@ export function InteractiveListings({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const selectedArea = searchParams.get("listArea") ?? filters?.area ?? "all";
@@ -89,9 +87,7 @@ export function InteractiveListings({
     if (p > 1) params.set("page", String(p));
     else params.delete("page");
 
-    startTransition(() => {
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    });
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   // Sync debounce to URL
@@ -472,9 +468,7 @@ export function InteractiveListings({
         </span>
       </div>
 
-      {isPending ? (
-        <PropertyGridSkeleton count={perPage} />
-      ) : searched.length === 0 ? (
+      {searched.length === 0 ? (
         <div className="flex min-h-75 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/50 text-center">
           <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-muted">
             <Icon name="search" size="sm" className="text-muted-foreground" />
