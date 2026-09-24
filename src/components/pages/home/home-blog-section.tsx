@@ -10,7 +10,11 @@ import { localeHref } from "@/i18n/href";
 import Link from "next/link";
 
 export async function HomeBlogSection() {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const [dict, locale, latestInsights] = await Promise.all([
+    getDictionary(),
+    getLocale(),
+    getHomeInsights(4),
+  ]);
   const t = dict.blog;
 
   const dateFormatter = new Intl.DateTimeFormat(LOCALE_TAGS[locale], {
@@ -18,8 +22,6 @@ export async function HomeBlogSection() {
     month: "long",
     day: "numeric",
   });
-
-  const latestInsights = await getHomeInsights(4);
 
   return (
     <section className="bg-background pt-16 pb-2 sm:py-24">

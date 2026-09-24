@@ -77,13 +77,16 @@ export default async function BlogPostPage({
   params: Promise<{ lang: Locale; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const found = await getInsightBySlug(slug);
+  const [found, dict, allInsights] = await Promise.all([
+    getInsightBySlug(slug),
+    getDictionary(),
+    getInsights(60),
+  ]);
 
   if (!found) notFound();
 
   const { insight, content, contentBn } = found;
 
-  const dict = await getDictionary();
   const t = dict.blog;
   const a = t.article;
   const isBn = lang === "bn";
@@ -103,7 +106,7 @@ export default async function BlogPostPage({
   });
   const formattedDate = dateFormatter.format(new Date(insight.date));
 
-  const related = relatedInsights(insight, await getInsights(60), 3);
+  const related = relatedInsights(insight, allInsights, 3);
 
   const blogHref = localeHref(lang, "/blog");
   const articleUrl = absoluteUrl(`/${lang}/blog/${slug}`);

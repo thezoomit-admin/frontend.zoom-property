@@ -76,11 +76,14 @@ export default async function PropertyDetailPage({
   params: Promise<{ lang: Locale; slug: string }>;
 }) {
   const { lang, slug } = await params;
-  const property = (await getPropertyBySlug(slug)) ?? propertyBySlug(slug);
+  const [fetchedProperty, dict] = await Promise.all([
+    getPropertyBySlug(slug),
+    getDictionary(),
+  ]);
+  const property = fetchedProperty ?? propertyBySlug(slug);
 
   if (!property) notFound();
 
-  const dict = await getDictionary();
   const t = dict.property;
   const displayTitle = lang === "bn" && property.titleBn ? property.titleBn : property.title;
   const displayArea = lang === "bn" && property.areaBn ? property.areaBn : property.area;

@@ -7,10 +7,19 @@ import { AreaDetailView } from "@/components/pages/areas/area-detail-view";
 import { pageBanners } from "@/data/page-banners";
 import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { getAreaBySlug } from "@/server/features/areas";
+import { getAreaBySlug, getAreas } from "@/server/features/areas";
 import { getSubAreasByArea } from "@/server/features/sub-areas";
+import { LOCALES } from "@/i18n/config";
 
 type Params = { lang: string; slug: string };
+
+/** Prebuild every area detail so card clicks hit a warm page. */
+export async function generateStaticParams() {
+  const list = await getAreas(100);
+  return LOCALES.flatMap((lang) =>
+    list.map((area) => ({ lang, slug: area.id })),
+  );
+}
 
 export async function generateMetadata({
   params,
