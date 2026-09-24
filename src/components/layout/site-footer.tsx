@@ -1,19 +1,14 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 
 import { Icon } from "@/components/common/icon";
 import { AppContainer } from "@/components/common/app-container";
 import { Logo } from "@/components/layout/logo";
 import { Text } from "@/components/common/text";
-import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
 import { getProjects } from "@/server/features/projects";
-import { getLandingChrome } from "@/server/features/project-landing";
-import { matchLanding } from "@/lib/landing";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { footerLinks } from "@/lib/footer-links";
 import { mailHref, socialProfiles, telHref } from "@/lib/contact";
-import { PATHNAME_HEADER } from "@/lib/not-found";
 
 /**
  * Footer.
@@ -31,14 +26,16 @@ import { PATHNAME_HEADER } from "@/lib/not-found";
  * Three columns rather than four, and no newsletter form — it was asking for an
  * email before the visitor had a reason to give one, and it squeezed the
  * contact details into a cramped column.
+ *
+ * This is the default footer only — a campaign landing page gets
+ * `LandingFooter` instead, swapped in client-side by `SiteFooterSwitch`
+ * (`usePathname()`, not a server-side pathname read: reading the current path
+ * on the server means `headers()`, and `headers()` opts the *entire page*
+ * out of static rendering and the Data Cache — every route on the site
+ * would pay for a footer variant only a handful of campaign pages need).
  */
 export async function SiteFooter() {
-  const pathname = (await headers()).get(PATHNAME_HEADER) ?? "";
   const locale = await getLocale();
-  const chrome = matchLanding(pathname, await getLandingChrome(locale));
-  if (chrome) {
-    return <LandingFooter chrome={chrome} />;
-  }
 
   // The project column is whatever is published, not a list typed in here:
   // a footer that still advertises a delivered project is worse than one with
