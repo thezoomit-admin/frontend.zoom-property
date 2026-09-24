@@ -56,6 +56,100 @@ function SelectTrigger({
   )
 }
 
+/**
+ * The OS/browser scrollbar for a long option list (e.g. every sub-area under
+ * one area). `scrollbar-color`/`::-webkit-scrollbar` styling is what most
+ * scroll rails on this site use, but Windows' "overlay scrollbars" mode
+ * overrides that styling with its own auto-hiding bar regardless of what the
+ * page asks for — so inside a Radix popper, where that's the only affordance
+ * a long list has, a custom thumb drawn from the Viewport's own scroll state
+ * is the only way to guarantee it is ever visible.
+ */
+function SelectScrollThumb({
+  viewport,
+}: {
+  viewport: HTMLDivElement | null;
+}) {
+  const [thumb, setThumb] = React.useState<{ top: number; height: number } | null>(null);
+  // Read during a drag, where `thumb` (state) is a render behind the pointer.
+  const thumbRef = React.useRef(thumb);
+  thumbRef.current = thumb;
+  const dragRef = React.useRef<{ startY: number; startScrollTop: number } | null>(null);
+
+  React.useEffect(() => {
+    if (!viewport) return;
+
+    const update = () => {
+      const { scrollTop, scrollHeight, clientHeight, offsetTop } = viewport;
+      if (scrollHeight <= clientHeight + 1) {
+        setThumb(null);
+        return;
+      }
+      const height = Math.max((clientHeight / scrollHeight) * clientHeight, 24);
+      const trackTop =
+        (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - height);
+      // Anchored to Content (the nearest positioned ancestor), not Viewport
+      // itself — Viewport stays a direct child of Content, exactly where
+      // Radix expects it for its own available-height measurements, so the
+      // thumb's own offset has to account for whatever sits above it
+      // (the scroll-up button, when present) rather than assuming top: 0.
+      setThumb({ top: offsetTop + trackTop, height });
+    };
+
+    update();
+    viewport.addEventListener("scroll", update);
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(viewport);
+
+    return () => {
+      viewport.removeEventListener("scroll", update);
+      resizeObserver.disconnect();
+    };
+  }, [viewport]);
+
+  if (!thumb) return null;
+
+  // Dragging the bar itself, not just watching it — a scrollbar you can only
+  // look at sends every drag straight through to whatever is behind it,
+  // which on this popover is the page (its own scroll-lock is deliberately
+  // released; see the override in globals.css), so the grab drags the body.
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!viewport) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { startY: event.clientY, startScrollTop: viewport.scrollTop };
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!viewport || !dragRef.current || !thumbRef.current) return;
+    event.preventDefault();
+    const { scrollHeight, clientHeight } = viewport;
+    const trackRange = clientHeight - thumbRef.current.height;
+    if (trackRange <= 0) return;
+    const scrollRange = scrollHeight - clientHeight;
+    const deltaY = event.clientY - dragRef.current.startY;
+    viewport.scrollTop =
+      dragRef.current.startScrollTop + (deltaY / trackRange) * scrollRange;
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragRef.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
+  return (
+    <div
+      role="presentation"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      className="absolute top-0 right-0.5 w-1.5 cursor-pointer touch-none rounded-full bg-primary/60 hover:bg-primary/80"
+      style={{ top: thumb.top, height: thumb.height }}
+    />
+  )
+}
+
 function SelectContent({
   className,
   children,
@@ -63,26 +157,34 @@ function SelectContent({
   align = "start",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null);
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
-        className={cn("relative z-50 max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/35 hover:scrollbar-thumb-primary/60 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
+        className={cn("relative z-50 max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
         position={position}
         align={align}
         {...props}
       >
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
+          ref={setViewport}
           data-position={position}
           className={cn(
-            "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",
+            // `overscroll-contain`: the body's own scroll-lock is deliberately
+            // released while a Select is open (see the scroll-lock override in
+            // globals.css), so without this a wheel scroll that runs out of
+            // list to scroll chains straight through to the page behind it.
+            "select-viewport-scroll overscroll-contain data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",
             position === "popper" && ""
           )}
         >
           {children}
         </SelectPrimitive.Viewport>
+        <SelectScrollThumb viewport={viewport} />
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>

@@ -228,6 +228,26 @@
     background: color-mix(in oklab, var(--brand-green) 40%, transparent);
   }
 
+  /* A `Select` dropdown's option list — visible enough that a long list (e.g.
+     every sub-area under one area) reads as scrollable, not just clipped. */
+  .select-viewport-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--brand-green) 55%, transparent) transparent;
+  }
+
+  .select-viewport-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .select-viewport-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .select-viewport-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--brand-green) 55%, transparent);
+  }
+
   /* ------------------------------------------------------------------ */
   /*  Scroll lock                                                        */
   /*                                                                     */
