@@ -54,36 +54,23 @@ export function ResidencesFields({
 
   return (
     <div className="space-y-6">
-      {/* ── Residences Header & Intro ─────────────────────────────────── */}
+      {/* ── 1. Residences Header & Intro ─────────────────────────────── */}
       <FormSectionCard
         title="Residences Section Header"
         description="Section title, category badge, and overview text for residential units."
         icon={Home}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <TextPair
-            label="Section Eyebrow"
-            description="Small tag above residence heading"
-            en={value.eyebrow ?? ""}
-            bn={value.eyebrowBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, eyebrow: v })}
-            onBnChange={(v) => setValue({ ...value, eyebrowBn: v })}
-            placeholderEn="e.g., Signature Living Spaces"
-            placeholderBn="যেমন: অভিজাত অ্যাপার্টমেন্টসমূহ"
-            maxLength={50}
-          />
-          <TextPair
-            label="Featured Unit Badge"
-            description="Highlight tag for the top apartment"
-            en={value.featured ?? ""}
-            bn={value.featuredBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, featured: v })}
-            onBnChange={(v) => setValue({ ...value, featuredBn: v })}
-            placeholderEn="e.g., Premium 4-Bed Penthouse"
-            placeholderBn="যেমন: প্রিমিয়াম ৪-বেড পেন্টহাউজ"
-            maxLength={30}
-          />
-        </div>
+        <TextPair
+          label="Section Eyebrow"
+          description="Small tag above residence heading"
+          en={value.eyebrow ?? ""}
+          bn={value.eyebrowBn ?? ""}
+          onEnChange={(v) => setValue({ ...value, eyebrow: v })}
+          onBnChange={(v) => setValue({ ...value, eyebrowBn: v })}
+          placeholderEn="e.g., Signature Living Spaces"
+          placeholderBn="যেমন: অভিজাত অ্যাপার্টমেন্টসমূহ"
+          maxLength={50}
+        />
 
         <TextPair
           label="Residences Main Title"
@@ -111,10 +98,10 @@ export function ResidencesFields({
         />
       </FormSectionCard>
 
-      {/* ── Featured Unit Specification Card ─────────────────────────── */}
+      {/* ── 2. Featured Unit Specification Card ───────────────────────── */}
       <FormSectionCard
         title="Featured Apartment / Unit Details"
-        description="Key specifications of the featured model unit (beds, baths, size, price, note)."
+        description="Key specifications of the featured model unit (Type name, layout note, price, beds, baths, size)."
         icon={BedDouble}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -130,38 +117,33 @@ export function ResidencesFields({
             maxLength={60}
           />
           <TextPair
-            label="Size / Area"
-            description="Square footage of the unit"
-            en={unit.size ?? ""}
-            bn={unit.sizeBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, unit: { ...unit, size: v } })}
-            onBnChange={(v) => setValue({ ...value, unit: { ...unit, sizeBn: v } })}
-            placeholderEn="e.g., 3,450 sq.ft (Approx.)"
-            placeholderBn="যেমন: ৩,৪৫০ বর্গফুট"
+            label="Featured Unit Badge"
+            description="Highlight tag for the top apartment"
+            en={value.featured ?? ""}
+            bn={value.featuredBn ?? ""}
+            onEnChange={(v) => setValue({ ...value, featured: v })}
+            onBnChange={(v) => setValue({ ...value, featuredBn: v })}
+            placeholderEn="e.g., Premium 4-Bed Penthouse"
+            placeholderBn="যেমন: প্রিমিয়াম ৪-বেড পেন্টহাউজ"
             maxLength={30}
           />
-          <TextPair
-            label="Bedrooms"
-            description="Number of bedrooms"
-            en={unit.beds ?? ""}
-            bn={unit.bedsBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, unit: { ...unit, beds: v } })}
-            onBnChange={(v) => setValue({ ...value, unit: { ...unit, bedsBn: v } })}
-            placeholderEn="e.g., 4 Beds + Maid's Room"
-            placeholderBn="যেমন: ৪ বেড + কাজের লোক রুম"
-            maxLength={20}
-          />
-          <TextPair
-            label="Bathrooms"
-            description="Number of bathrooms"
-            en={unit.baths ?? ""}
-            bn={unit.bathsBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, unit: { ...unit, baths: v } })}
-            onBnChange={(v) => setValue({ ...value, unit: { ...unit, bathsBn: v } })}
-            placeholderEn="e.g., 5 Baths (4 Attached)"
-            placeholderBn="যেমন: ৫ বাথ (৪ এটাচড)"
-            maxLength={20}
-          />
+        </div>
+
+        {/* Note / Layout details — directly below unit title on the live design */}
+        <TextPair
+          label="Apartment Layout & Features Note (বর্ণনা / ফিচার নোট)"
+          description="Layout summary shown directly under apartment title (e.g. আলাদা ডাইনিং ও ড্রয়িং, কিচেন, ব্যালকনি)"
+          en={unit.note ?? ""}
+          bn={unit.noteBn ?? ""}
+          onEnChange={(v) => setValue({ ...value, unit: { ...unit, note: v } })}
+          onBnChange={(v) => setValue({ ...value, unit: { ...unit, noteBn: v } })}
+          placeholderEn="e.g., Separate dining & drawing, modular kitchen, 3 wide balconies. Only 2 units per floor."
+          placeholderBn="যেমন: আলাদা ডাইনিং ও ড্রয়িং, একটি কিচেন, তিন ব্যালকনি। প্রতি তলায় দুটি ইউনিট।"
+          multiline
+          maxLength={200}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <TextPair
             label="Price / Payment Plan Note"
             description="Pricing guideline or payment terms"
@@ -174,16 +156,58 @@ export function ResidencesFields({
             maxLength={40}
           />
           <TextPair
-            label="Special Features Note"
-            description="Additional amenities or unit perks"
-            en={unit.note ?? ""}
-            bn={unit.noteBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, unit: { ...unit, note: v } })}
-            onBnChange={(v) => setValue({ ...value, unit: { ...unit, noteBn: v } })}
-            placeholderEn="e.g., Includes 2 Dedicated Basements Parking Slots & Panoramic Balcony"
-            placeholderBn="যেমন: ২টি কার পার্কিং ও বিশাল ব্যালকনি অন্তর্ভুক্ত"
-            maxLength={150}
+            label="Action Button Label (CTA)"
+            description="Button text at the bottom of residence card"
+            en={value.cta ?? ""}
+            bn={value.ctaBn ?? ""}
+            onEnChange={(v) => setValue({ ...value, cta: v })}
+            onBnChange={(v) => setValue({ ...value, ctaBn: v })}
+            placeholderEn="e.g., Request Floor Plan & Pricing"
+            placeholderBn="যেমন: ফ্লোর প্ল্যান ও মূল্য জানতে যোগাযোগ করুন"
+            maxLength={40}
           />
+        </div>
+
+        {/* 3 Spec Boxes: Beds, Baths, Size */}
+        <div className="pt-2 border-t border-border/50">
+          <p className="text-xs font-semibold text-foreground mb-2">
+            Unit Key Specifications (বেডরুম, বাথরুম ও সাইজ বক্স)
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <TextPair
+              label="Bedrooms"
+              description="E.g., 4 Beds"
+              en={unit.beds ?? ""}
+              bn={unit.bedsBn ?? ""}
+              onEnChange={(v) => setValue({ ...value, unit: { ...unit, beds: v } })}
+              onBnChange={(v) => setValue({ ...value, unit: { ...unit, bedsBn: v } })}
+              placeholderEn="e.g., 4 Beds"
+              placeholderBn="যেমন: ৪ বেড"
+              maxLength={20}
+            />
+            <TextPair
+              label="Bathrooms"
+              description="E.g., 5 Baths"
+              en={unit.baths ?? ""}
+              bn={unit.bathsBn ?? ""}
+              onEnChange={(v) => setValue({ ...value, unit: { ...unit, baths: v } })}
+              onBnChange={(v) => setValue({ ...value, unit: { ...unit, bathsBn: v } })}
+              placeholderEn="e.g., 5 Baths"
+              placeholderBn="যেমন: ৫ বাথ"
+              maxLength={20}
+            />
+            <TextPair
+              label="Size / Area"
+              description="E.g., 3,450 sq.ft"
+              en={unit.size ?? ""}
+              bn={unit.sizeBn ?? ""}
+              onEnChange={(v) => setValue({ ...value, unit: { ...unit, size: v } })}
+              onBnChange={(v) => setValue({ ...value, unit: { ...unit, sizeBn: v } })}
+              placeholderEn="e.g., 3,450 sq.ft"
+              placeholderBn="যেমন: ৩,৪৫০ বর্গফুট"
+              maxLength={30}
+            />
+          </div>
         </div>
       </FormSectionCard>
 
