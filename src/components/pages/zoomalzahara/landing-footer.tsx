@@ -49,6 +49,8 @@ export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
             {chrome.whatsapp ? (
               <a
                 href={whatsappHref(chrome.whatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={pill}
                 aria-label={`${chrome.whatsappLabel} ${chrome.whatsapp}`}
               >

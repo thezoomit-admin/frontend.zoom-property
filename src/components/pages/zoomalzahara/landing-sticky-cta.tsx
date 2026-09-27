@@ -33,7 +33,11 @@ export function LandingStickyCta({
         ) : null}
         {whatsapp ? (
           <Button asChild variant="outline" className="h-10 min-w-0 flex-1">
-            <a href={whatsappHref(whatsapp)}>
+            <a
+              href={whatsappHref(whatsapp)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="whatsapp" size="xs" />
               {whatsappLabel}
             </a>

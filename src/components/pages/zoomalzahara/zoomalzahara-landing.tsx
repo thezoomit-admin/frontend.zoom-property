@@ -1178,7 +1178,11 @@ function LandingCta({
               variant="outline"
               className="h-10 w-full border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground sm:h-9 sm:w-auto"
             >
-              <a href={whatsappHref(whatsapp)}>
+              <a
+                href={whatsappHref(whatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Icon name="whatsapp" size="xs" />
                 {dict.whatsapp}
               </a>
@@ -1233,6 +1237,8 @@ function ContactPills({
       {whatsapp ? (
         <a
           href={whatsappHref(whatsapp)}
+          target="_blank"
+          rel="noopener noreferrer"
           className={pill}
           aria-label={`${whatsappLabel} ${whatsapp}`}
         >

@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Image as ImageIcon, MousePointerClick, Type } from "lucide-react";
+import { BarChart3, Image as ImageIcon, MousePointerClick, Type, X } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
 import { FormSectionCard, TextPair } from "../field-inputs";
@@ -71,10 +71,11 @@ export function HeroFields({
                       const next = images.filter((_, i) => i !== index);
                       setValue({ ...value, images: next });
                     }}
-                    className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center shadow hover:scale-110 transition-transform"
+                    className="absolute -top-2 -right-2 size-5.5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer z-10 border border-white"
                     title="Remove image"
+                    aria-label="Remove image"
                   >
-                    ✕
+                    <X className="size-3.5 text-white stroke-[2.5]" />
                   </button>
                 </div>
               );
