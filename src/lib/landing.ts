@@ -4,7 +4,8 @@ export function landingHref(path: string) {
     .replace(/^\/+|\/+$/g, "")
     .toLowerCase();
   if (!clean) return "/";
-  if (clean === "project-landing" || clean === "zoomalzahara") return "/project-landing";
+  if (clean === "zoomalzahara") return "/zoomalzahara";
+  if (clean === "project-landing") return "/project-landing";
   return `/p/${clean}`;
 }
 

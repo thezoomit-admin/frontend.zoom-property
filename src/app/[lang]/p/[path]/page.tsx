@@ -12,9 +12,6 @@ export async function generateMetadata({
   params: Promise<{ path: string }>;
 }): Promise<Metadata> {
   const { path } = await params;
-  if (path === "project-landing" || path === "zoomalzahara") {
-    return { robots: { index: false, follow: false } };
-  }
   return generateLandingMetadata(path);
 }
 
@@ -24,6 +21,5 @@ export default async function ProjectLandingPathPage({
   params: Promise<{ path: string }>;
 }) {
   const { path } = await params;
-  if (path === "project-landing" || path === "zoomalzahara") notFound();
   return <ProjectLandingRoute path={path} />;
 }
