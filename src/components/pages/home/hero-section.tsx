@@ -49,12 +49,6 @@ export async function HeroSection() {
 
   return (
     <section className="relative z-10 flex min-h-[80svh] items-center overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
-      <CmsSectionEditControl
-        pageId="home"
-        sectionId="hero"
-        label="Hero Section"
-        position="top-24 right-6 sm:top-28 sm:right-10"
-      />
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Parallax speed={0.18} zoom className="absolute inset-0 size-full">
           <HeroBackdrop images={images} fallbackImages={HERO_IMAGES} />
@@ -67,6 +61,12 @@ export async function HeroSection() {
       </div>
 
       <AppContainer className="relative z-10 w-full pb-20 pt-16 sm:pb-24 sm:pt-20">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="hero"
+          label="Hero Section"
+          position="top-2 right-4 sm:top-4 sm:right-6"
+        />
         {/* Left = copy, right = lead form (side-by-side from md up). */}
         <div className="flex flex-col gap-10 md:flex-row md:items-center md:gap-12 lg:gap-14">
           <div className="flex min-w-0 flex-1 flex-col gap-6">

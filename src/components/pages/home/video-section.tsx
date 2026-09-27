@@ -25,12 +25,6 @@ export async function VideoSection() {
       className="relative isolate overflow-hidden bg-cover bg-center bg-fixed py-14 max-md:bg-scroll sm:py-28"
       style={{ backgroundImage: `url(${videoSectionBackdrop})` }}
     >
-      <CmsSectionEditControl
-        pageId="home"
-        sectionId="videoSection"
-        label="Video Section"
-        position="top-6 right-6"
-      />
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-b from-black/90 via-black/80 to-black/95"
@@ -44,7 +38,13 @@ export async function VideoSection() {
         className="pointer-events-none absolute -bottom-40 -right-40 -z-10 size-96 rounded-full bg-brand/15 blur-[140px]"
       />
 
-      <AppContainer>
+      <AppContainer className="relative z-10">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="videoSection"
+          label="Video Section"
+          position="-top-6 right-0 sm:-top-10 sm:right-2"
+        />
         <SectionHeading title={t.title} align="center" tone="inverse" />
         <OrnamentDivider tone="inverse" className="mt-7" />
         <div className="mt-8 sm:mt-12">

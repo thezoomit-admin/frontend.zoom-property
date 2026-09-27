@@ -67,16 +67,18 @@ export function ProjectLanding({
         <About dict={landing.about} raw={raw?.about} />
       ) : null}
       {show("residences") && hasResidences(landing) ? (
-        <div className="relative">
-          <SectionEditControl
-            section="residences"
-            title="Residences"
-            value={raw?.residences}
-            empty={emptyResidences}
-            Fields={ResidencesFields}
-          />
-          <ProjectResidence dict={landing.residences} />
-        </div>
+        <ProjectResidence
+          dict={landing.residences}
+          editControl={
+            <SectionEditControl
+              section="residences"
+              title="Residences"
+              value={raw?.residences}
+              empty={emptyResidences}
+              Fields={ResidencesFields}
+            />
+          }
+        />
       ) : null}
       {show("elevation") && landing.elevation.views.length ? (
         <Elevation dict={landing.elevation} raw={raw?.elevation} />
@@ -208,13 +210,6 @@ function Hero({
 
   return (
     <section className="relative isolate overflow-hidden bg-[#1b2318]">
-      <SectionEditControl
-        section="hero"
-        title="Hero"
-        value={raw}
-        empty={emptyHero}
-        Fields={HeroFields}
-      />
       {images.length ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <HeroBackdrop images={images} className="absolute inset-0 size-full" />
@@ -252,6 +247,14 @@ function Hero({
       />
 
       <AppContainer className="relative z-10 pb-8 pt-16 sm:pt-20 lg:pb-10">
+        <SectionEditControl
+          section="hero"
+          title="Hero"
+          value={raw}
+          empty={emptyHero}
+          Fields={HeroFields}
+          position="top-2 right-4 sm:top-4 sm:right-6"
+        />
         <div
           className={cn(
             "grid items-center gap-6 lg:gap-8",

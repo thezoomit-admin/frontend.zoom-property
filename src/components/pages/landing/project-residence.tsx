@@ -34,8 +34,10 @@ const HIGHLIGHT_ICONS: IconName[] = [
 
 export function ProjectResidence({
   dict,
+  editControl,
 }: {
   dict: LandingView["residences"];
+  editControl?: React.ReactNode;
 }) {
   const unit = dict.unit;
   const shots = useMemo(
@@ -53,6 +55,7 @@ export function ProjectResidence({
       spacing="sm"
       className="scroll-mt-24 border-y border-border bg-muted/30"
     >
+      {editControl}
       <div
         className={cn(
           "grid items-stretch gap-6 lg:gap-8",

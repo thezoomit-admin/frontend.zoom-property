@@ -3,6 +3,7 @@
 import {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useState,
   type ReactNode,
@@ -38,7 +39,7 @@ export const EditorContext = createContext<EditorState>({
 const LIVE_EDIT_STORAGE_KEY = "zp_live_cms_active";
 
 export function EditorProvider({
-  isEditor = false,
+  isEditor: isEditorProp,
   projectId = null,
   children,
 }: {
@@ -46,6 +47,9 @@ export function EditorProvider({
   projectId?: string | null;
   children: ReactNode;
 }) {
+  const parent = useContext(EditorContext);
+  const isEditor = isEditorProp ?? parent?.isEditor ?? false;
+
   const [isLiveEdit, setIsLiveEditState] = useState<boolean>(() => {
     if (typeof window !== "undefined" && isEditor) {
       const stored = localStorage.getItem(LIVE_EDIT_STORAGE_KEY);
@@ -66,6 +70,18 @@ export function EditorProvider({
         setIsLiveEditState((prev) => (prev !== false ? false : prev));
       }
     }
+  }, [isEditor]);
+
+  // Sync across tabs
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === LIVE_EDIT_STORAGE_KEY && isEditor) {
+        setIsLiveEditState(e.newValue !== "false");
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, [isEditor]);
 
   const setLiveEdit = useCallback(
@@ -112,6 +128,20 @@ export function EditorProvider({
       toast.error("Failed to log out");
     }
   }, []);
+
+  // If nested inside an already active EditorProvider, delegate state to parent and enrich projectId
+  if (parent && parent.isEditor) {
+    return (
+      <EditorContext.Provider
+        value={{
+          ...parent,
+          projectId: projectId || parent.projectId,
+        }}
+      >
+        {children}
+      </EditorContext.Provider>
+    );
+  }
 
   return (
     <EditorContext.Provider

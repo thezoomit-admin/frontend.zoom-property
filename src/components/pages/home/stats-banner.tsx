@@ -96,12 +96,6 @@ export async function StatsBanner({
     <section
       className={`relative flex min-h-48 w-full items-center overflow-hidden bg-stone-800 py-10 sm:block sm:min-h-0 sm:py-16 lg:py-20 ${className}`}
     >
-      <CmsSectionEditControl
-        pageId="home"
-        sectionId="statsBanner"
-        label="Stats Banner"
-        position="top-6 right-6"
-      />
       <Image
         aria-hidden
         alt=""
@@ -117,6 +111,12 @@ export async function StatsBanner({
 
       {/* Foreground Stats Content Layer (z-20) */}
       <AppContainer size="lg" className="relative z-20">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="statsBanner"
+          label="Stats Banner"
+          position="-top-4 right-0 sm:top-0 sm:right-2"
+        />
         <Stagger className="grid grid-cols-2 gap-y-6 gap-x-6 sm:gap-8 md:grid-cols-4 md:gap-8">
           {stats.map((item, index) => (
             <StaggerItem
