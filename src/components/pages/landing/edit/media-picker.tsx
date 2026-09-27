@@ -251,12 +251,27 @@ export function MediaPicker({
   const handleUpload = async (file: File) => {
     setUploading(true);
     try {
+      // Straight to the backend from here, not through this app's own
+      // server — a Vercel Node Function in between caps the body at ~4.5MB,
+      // well under a single phone photo. See /api/media/upload-token.
+      const tokenRes = await fetch("/api/media/upload-token");
+      const tokenJson = await tokenRes.json();
+      if (!tokenJson?.success || !tokenJson.token) {
+        toast.error(tokenJson?.message || "Not signed in");
+        return;
+      }
+
       const formData = new FormData();
       formData.set("file", file);
       if (currentFolderId) {
         formData.set("folder", currentFolderId);
       }
-      const res = await fetch("/api/media/upload", { method: "POST", body: formData });
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5009/api").replace(/\/+$/, "");
+      const res = await fetch(`${apiUrl}/media-library`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${tokenJson.token}` },
+        body: formData,
+      });
       const json = await res.json();
       if (json?.success && json.data) {
         const media: MediaRow = {
