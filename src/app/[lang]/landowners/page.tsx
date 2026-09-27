@@ -42,6 +42,8 @@ export default async function LandownersPage({
         title={t.title}
         description={t.description}
         image={dict.landowner.backgroundImage || pageBanners.landowners}
+        cmsPageId="landowners"
+        cmsSectionId="landowners"
       />
 
       {/* Written in the panel. Removes itself when nothing is published. */}

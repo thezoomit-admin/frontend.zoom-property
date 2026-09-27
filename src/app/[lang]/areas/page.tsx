@@ -47,6 +47,8 @@ export default async function AreasPage({
         title={dict.areas.pageTitle}
         description={dict.areas.pageDescription}
         image={dict.areas.backgroundImage || pageBanners.areas}
+        cmsPageId="areas"
+        cmsSectionId="areas"
       />
 
       <AreasPaginated

@@ -9,6 +9,7 @@ import { InteractiveProjects } from "./interactive-projects";
 import { getHomeProjects, getProjects } from "@/server/features/projects";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export async function ProjectsSection({
   variant = "home",
@@ -31,7 +32,15 @@ export async function ProjectsSection({
   ]);
 
   return (
-    <Section id="projects" className="bg-background">
+    <Section id="projects" className="relative bg-background">
+      {!isFull && (
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="projectsSection"
+          label="Audited Projects"
+          position="top-6 right-6"
+        />
+      )}
       {isFull ? (
         <InteractiveProjects
           projects={projects}

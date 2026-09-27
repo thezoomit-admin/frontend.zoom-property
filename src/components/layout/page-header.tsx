@@ -6,31 +6,16 @@ import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
 import { shimmerDataUrl } from "@/lib/image";
 import { ReactNode } from "react";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
-/**
- * The banner every inner page opens with.
- *
- * The page photograph fills the banner edge to edge (`object-cover`, centred)
- * so it is never letterboxed or stretched. A primary-green gradient runs in
- * from the left where the type sits and fades out to the right, so the copy
- * always lands on a calm brand ground while the photograph itself stays
- * clear and visible on the other half.
- *
- * Kept short (~42svh): tall enough to register as a header, short enough that
- * the actual content is on screen without scrolling.
- *
- * The home page does not use this; it has its own full-height hero with the
- * search built in.
- *
- * Text is hard-coded white. It always sits on the gradient, so it must not
- * follow the theme tokens — `text-foreground` is near-black here.
- */
 export function PageHeader({
   eyebrow,
   title,
   description,
   image,
   children,
+  cmsPageId,
+  cmsSectionId,
 }: {
   eyebrow?: string;
   title: string;
@@ -38,9 +23,19 @@ export function PageHeader({
   /** Page-specific photograph. */
   image: string;
   children?: ReactNode;
+  cmsPageId?: string;
+  cmsSectionId?: string;
 }) {
   return (
     <section className="relative isolate flex min-h-[42svh] items-end overflow-hidden bg-primary pb-12 pt-28 sm:min-h-[46svh] sm:pb-16 sm:pt-32">
+      {cmsPageId && (
+        <CmsSectionEditControl
+          pageId={cmsPageId}
+          sectionId={cmsSectionId || cmsPageId}
+          label="Banner"
+          position="top-24 sm:top-28 right-4 sm:right-8"
+        />
+      )}
       {/* Full-bleed photo. `object-cover` fills without distortion; centred
           crop keeps the subject in frame at every viewport. */}
       <Image

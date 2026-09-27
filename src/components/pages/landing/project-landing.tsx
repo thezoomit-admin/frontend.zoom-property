@@ -8,14 +8,14 @@ import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
-import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
-import { ZoomAlZaharaLeadForm } from "@/components/pages/zoomalzahara/lead-form";
-import { LandingStickyCta } from "@/components/pages/zoomalzahara/landing-sticky-cta";
-import { ProjectElevations } from "@/components/pages/zoomalzahara/project-elevations";
-import { ProjectFilms } from "@/components/pages/zoomalzahara/project-films";
-import { ProjectGallery } from "@/components/pages/zoomalzahara/project-gallery";
-import { ProjectResidence } from "@/components/pages/zoomalzahara/project-residence";
-import { ProjectReviews } from "@/components/pages/zoomalzahara/project-reviews";
+import { landingCardClass, landingTitleClass } from "@/components/pages/landing/landing-card";
+import { ZoomAlZaharaLeadForm } from "@/components/pages/landing/lead-form";
+import { LandingStickyCta } from "@/components/pages/landing/landing-sticky-cta";
+import { ProjectElevations } from "@/components/pages/landing/project-elevations";
+import { ProjectFilms } from "@/components/pages/landing/project-films";
+import { ProjectGallery } from "@/components/pages/landing/project-gallery";
+import { ProjectResidence } from "@/components/pages/landing/project-residence";
+import { ProjectReviews } from "@/components/pages/landing/project-reviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,24 +28,24 @@ import { telHref, whatsappHref } from "@/lib/contact";
 import { resolveAmenityMaps } from "@/lib/maps-distance";
 import { cn } from "@/lib/utils";
 import type { ApiProjectLanding, LandingView } from "@/server/features/project-landing/types";
-import { SectionEditControl } from "@/components/pages/zoomalzahara/edit/section-edit-control";
-import { AboutFields, emptyAbout } from "@/components/pages/zoomalzahara/edit/section-fields/about-fields";
-import { GalleryFields, emptyGallery } from "@/components/pages/zoomalzahara/edit/section-fields/gallery-fields";
-import { FaqFields, emptyFaq } from "@/components/pages/zoomalzahara/edit/section-fields/faq-fields";
-import { EditorBar } from "@/components/pages/zoomalzahara/edit/editor-bar";
-import { HeroFields, emptyHero } from "@/components/pages/zoomalzahara/edit/section-fields/hero-fields";
-import { ResidencesFields, emptyResidences } from "@/components/pages/zoomalzahara/edit/section-fields/residences-fields";
-import { ElevationFields, emptyElevation } from "@/components/pages/zoomalzahara/edit/section-fields/elevation-fields";
-import { FilmsFields, emptyFilms } from "@/components/pages/zoomalzahara/edit/section-fields/films-fields";
-import { AmenitiesFields, emptyAmenities } from "@/components/pages/zoomalzahara/edit/section-fields/amenities-fields";
-import { LocationFields, emptyLocation } from "@/components/pages/zoomalzahara/edit/section-fields/location-fields";
-import { ProcessFields, emptyProcess } from "@/components/pages/zoomalzahara/edit/section-fields/process-fields";
-import { CtaFields, emptyCta } from "@/components/pages/zoomalzahara/edit/section-fields/cta-fields";
-import { ReviewsFields, emptyReviews } from "@/components/pages/zoomalzahara/edit/section-fields/reviews-fields";
-import { EnquireFields, emptyEnquire } from "@/components/pages/zoomalzahara/edit/section-fields/enquire-fields";
-import { CustomFields, emptyCustom } from "@/components/pages/zoomalzahara/edit/section-fields/custom-fields";
+import { SectionEditControl } from "@/components/pages/landing/edit/section-edit-control";
+import { AboutFields, emptyAbout } from "@/components/pages/landing/edit/section-fields/about-fields";
+import { GalleryFields, emptyGallery } from "@/components/pages/landing/edit/section-fields/gallery-fields";
+import { FaqFields, emptyFaq } from "@/components/pages/landing/edit/section-fields/faq-fields";
+import { EditorBar } from "@/components/pages/landing/edit/editor-bar";
+import { HeroFields, emptyHero } from "@/components/pages/landing/edit/section-fields/hero-fields";
+import { ResidencesFields, emptyResidences } from "@/components/pages/landing/edit/section-fields/residences-fields";
+import { ElevationFields, emptyElevation } from "@/components/pages/landing/edit/section-fields/elevation-fields";
+import { FilmsFields, emptyFilms } from "@/components/pages/landing/edit/section-fields/films-fields";
+import { AmenitiesFields, emptyAmenities } from "@/components/pages/landing/edit/section-fields/amenities-fields";
+import { LocationFields, emptyLocation } from "@/components/pages/landing/edit/section-fields/location-fields";
+import { ProcessFields, emptyProcess } from "@/components/pages/landing/edit/section-fields/process-fields";
+import { CtaFields, emptyCta } from "@/components/pages/landing/edit/section-fields/cta-fields";
+import { ReviewsFields, emptyReviews } from "@/components/pages/landing/edit/section-fields/reviews-fields";
+import { EnquireFields, emptyEnquire } from "@/components/pages/landing/edit/section-fields/enquire-fields";
+import { CustomFields, emptyCustom } from "@/components/pages/landing/edit/section-fields/custom-fields";
 
-export function ZoomAlZaharaLanding({
+export function ProjectLanding({
   landing,
   raw,
 }: {
@@ -1284,3 +1284,5 @@ function ContactPills({
     </div>
   );
 }
+
+export const ZoomAlZaharaLanding = ProjectLanding;

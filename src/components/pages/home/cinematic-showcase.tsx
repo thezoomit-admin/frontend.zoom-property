@@ -8,6 +8,7 @@ import { Icon } from "@/components/common/icon";
 import { Text } from "@/components/common/text";
 import { shimmerDataUrl } from "@/lib/image";
 import { VideoLightbox } from "@/components/media/video-lightbox";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export interface ShowcaseDict {
   eyebrow: string;
@@ -36,6 +37,14 @@ export function CinematicShowcase({
         onClick={() => setOpenModal(true)}
         className="group relative isolate min-h-[70svh] overflow-hidden bg-black sm:min-h-[80svh] cursor-pointer"
       >
+        <div onClick={(e) => e.stopPropagation()}>
+          <CmsSectionEditControl
+            pageId="home"
+            sectionId="showcase"
+            label="Film Showcase"
+            position="top-6 right-6"
+          />
+        </div>
         <Image
           src={poster}
           alt={dict.title}

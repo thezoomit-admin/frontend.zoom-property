@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Info, Languages, Loader2 } from "lucide-react";
+import { Languages, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { translateToBangla } from "@/lib/translate";
+import { translateToBangla, translateToEnglish } from "@/lib/translate";
 
 /**
  * Card container to group related inputs with a title, icon, and explanation.
@@ -77,19 +77,20 @@ export function TextPair({
   placeholderEn?: string;
   placeholderBn?: string;
 }) {
-  const [translating, setTranslating] = useState(false);
+  const [translatingToBn, setTranslatingToBn] = useState(false);
+  const [translatingToEn, setTranslatingToEn] = useState(false);
   const Field = multiline ? Textarea : Input;
   const near = (value: string) => value.length >= maxLength * 0.9;
 
   const usageHint = description || hint;
 
-  const handleTranslate = async () => {
+  const handleTranslateEnToBn = async () => {
     if (!en || !en.trim()) {
-      toast.info("অনুবাদের জন্য আগে ইংরেজিতে লিখুন");
+      toast.info("অনুবাদের জন্য আগে ইংরেজিতে টেক্সট লিখুন");
       return;
     }
 
-    setTranslating(true);
+    setTranslatingToBn(true);
     try {
       const translated = await translateToBangla(en);
       if (translated) {
@@ -99,13 +100,33 @@ export function TextPair({
     } catch {
       toast.error("অনুবাদ করতে সমস্যা হয়েছে");
     } finally {
-      setTranslating(false);
+      setTranslatingToBn(false);
+    }
+  };
+
+  const handleTranslateBnToEn = async () => {
+    if (!bn || !bn.trim()) {
+      toast.info("অনুবাদের জন্য আগে বাংলায় টেক্সট লিখুন");
+      return;
+    }
+
+    setTranslatingToEn(true);
+    try {
+      const translated = await translateToEnglish(bn);
+      if (translated) {
+        onEnChange(translated.slice(0, maxLength));
+        toast.success("English-এ রূপান্তর করা হয়েছে!");
+      }
+    } catch {
+      toast.error("অনুবাদ করতে সমস্যা হয়েছে");
+    } finally {
+      setTranslatingToEn(false);
     }
   };
 
   return (
     <div className="space-y-2 rounded-lg border border-border/40 bg-muted/20 p-3 sm:p-3.5 transition-colors hover:border-border">
-      {/* Top Header: Label, Usage Hint, Auto-translate, Character Counter */}
+      {/* Top Header: Label, Usage Hint, Auto-translate Actions, Character Counter */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
@@ -118,25 +139,44 @@ export function TextPair({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {/* EN -> BN */}
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={handleTranslate}
-            disabled={translating || !en.trim()}
-            className="group h-7 px-2.5 text-[11px] font-bold text-primary border-primary/40 bg-primary/10 hover:bg-primary hover:text-white hover:border-primary transition-all duration-150 flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-40"
-            title="Auto-translate English text to Bangla (বাংলা করুন)"
+            onClick={handleTranslateEnToBn}
+            disabled={translatingToBn || !en.trim()}
+            className="h-6.5 px-2 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-1 shadow-2xs cursor-pointer disabled:opacity-35"
+            title="Translate English to Bangla (EN → BN)"
           >
-            {translating ? (
-              <Loader2 className="size-3.5 animate-spin text-current shrink-0" />
+            {translatingToBn ? (
+              <Loader2 className="size-3 animate-spin text-current shrink-0" />
             ) : (
-              <Languages className="size-3.5 text-current shrink-0 transition-colors" />
+              <Languages className="size-3 text-current shrink-0" />
             )}
-            <span className="text-current">{translating ? "রূপান্তর হচ্ছে..." : "বাংলা করুন"}</span>
+            <span>{translatingToBn ? "রূপান্তর..." : "বাংলা করুন (EN→BN)"}</span>
           </Button>
 
-          <span className="text-[10px] tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+          {/* BN -> EN */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleTranslateBnToEn}
+            disabled={translatingToEn || !bn.trim()}
+            className="h-6.5 px-2 text-[10px] font-bold text-blue-700 dark:text-blue-400 border-blue-500/40 bg-blue-500/10 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1 shadow-2xs cursor-pointer disabled:opacity-35"
+            title="Translate Bangla to English (BN → EN)"
+          >
+            {translatingToEn ? (
+              <Loader2 className="size-3 animate-spin text-current shrink-0" />
+            ) : (
+              <Languages className="size-3 text-current shrink-0" />
+            )}
+            <span>{translatingToEn ? "Translating..." : "English (BN→EN)"}</span>
+          </Button>
+
+          <span className="text-[10px] tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded ml-0.5">
             {Math.max(en.length, bn.length)}/{maxLength}
           </span>
         </div>

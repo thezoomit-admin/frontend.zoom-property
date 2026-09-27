@@ -4,6 +4,7 @@ import { Text } from "@/components/common/text";
 import { Counter } from "@/components/motion/counter";
 import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { getDictionary } from "@/i18n/dictionaries";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 /**
  * The figures, on the charcoal.
@@ -21,7 +22,13 @@ export async function FiguresBand() {
   const dict = await getDictionary();
 
   return (
-    <Section className="bg-footer text-footer-foreground">
+    <Section className="relative bg-footer text-footer-foreground">
+      <CmsSectionEditControl
+        pageId="about"
+        sectionId="figures"
+        label="Key Figures"
+        position="top-6 right-6"
+      />
       <div className="flex flex-col gap-3">
         <Heading as="h2" size="h3" className="max-w-2xl text-footer-foreground">
           {dict.about.figuresTitle}

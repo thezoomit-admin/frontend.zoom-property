@@ -9,6 +9,7 @@ import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { footerLinks } from "@/lib/footer-links";
 import { mailHref, socialProfiles, telHref } from "@/lib/contact";
+import { FooterLiveSwitch } from "@/components/layout/footer-live-switch";
 
 /**
  * Footer.
@@ -185,21 +186,23 @@ export async function SiteFooter() {
           <Text size="xs" tone="inverse" className="text-footer-foreground/60">
             © {new Date().getFullYear()} {t.companyName} {t.rights}
           </Text>
-          {/* The legal pages sit in the bottom bar rather than a nav column:
-              they are read once, on purpose, by someone looking for them. */}
-          <div className="flex items-center gap-4">
-            <Link
-              href={localeHref(locale, "/terms")}
-              className="text-xs text-footer-foreground/60 transition-colors hover:text-brand-green-light"
-            >
-              {t.terms}
-            </Link>
-            <Link
-              href={localeHref(locale, "/privacy")}
-              className="text-xs text-footer-foreground/60 transition-colors hover:text-brand-green-light"
-            >
-              {t.privacy}
-            </Link>
+          {/* The legal pages sit in the bottom bar along with Live CMS switcher */}
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4">
+              <Link
+                href={localeHref(locale, "/terms")}
+                className="text-xs text-footer-foreground/60 transition-colors hover:text-brand-green-light"
+              >
+                {t.terms}
+              </Link>
+              <Link
+                href={localeHref(locale, "/privacy")}
+                className="text-xs text-footer-foreground/60 transition-colors hover:text-brand-green-light"
+              >
+                {t.privacy}
+              </Link>
+            </div>
+            <FooterLiveSwitch />
           </div>
         </AppContainer>
       </div>

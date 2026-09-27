@@ -48,6 +48,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         title={t.title}
         description={t.description}
         image={dict.blog.backgroundImage || pageBanners.blog}
+        cmsPageId="blog"
+        cmsSectionId="blog"
       />
 
       <Section className="bg-background pt-10 sm:pt-14 pb-20">

@@ -35,6 +35,7 @@ export function LoginForm({ lang, next }: { lang: Locale; next?: string }) {
           name="email"
           type="email"
           autoComplete="email"
+          placeholder="admin@zoomproperty.com.bd"
           required
         />
       </div>
@@ -46,6 +47,7 @@ export function LoginForm({ lang, next }: { lang: Locale; next?: string }) {
           name="password"
           type="password"
           autoComplete="current-password"
+          placeholder="••••••••"
           required
         />
       </div>

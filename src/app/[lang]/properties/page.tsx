@@ -95,6 +95,8 @@ export default async function PropertiesPage({
           String(allProperties.length),
         )}
         image={dict.listings.backgroundImage || pageBanners.properties}
+        cmsPageId="properties"
+        cmsSectionId="listings"
       />
 
       {/* 2. Middle Properties Section with Dynamic Area Filters & Cards */}

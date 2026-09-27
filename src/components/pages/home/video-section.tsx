@@ -5,6 +5,7 @@ import { VideoCarousel } from "@/components/pages/home/video-carousel";
 import { videoSectionBackdrop } from "@/data/videos";
 import { getHomeVideos } from "@/server/features/videos";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 /**
  * Home video showcase section.
@@ -24,6 +25,12 @@ export async function VideoSection() {
       className="relative isolate overflow-hidden bg-cover bg-center bg-fixed py-14 max-md:bg-scroll sm:py-28"
       style={{ backgroundImage: `url(${videoSectionBackdrop})` }}
     >
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="videoSection"
+        label="Video Section"
+        position="top-6 right-6"
+      />
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-b from-black/90 via-black/80 to-black/95"

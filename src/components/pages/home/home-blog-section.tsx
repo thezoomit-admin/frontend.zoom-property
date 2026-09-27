@@ -8,6 +8,7 @@ import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { LOCALE_TAGS } from "@/i18n/config";
 import { localeHref } from "@/i18n/href";
 import Link from "next/link";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export async function HomeBlogSection() {
   const [dict, locale, latestInsights] = await Promise.all([
@@ -24,7 +25,13 @@ export async function HomeBlogSection() {
   });
 
   return (
-    <section className="bg-background pt-16 pb-2 sm:py-24">
+    <section className="relative bg-background pt-16 pb-2 sm:py-24">
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="homeBlog"
+        label="Blog Section"
+        position="top-6 right-6"
+      />
       <AppContainer>
         {/* `homeTitle`, not `title`: the same words open the /blog page,
             and one row that changes two unrelated headings is a trap for

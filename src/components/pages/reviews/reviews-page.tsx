@@ -57,6 +57,8 @@ export function ReviewsPage({
         title={t.pageTitle}
         description={t.pageDescription}
         image={t.backgroundImage || pageBanners.reviews}
+        cmsPageId="reviews"
+        cmsSectionId="reviews"
       />
 
       <section className="border-b border-border bg-muted/30 py-10 sm:py-14">

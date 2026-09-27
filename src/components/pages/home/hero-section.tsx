@@ -9,6 +9,7 @@ import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
 import { Badge } from "@/components/ui/badge";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getLeadAreaOptions } from "@/server/features/areas";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 const photo = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=2000&q=80`;
@@ -48,6 +49,12 @@ export async function HeroSection() {
 
   return (
     <section className="relative z-10 flex min-h-[80svh] items-center overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="hero"
+        label="Hero Section"
+        position="top-24 right-6 sm:top-28 sm:right-10"
+      />
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Parallax speed={0.18} zoom className="absolute inset-0 size-full">
           <HeroBackdrop images={images} fallbackImages={HERO_IMAGES} />

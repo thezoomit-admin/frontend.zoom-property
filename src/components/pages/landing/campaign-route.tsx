@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/common/json-ld";
-import { ZoomAlZaharaLanding } from "@/components/pages/zoomalzahara/zoomalzahara-landing";
+import { ProjectLanding } from "./project-landing";
 import { localeAlternates } from "@/i18n/alternates";
 import { LOCALE_TAGS } from "@/i18n/config";
 import { getLocale } from "@/i18n/dictionaries";
@@ -108,7 +108,7 @@ export async function ProjectLandingRoute({ path }: { path: string }) {
         isEditor={Boolean(session)}
         projectId={raw?.project?._id ?? null}
       >
-        <ZoomAlZaharaLanding landing={landing} raw={raw} />
+        <ProjectLanding landing={landing} raw={raw} />
       </EditorProvider>
     </>
   );

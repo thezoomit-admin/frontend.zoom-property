@@ -86,6 +86,8 @@ export default async function ContactPage() {
         title={dict.contact.title}
         description={dict.contact.description}
         image={dict.contact.backgroundImage || pageBanners.contact}
+        cmsPageId="contact"
+        cmsSectionId="contact"
       />
 
       <Section className="bg-background">

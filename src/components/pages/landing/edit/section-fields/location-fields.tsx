@@ -94,7 +94,7 @@ export function LocationFields({
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-foreground">"Open in Google Maps" Direct Link</Label>
+            <Label className="text-xs font-semibold text-foreground">&quot;Open in Google Maps&quot; Direct Link</Label>
             <p className="text-[11px] text-muted-foreground">Direct URL opening navigation on mobile</p>
             <Input
               placeholder="https://maps.app.goo.gl/..."

@@ -68,6 +68,8 @@ export default async function ProjectsPage({
         title={dict.projects.pageTitle}
         description={dict.projects.pageDescription}
         image={dict.projects.backgroundImage || pageBanners.projects}
+        cmsPageId="projects"
+        cmsSectionId="projects"
       />
 
       <ProjectsSection

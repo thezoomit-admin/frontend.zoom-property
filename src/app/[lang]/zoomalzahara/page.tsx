@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import {
   generateLandingMetadata,
   ProjectLandingRoute,
-} from "@/components/pages/zoomalzahara/campaign-route";
+} from "@/components/pages/landing/campaign-route";
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateLandingMetadata("zoomalzahara");

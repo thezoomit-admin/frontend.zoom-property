@@ -11,8 +11,7 @@ import { useEditor } from "@/hooks/use-editor";
  * client code runs). Doubles as the site's only logout affordance, since
  * there's deliberately no login/logout control in the normal public nav. */
 export function EditorBar() {
-  const { isEditor } = useEditor();
-  const [loggingOut, setLoggingOut] = useState(false);
+  const { isEditor, logout } = useEditor();
 
   if (!isEditor) return null;
 
@@ -24,12 +23,7 @@ export function EditorBar() {
         type="button"
         variant="ghost"
         size="sm"
-        disabled={loggingOut}
-        onClick={async () => {
-          setLoggingOut(true);
-          await fetch("/api/auth/logout", { method: "POST" });
-          window.location.reload();
-        }}
+        onClick={logout}
       >
         <LogOut className="size-3.5" />
         Log out

@@ -4,6 +4,7 @@ import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { getDictionary } from "@/i18n/dictionaries";
 import { toLatinDigits } from "@/lib/format";
 import Image from "next/image";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export interface StatsBannerProps {
   backgroundImage?: string;
@@ -95,6 +96,12 @@ export async function StatsBanner({
     <section
       className={`relative flex min-h-48 w-full items-center overflow-hidden bg-stone-800 py-10 sm:block sm:min-h-0 sm:py-16 lg:py-20 ${className}`}
     >
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="statsBanner"
+        label="Stats Banner"
+        position="top-6 right-6"
+      />
       <Image
         aria-hidden
         alt=""

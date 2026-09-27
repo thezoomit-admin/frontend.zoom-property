@@ -4,13 +4,20 @@ import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { getDictionary } from "@/i18n/dictionaries";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export async function VettingSection() {
   const dict = await getDictionary();
   const { vetting } = dict.pages;
 
   return (
-    <Section className="border-t border-border bg-background">
+    <Section className="relative border-t border-border bg-background">
+      <CmsSectionEditControl
+        pageId="about"
+        sectionId="vetting"
+        label="Vetting Section"
+        position="top-6 right-6"
+      />
       <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex flex-col gap-8">
           <SectionHeading

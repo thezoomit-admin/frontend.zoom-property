@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import Image from "@/components/common/image";
 import { Icon } from "@/components/common/icon";
-import { LandingSlider } from "@/components/pages/zoomalzahara/landing-slider";
-import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
+import { LandingSlider } from "./landing-slider";
+import { landingCardClass } from "./landing-card";
 import { VideoLightbox } from "@/components/media/video-lightbox";
 import {
   facebookEmbedUrl,

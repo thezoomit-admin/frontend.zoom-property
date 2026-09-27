@@ -5,7 +5,7 @@ import { useState } from "react";
 import Image from "@/components/common/image";
 import { Icon } from "@/components/common/icon";
 import { VideoLightbox } from "@/components/media/video-lightbox";
-import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
+import { landingCardClass } from "./landing-card";
 import { facebookEmbedUrl, parseVideoId, resolveVideoProvider, youtubeThumbnail } from "@/lib/video";
 import { cn } from "@/lib/utils";
 
