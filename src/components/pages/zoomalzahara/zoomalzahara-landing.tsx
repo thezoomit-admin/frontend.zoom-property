@@ -1164,7 +1164,7 @@ function LandingCta({
             <Button
               asChild
               variant="outline"
-              className="h-10 w-full border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground sm:h-9 sm:w-auto"
+              className="h-10 w-full border-white/50 bg-white/15 px-4 font-bold text-white backdrop-blur-sm hover:bg-white/25 hover:text-white sm:h-9 sm:w-auto shadow-sm"
             >
               <a href={telHref(phone)}>
                 <Icon name="phone" size="xs" />
@@ -1175,8 +1175,7 @@ function LandingCta({
           {whatsapp ? (
             <Button
               asChild
-              variant="outline"
-              className="h-10 w-full border-white/40 bg-white/10 px-3 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground sm:h-9 sm:w-auto"
+              className="h-10 w-full bg-[#25D366] hover:bg-[#20bd5a] px-4 font-bold text-white shadow-md shadow-[#25D366]/30 hover:shadow-[0_0_18px_rgba(37,211,102,0.5)] sm:h-9 sm:w-auto transition-all"
             >
               <a
                 href={whatsappHref(whatsapp)}
@@ -1210,28 +1209,43 @@ function ContactPills({
   tone?: "default" | "onDark";
 }) {
   const onDark = tone === "onDark";
-  const pill = onDark
-    ? "inline-flex h-8 items-center gap-1.5 rounded-md border border-white/25 bg-white/10 px-2.5 text-xs font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/20"
-    : "inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/40 hover:bg-muted/50";
 
   if (!phone && !phoneAlt && !whatsapp) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-2 pt-1">
       {phone ? (
-        <a href={telHref(phone)} className={pill} aria-label={`${phoneLabel} ${phone}`}>
-          <Icon name="phone" size="xs" className={onDark ? "text-white" : "text-primary"} />
-          <span className="truncate">{phone}</span>
+        <a
+          href={telHref(phone)}
+          className={cn(
+            "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-bold transition-all duration-200 shadow-sm",
+            onDark
+              ? "border border-white/30 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 hover:border-white/50 hover:scale-[1.02]"
+              : "border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:border-primary hover:scale-[1.02]",
+          )}
+          aria-label={`${phoneLabel} ${phone}`}
+        >
+          <span className="flex size-5 items-center justify-center rounded-full bg-white/20 text-white">
+            <Icon name="phone" size="xs" />
+          </span>
+          <span className="tracking-wide">{phone}</span>
         </a>
       ) : null}
       {phoneAlt ? (
         <a
           href={telHref(phoneAlt)}
-          className={pill}
+          className={cn(
+            "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-bold transition-all duration-200 shadow-sm",
+            onDark
+              ? "border border-white/30 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 hover:border-white/50 hover:scale-[1.02]"
+              : "border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:border-primary hover:scale-[1.02]",
+          )}
           aria-label={`${phoneLabel} ${phoneAlt}`}
         >
-          <Icon name="phone" size="xs" className={onDark ? "text-white" : "text-primary"} />
-          <span className="truncate">{phoneAlt}</span>
+          <span className="flex size-5 items-center justify-center rounded-full bg-white/20 text-white">
+            <Icon name="phone" size="xs" />
+          </span>
+          <span className="tracking-wide">{phoneAlt}</span>
         </a>
       ) : null}
       {whatsapp ? (
@@ -1239,11 +1253,18 @@ function ContactPills({
           href={whatsappHref(whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
-          className={pill}
+          className={cn(
+            "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-bold transition-all duration-200 shadow-sm",
+            onDark
+              ? "border border-[#25D366]/60 bg-[#25D366]/30 text-white backdrop-blur-md hover:bg-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_18px_rgba(37,211,102,0.45)] hover:scale-[1.03]"
+              : "border border-[#25D366]/50 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] hover:shadow-[0_0_14px_rgba(37,211,102,0.35)] hover:scale-[1.03]",
+          )}
           aria-label={`${whatsappLabel} ${whatsapp}`}
         >
-          <Icon name="whatsapp" size="xs" className={onDark ? "text-white" : "text-primary"} />
-          <span className="truncate">{whatsappLabel}</span>
+          <span className="flex size-5 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xs">
+            <Icon name="whatsapp" size="xs" />
+          </span>
+          <span className="font-semibold">{whatsappLabel || "হোয়াটসঅ্যাপ"}</span>
         </a>
       ) : null}
     </div>
