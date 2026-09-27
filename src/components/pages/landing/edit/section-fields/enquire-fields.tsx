@@ -1,6 +1,6 @@
 "use client";
 
-import { HelpCircle, MessageSquare, PhoneCall } from "lucide-react";
+import { HelpCircle, PhoneCall } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { FormSectionCard, TextPair } from "../field-inputs";
 

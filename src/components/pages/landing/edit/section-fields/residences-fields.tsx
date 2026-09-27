@@ -1,6 +1,6 @@
 "use client";
 
-import { BedDouble, Home, Image as ImageIcon, Sparkles, Tag, X } from "lucide-react";
+import { BedDouble, Home, Image as ImageIcon, Sparkles, X } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
 import { FormSectionCard, IconInputField, TextPair } from "../field-inputs";

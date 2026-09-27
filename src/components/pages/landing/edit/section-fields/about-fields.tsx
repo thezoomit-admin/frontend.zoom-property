@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Image as ImageIcon, Sparkles } from "lucide-react";
+import { CheckCircle2, Sparkles } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
 import { FormSectionCard, IconInputField, TextPair } from "../field-inputs";
