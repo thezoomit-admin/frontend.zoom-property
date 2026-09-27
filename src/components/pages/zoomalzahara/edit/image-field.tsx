@@ -11,10 +11,12 @@ import { MediaPicker, type PickedMedia } from "./media-picker";
  * `url` is only for the preview. */
 export function ImageField({
   previewUrl,
+  value,
   onChange,
   className,
 }: {
   previewUrl?: string;
+  value?: string;
   onChange: (media: PickedMedia) => void;
   className?: string;
 }) {
@@ -27,19 +29,20 @@ export function ImageField({
         onClick={() => setOpen(true)}
         className={
           className ??
-          "relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/40 hover:border-primary"
+          "relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/40 hover:border-primary transition-all duration-200 group hover:shadow-xs cursor-pointer"
         }
       >
         {previewUrl ? (
-          <Image src={previewUrl} alt="" fill sizes="96px" className="object-cover" />
+          <Image src={previewUrl} alt="" fill sizes="96px" className="object-cover group-hover:scale-105 transition-transform duration-200" />
         ) : (
-          <ImagePlus className="size-5 text-muted-foreground" />
+          <ImagePlus className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
         )}
       </button>
       <MediaPicker
         open={open}
         onOpenChange={setOpen}
         onSelect={onChange}
+        initialSelected={previewUrl || value}
       />
     </>
   );

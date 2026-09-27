@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   ArrowLeft,
+  Check,
   ChevronRight,
+  Copy,
   Folder,
   FolderOpen,
   FolderPlus,
@@ -29,6 +31,7 @@ import { cn } from "@/lib/utils";
 export interface PickedMedia {
   id: string;
   url: string;
+  name?: string;
 }
 
 interface MediaRow {
@@ -43,19 +46,28 @@ interface FolderRow {
   parent?: string | null;
 }
 
+export interface MediaPickerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (media: PickedMedia) => void;
+  initialSelected?: string | string[] | PickedMedia | PickedMedia[] | null;
+  selectionMode?: "single" | "multiple";
+  title?: string;
+}
+
 /**
- * Media picker with full folder navigation, search, and instant uploads.
- * Styled to 90% viewport width and 95% viewport height.
+ * Media picker with full folder navigation, search, instant uploads,
+ * persistent selected image state, and visual checkmark highlighting
+ * matching the admin media workflow.
  */
 export function MediaPicker({
   open,
   onOpenChange,
   onSelect,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSelect: (media: PickedMedia) => void;
-}) {
+  initialSelected,
+  selectionMode = "single",
+  title = "Select Image from Media",
+}: MediaPickerProps) {
   const [items, setItems] = useState<MediaRow[]>([]);
   const [folders, setFolders] = useState<FolderRow[]>([]);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -64,6 +76,9 @@ export function MediaPicker({
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  // Selected item state
+  const [selectedMedia, setSelectedMedia] = useState<MediaRow | null>(null);
 
   // New folder creation state
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -91,7 +106,16 @@ export function MediaPicker({
 
       const mediaPromise = fetch(`/api/media?${mediaParams}`, { signal })
         .then((r) => r.json())
-        .then((res) => (res?.success && Array.isArray(res.data?.data) ? res.data.data : []))
+        .then((res) => {
+          if (res?.success && Array.isArray(res.data?.data)) {
+            return res.data.data.map((m: any) => ({
+              id: m._id || m.id,
+              name: m.name,
+              url: m.url || m.path,
+            }));
+          }
+          return [];
+        })
         .catch(() => []);
 
       const [folderList, mediaList] = await Promise.all([folderPromise, mediaPromise]);
@@ -113,6 +137,7 @@ export function MediaPicker({
       setSearch("");
       setIsCreatingFolder(false);
       setNewFolderName("");
+      setSelectedMedia(null);
       return;
     }
 
@@ -120,6 +145,39 @@ export function MediaPicker({
     void fetchData(controller.signal);
     return () => controller.abort();
   }, [open, currentFolderId, search, fetchData]);
+
+  // Match initialSelected when items load or when modal opens
+  useEffect(() => {
+    if (!open || items.length === 0 || !initialSelected) return;
+
+    const rawTarget = Array.isArray(initialSelected)
+      ? initialSelected[0]
+      : initialSelected;
+
+    if (!rawTarget) return;
+
+    const target =
+      typeof rawTarget === "string"
+        ? rawTarget
+        : (rawTarget as PickedMedia).url || (rawTarget as PickedMedia).id;
+
+    if (!target) return;
+
+    const found = items.find((item) => {
+      if (item.id === target) return true;
+      if (item.url === target) return true;
+      if (item.name === target) return true;
+      const cleanTarget = target.split("?")[0];
+      const cleanItemUrl = item.url.split("?")[0];
+      if (cleanTarget === cleanItemUrl) return true;
+      if (cleanTarget.endsWith(item.name) || cleanItemUrl.endsWith(target)) return true;
+      return false;
+    });
+
+    if (found) {
+      setSelectedMedia(found);
+    }
+  }, [open, items, initialSelected]);
 
   const handleOpenFolder = (folder: FolderRow) => {
     setBreadcrumbs((prev) => [...prev, { id: folder._id, name: folder.name }]);
@@ -190,11 +248,14 @@ export function MediaPicker({
       const res = await fetch("/api/media/upload", { method: "POST", body: formData });
       const json = await res.json();
       if (json?.success && json.data) {
-        const media: MediaRow = { id: json.data.id, name: json.data.name, url: json.data.url };
+        const media: MediaRow = {
+          id: json.data.id || json.data._id,
+          name: json.data.name,
+          url: json.data.url || json.data.path,
+        };
         setItems((prev) => [media, ...prev]);
-        toast.success("Image uploaded");
-        onSelect({ id: media.id, url: media.url });
-        onOpenChange(false);
+        setSelectedMedia(media);
+        toast.success("Image uploaded and selected");
       } else {
         toast.error(json?.message || "Failed to upload image");
       }
@@ -205,6 +266,27 @@ export function MediaPicker({
     }
   };
 
+  const handleCopyUrl = async (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("URL copied to clipboard");
+    } catch {
+      toast.error("Failed to copy URL");
+    }
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedMedia) {
+      onSelect({
+        id: selectedMedia.id,
+        url: selectedMedia.url,
+        name: selectedMedia.name,
+      });
+      onOpenChange(false);
+    }
+  };
+
   const currentFolderName =
     breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].name : "All Media";
 
@@ -212,21 +294,24 @@ export function MediaPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-lenis-prevent
-        className="w-[90vw] max-w-[90vw] sm:max-w-[90vw] h-[95vh] max-h-[95vh] flex flex-col p-5 sm:p-6"
+        className="w-[94vw] max-w-6xl sm:max-w-6xl h-[95vh] max-h-[95vh] flex flex-col p-4 sm:p-6"
       >
         <DialogHeader className="pb-1">
-          <DialogTitle className="flex items-center justify-between text-lg font-semibold">
-            <span>Choose an image</span>
+          <DialogTitle className="flex items-center justify-between text-base sm:text-lg font-semibold">
+            <span className="flex items-center gap-2">
+              <FolderOpen className="size-5 text-primary" />
+              {title}
+            </span>
           </DialogTitle>
         </DialogHeader>
 
         {/* ── Breadcrumb Bar ────────────────────────────────────────── */}
-        <div className="flex items-center gap-1.5 overflow-x-auto rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground border border-border/50">
+        <div className="flex items-center gap-1.5 overflow-x-auto rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground border border-border/50">
           <button
             type="button"
             onClick={() => handleGoToCrumb(-1)}
             className={cn(
-              "flex items-center gap-1.5 font-medium transition-colors hover:text-foreground",
+              "flex items-center gap-1.5 font-medium transition-colors hover:text-foreground cursor-pointer",
               currentFolderId === null ? "font-semibold text-foreground" : "text-muted-foreground"
             )}
           >
@@ -241,7 +326,7 @@ export function MediaPicker({
                 type="button"
                 onClick={() => handleGoToCrumb(idx)}
                 className={cn(
-                  "font-medium transition-colors hover:text-foreground max-w-[160px] truncate",
+                  "font-medium transition-colors hover:text-foreground max-w-[160px] truncate cursor-pointer",
                   idx === breadcrumbs.length - 1
                     ? "font-semibold text-foreground"
                     : "text-muted-foreground"
@@ -276,13 +361,13 @@ export function MediaPicker({
               placeholder={`Search images in ${currentFolderName}...`}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 pl-8 pr-8"
+              className="h-9 pl-8 pr-8 text-sm"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <X className="size-3.5" />
               </button>
@@ -415,7 +500,7 @@ export function MediaPicker({
                         type="button"
                         onClick={() => handleOpenFolder(f)}
                         className={cn(
-                          "group flex items-center gap-2.5 rounded-lg border border-border bg-card p-3 text-left transition-all",
+                          "group flex items-center gap-2.5 rounded-lg border border-border bg-card p-3 text-left transition-all cursor-pointer",
                           "hover:border-primary hover:bg-primary/5 hover:shadow-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
                         )}
                       >
@@ -443,40 +528,115 @@ export function MediaPicker({
                       <span>Images ({items.length})</span>
                     </div>
                   )}
-                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
-                    {items.map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          onSelect({ id: item.id, url: item.url });
-                          onOpenChange(false);
-                        }}
-                        className={cn(
-                          "group relative aspect-square overflow-hidden rounded-lg border border-border bg-card transition-all",
-                          "hover:border-primary hover:ring-2 hover:ring-primary hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                        )}
-                        title={item.name}
-                      >
-                        <Image
-                          src={item.url}
-                          alt={item.name}
-                          fill
-                          sizes="(max-width: 640px) 33vw, (max-width: 1024px) 16vw, 10vw"
-                          className="object-cover transition-transform duration-200 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
-                          <p className="truncate text-[11px] font-medium text-white">
-                            {item.name}
-                          </p>
+                  <div className="grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+                    {items.map((item) => {
+                      const isSelected = selectedMedia?.id === item.id || selectedMedia?.url === item.url;
+
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => setSelectedMedia(item)}
+                          onDoubleClick={() => {
+                            onSelect({ id: item.id, url: item.url, name: item.name });
+                            onOpenChange(false);
+                          }}
+                          className={cn(
+                            "group relative aspect-square overflow-hidden rounded-lg border bg-card text-left transition-all duration-150 cursor-pointer select-none",
+                            isSelected
+                              ? "border-primary ring-2 ring-primary ring-offset-1 shadow-md bg-primary/5"
+                              : "border-border hover:border-primary/60 hover:shadow-xs"
+                          )}
+                          title={`${item.name} • Double-click to set`}
+                        >
+                          {/* Checkmark indicator for selected state */}
+                          {isSelected && (
+                            <div className="absolute top-2 left-2 z-20 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md animate-in zoom-in-75 duration-150">
+                              <Check className="size-3.5 stroke-[3]" />
+                            </div>
+                          )}
+
+                          {/* Copy URL button on hover */}
+                          <button
+                            type="button"
+                            onClick={(e) => void handleCopyUrl(e, item.url)}
+                            className="absolute top-2 right-2 z-20 flex size-6.5 items-center justify-center rounded-md bg-black/60 text-white opacity-0 transition-opacity hover:bg-black group-hover:opacity-100 shadow-sm cursor-pointer"
+                            title="Copy URL"
+                          >
+                            <Copy className="size-3.5" />
+                          </button>
+
+                          <Image
+                            src={item.url}
+                            alt={item.name}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 20vw, 12vw"
+                            className={cn(
+                              "object-cover transition-transform duration-200 group-hover:scale-105",
+                              isSelected ? "scale-[1.02]" : ""
+                            )}
+                          />
+
+                          {/* Image name overlay */}
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1.5 pt-4 opacity-95 transition-opacity group-hover:opacity-100">
+                            <p className="truncate text-[11px] font-medium text-white text-center">
+                              {item.name}
+                            </p>
+                          </div>
                         </div>
-                      </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
             </div>
           )}
+        </div>
+
+        {/* ── Bottom Action / Confirmation Bar (matching admin standard) ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/80 pt-3.5 mt-auto">
+          <div className="flex items-center gap-2 min-w-0 text-xs text-muted-foreground">
+            {selectedMedia ? (
+              <div className="flex items-center gap-2 truncate">
+                <div className="relative size-7 shrink-0 overflow-hidden rounded border border-border">
+                  <Image
+                    src={selectedMedia.url}
+                    alt=""
+                    fill
+                    sizes="28px"
+                    className="object-cover"
+                  />
+                </div>
+                <span className="font-medium text-foreground truncate max-w-[200px] sm:max-w-[350px]">
+                  {selectedMedia.name}
+                </span>
+                <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-medium shrink-0">
+                  Selected
+                </span>
+              </div>
+            ) : (
+              <span className="italic">No image selected. Click an image to choose.</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={!selectedMedia}
+              onClick={handleConfirmSelection}
+              className="min-w-[100px]"
+            >
+              Set Image
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

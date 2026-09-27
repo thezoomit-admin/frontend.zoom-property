@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Languages, Loader2 } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { Info, Languages, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,28 +12,80 @@ import { cn } from "@/lib/utils";
 import { translateToBangla } from "@/lib/translate";
 
 /**
- * One label, an English input and its Bangla pair beside it with auto-translate capability.
+ * Card container to group related inputs with a title, icon, and explanation.
+ */
+export function FormSectionCard({
+  title,
+  description,
+  icon: Icon,
+  children,
+  className,
+}: {
+  title: string;
+  description?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs space-y-4",
+        className
+      )}
+    >
+      <div className="flex items-start justify-between border-b border-border/60 pb-3">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            {Icon && <Icon className="size-4 text-primary shrink-0" />}
+            <h3 className="text-sm font-semibold text-foreground tracking-tight">
+              {title}
+            </h3>
+          </div>
+          {description && (
+            <p className="text-xs text-muted-foreground">{description}</p>
+          )}
+        </div>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Bilingual TextPair with clear English & Bangla input labels, field usage hints,
+ * character count, and one-click Google translate to Bangla.
  */
 export function TextPair({
   label,
+  description,
+  hint,
   en,
   bn,
   onEnChange,
   onBnChange,
   multiline,
   maxLength,
+  placeholderEn,
+  placeholderBn,
 }: {
   label: string;
+  description?: string;
+  hint?: string;
   en: string;
   bn: string;
   onEnChange: (value: string) => void;
   onBnChange: (value: string) => void;
   multiline?: boolean;
   maxLength: number;
+  placeholderEn?: string;
+  placeholderBn?: string;
 }) {
   const [translating, setTranslating] = useState(false);
   const Field = multiline ? Textarea : Input;
   const near = (value: string) => value.length >= maxLength * 0.9;
+
+  const usageHint = description || hint;
 
   const handleTranslate = async () => {
     if (!en || !en.trim()) {
@@ -56,48 +108,85 @@ export function TextPair({
   };
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-2 rounded-lg border border-border/40 bg-muted/20 p-3 sm:p-3.5 transition-colors hover:border-border">
+      {/* Top Header: Label, Usage Hint, Auto-translate, Character Counter */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-1.5">
+            <Label className="text-xs font-semibold text-foreground">{label}</Label>
+            {usageHint && (
+              <span className="flex items-center text-[11px] text-muted-foreground font-normal">
+                ({usageHint})
+              </span>
+            )}
+          </div>
+        </div>
+
         <div className="flex items-center gap-2">
-          <Label className="text-sm font-medium">{label}</Label>
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={handleTranslate}
             disabled={translating || !en.trim()}
-            className="h-6 px-1.5 text-[11px] text-primary hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1 font-normal"
-            title="Translate English to Bangla (বাংলা করুন)"
+            className="h-7 px-2.5 text-[11px] font-bold text-primary border-primary/50 bg-primary/10 hover:bg-primary hover:text-white transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-40"
+            title="Auto-translate English text to Bangla (বাংলা করুন)"
           >
             {translating ? (
-              <Loader2 className="size-3 animate-spin" />
+              <Loader2 className="size-3.5 animate-spin text-primary" />
             ) : (
-              <Languages className="size-3.5" />
+              <Languages className="size-3.5 text-primary group-hover:text-white" />
             )}
             <span>{translating ? "রূপান্তর হচ্ছে..." : "বাংলা করুন"}</span>
           </Button>
-        </div>
 
-        <span className="text-[11px] tabular-nums text-muted-foreground">
-          {Math.max(en.length, bn.length)}/{maxLength}
-        </span>
+          <span className="text-[10px] tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+            {Math.max(en.length, bn.length)}/{maxLength}
+          </span>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <Field
-          value={en}
-          maxLength={maxLength}
-          onChange={(e) => onEnChange(e.target.value.slice(0, maxLength))}
-          placeholder={`${label} (English)`}
-          className={cn(near(en) && "border-amber-500 focus-visible:ring-amber-500/40")}
-        />
-        <Field
-          value={bn}
-          maxLength={maxLength}
-          onChange={(e) => onBnChange(e.target.value.slice(0, maxLength))}
-          placeholder={`${label} (বাংলা)`}
-          className={cn(near(bn) && "border-amber-500 focus-visible:ring-amber-500/40")}
-        />
+      {/* Two Column Grid for English and Bangla */}
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-0.5">
+            <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-blue-500" />
+              English
+            </span>
+          </div>
+          <Field
+            value={en}
+            maxLength={maxLength}
+            onChange={(e) => onEnChange(e.target.value.slice(0, maxLength))}
+            placeholder={placeholderEn || `Enter ${label.toLowerCase()} in English...`}
+            className={cn(
+              "text-xs sm:text-sm bg-background transition-colors",
+              multiline ? "min-h-[75px]" : "h-9",
+              near(en) && "border-amber-500 focus-visible:ring-amber-500/40"
+            )}
+          />
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-0.5">
+            <span className="font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              বাংলা (Bengali)
+            </span>
+          </div>
+          <Field
+            value={bn}
+            maxLength={maxLength}
+            onChange={(e) => onBnChange(e.target.value.slice(0, maxLength))}
+            placeholder={placeholderBn || `বাংলায় ${label.toLowerCase()} লিখুন...`}
+            className={cn(
+              "text-xs sm:text-sm bg-background transition-colors",
+              multiline ? "min-h-[75px]" : "h-9",
+              near(bn) && "border-amber-500 focus-visible:ring-amber-500/40"
+            )}
+          />
+        </div>
       </div>
     </div>
   );
