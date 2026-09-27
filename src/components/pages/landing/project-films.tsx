@@ -52,7 +52,7 @@ export function ProjectFilms({
   const isFacebook = provider === "facebook";
   const youtubeId = isFacebook ? "" : parseVideoId(current.url, "youtube");
   const thumb =
-    current.poster?.trim() || (youtubeId ? youtubeThumbnail(youtubeId) : "");
+    (youtubeId ? youtubeThumbnail(youtubeId) : "") || current.poster?.trim() || "";
 
   const embedSrc = playerEmbed(current.url).src;
 
@@ -179,7 +179,7 @@ export function ProjectFilms({
                     const isFb = filmProvider === "facebook";
                     const ytId = isFb ? "" : parseVideoId(film.url, "youtube");
                     const filmThumb =
-                      film.poster?.trim() || (ytId ? youtubeThumbnail(ytId) : "");
+                      (ytId ? youtubeThumbnail(ytId) : "") || film.poster?.trim() || "";
 
                     return (
                       <button

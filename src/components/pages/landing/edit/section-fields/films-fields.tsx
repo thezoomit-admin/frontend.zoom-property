@@ -162,6 +162,44 @@ export function FilmsFields({
                   </div>
                 </div>
 
+                {/* Live YouTube Preview Card */}
+                {(() => {
+                  const match = String(item.url || "").match(
+                    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|v=)([A-Za-z0-9_-]{6,})/,
+                  );
+                  const ytId = match?.[1];
+                  if (!ytId) return null;
+                  return (
+                    <div className="flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 p-2.5">
+                      <div className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-zinc-900 shadow-xs">
+                        <img
+                          src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+                          alt="YouTube Preview"
+                          className="size-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <span className="flex size-5 items-center justify-center rounded-full bg-red-600 text-white shadow-xs">
+                            <span className="translate-x-0.2 text-[10px]">▶</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                            YouTube Live
+                          </span>
+                          <span className="text-[11px] font-mono text-muted-foreground font-medium">
+                            ID: {ytId}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1">
+                          Auto-stream enabled from YouTube CDN.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <TextPair
                   label="Video Subtitle / Caption"
                   description="Short descriptive snippet under video"
