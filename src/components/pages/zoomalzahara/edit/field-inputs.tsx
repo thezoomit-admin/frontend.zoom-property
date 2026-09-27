@@ -125,15 +125,15 @@ export function TextPair({
             size="sm"
             onClick={handleTranslate}
             disabled={translating || !en.trim()}
-            className="h-7 px-2.5 text-[11px] font-bold text-primary border-primary/50 bg-primary/10 hover:bg-primary hover:text-white transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-40"
+            className="group h-7 px-2.5 text-[11px] font-bold text-primary border-primary/40 bg-primary/10 hover:bg-primary hover:text-white hover:border-primary transition-all duration-150 flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-40"
             title="Auto-translate English text to Bangla (বাংলা করুন)"
           >
             {translating ? (
-              <Loader2 className="size-3.5 animate-spin text-primary" />
+              <Loader2 className="size-3.5 animate-spin text-current shrink-0" />
             ) : (
-              <Languages className="size-3.5 text-primary group-hover:text-white" />
+              <Languages className="size-3.5 text-current shrink-0 transition-colors" />
             )}
-            <span>{translating ? "রূপান্তর হচ্ছে..." : "বাংলা করুন"}</span>
+            <span className="text-current">{translating ? "রূপান্তর হচ্ছে..." : "বাংলা করুন"}</span>
           </Button>
 
           <span className="text-[10px] tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
