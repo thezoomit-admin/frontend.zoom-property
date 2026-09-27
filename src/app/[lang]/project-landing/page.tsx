@@ -6,9 +6,9 @@ import {
 } from "@/components/pages/landing/campaign-route";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return generateLandingMetadata("zoomalzahara");
+  return generateLandingMetadata("project-landing");
 }
 
-export default function ZoomAlZaharaPage() {
-  return <ProjectLandingRoute path="zoomalzahara" />;
+export default function ProjectLandingPage() {
+  return <ProjectLandingRoute path="project-landing" />;
 }

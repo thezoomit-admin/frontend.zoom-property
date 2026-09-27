@@ -10,5 +10,5 @@ export default async function Image({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
-  return landingOgResponse("zoomalzahara", lang);
+  return landingOgResponse("project-landing", lang);
 }

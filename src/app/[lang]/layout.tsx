@@ -80,7 +80,11 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const locale = await getLocale();
   const [dict, campaigns, session] = await Promise.all([
     getDictionary(),
