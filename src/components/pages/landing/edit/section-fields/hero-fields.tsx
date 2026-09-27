@@ -48,43 +48,6 @@ export function HeroFields({
         description="Main headline, subtitles, and introductory description visible above the fold."
         icon={Type}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <TextPair
-            label="Top Badge"
-            description="Small highlighted chip above title"
-            en={value.badge ?? ""}
-            bn={value.badgeBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, badge: v })}
-            onBnChange={(v) => setValue({ ...value, badgeBn: v })}
-            placeholderEn="e.g., Exclusive Waterfront Landmark"
-            placeholderBn="যেমন: এক্সক্লুসিভ ওয়াটারফ্রন্ট প্রজেক্ট"
-            maxLength={30}
-          />
-          <TextPair
-            label="Handover Timeline"
-            description="Completion / delivery schedule note"
-            en={value.handover ?? ""}
-            bn={value.handoverBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, handover: v })}
-            onBnChange={(v) => setValue({ ...value, handoverBn: v })}
-            placeholderEn="e.g., Ready by December 2026"
-            placeholderBn="যেমন: হস্তান্তর: ডিসেম্বর ২০২৬"
-            maxLength={60}
-          />
-        </div>
-
-        <TextPair
-          label="Eyebrow Subtitle"
-          description="Category tag displayed directly above main title"
-          en={value.eyebrow ?? ""}
-          bn={value.eyebrowBn ?? ""}
-          onEnChange={(v) => setValue({ ...value, eyebrow: v })}
-          onBnChange={(v) => setValue({ ...value, eyebrowBn: v })}
-          placeholderEn="e.g., A New Standard of Luxury Living"
-          placeholderBn="যেমন: বিলাসবহুল জীবনযাত্রার অনন্য ঠিকানা"
-          maxLength={50}
-        />
-
         <TextPair
           label="Main Hero Title"
           description="Large prominent heading of the landing page"
@@ -123,36 +86,23 @@ export function HeroFields({
         />
       </FormSectionCard>
 
-      {/* ── 2. Call to Action Buttons ───────────────────────────────── */}
+      {/* ── 2. Call to Action Button ───────────────────────────────── */}
       <FormSectionCard
-        title="Call to Action (CTA) Buttons"
-        description="Button labels triggering inquiries, brochures, or booking tours."
+        title="Call to Action (CTA) Button"
+        description="Main button label triggering inquiry form."
         icon={MousePointerClick}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <TextPair
-            label="Primary Action Button"
-            description="Main filled button label"
-            en={value.ctaPrimary ?? ""}
-            bn={value.ctaPrimaryBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, ctaPrimary: v })}
-            onBnChange={(v) => setValue({ ...value, ctaPrimaryBn: v })}
-            placeholderEn="e.g., Explore Residences"
-            placeholderBn="যেমন: অ্যাপার্টমেন্ট দেখুন"
-            maxLength={30}
-          />
-          <TextPair
-            label="Secondary Action Button"
-            description="Outline button label"
-            en={value.ctaSecondary ?? ""}
-            bn={value.ctaSecondaryBn ?? ""}
-            onEnChange={(v) => setValue({ ...value, ctaSecondary: v })}
-            onBnChange={(v) => setValue({ ...value, ctaSecondaryBn: v })}
-            placeholderEn="e.g., Schedule a Private Tour"
-            placeholderBn="যেমন: ভিজিট বুক করুন"
-            maxLength={30}
-          />
-        </div>
+        <TextPair
+          label="Primary Action Button"
+          description="Main filled button label"
+          en={value.ctaPrimary ?? ""}
+          bn={value.ctaPrimaryBn ?? ""}
+          onEnChange={(v) => setValue({ ...value, ctaPrimary: v })}
+          onBnChange={(v) => setValue({ ...value, ctaPrimaryBn: v })}
+          placeholderEn="e.g., Book Land Share"
+          placeholderBn="যেমন: ল্যান্ড শেয়ার বুক করুন"
+          maxLength={30}
+        />
       </FormSectionCard>
 
       {/* ── 3. Key Highlights & Statistics ──────────────────────────── */}

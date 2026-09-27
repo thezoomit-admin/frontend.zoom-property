@@ -32,7 +32,7 @@ export function MetaPixel() {
       trackMeta("PageView");
     }
 
-    if (pathname.includes("/p/") || pathname.includes("/zoomalzahara")) {
+    if (pathname.includes("/p/") || pathname.includes("/project-landing") || pathname.includes("/zoomalzahara")) {
       const slug = pathname.split("/").filter(Boolean).pop() || "landing";
       trackMeta("ViewContent", {
         content_ids: [slug],

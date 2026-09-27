@@ -80,7 +80,11 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const locale = await getLocale();
   const [dict, campaigns, session] = await Promise.all([
     getDictionary(),
@@ -97,6 +101,10 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       className={`${fontVariables} antialiased`}
     >
       <head>
+        <meta
+          name="facebook-domain-verification"
+          content="27uwce7hr329q5lsfv1twnym1rvd8x"
+        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
