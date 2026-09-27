@@ -24,7 +24,7 @@ export function LandingStickyCta({
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
       <div className="mx-auto flex max-w-lg gap-2">
         {phone ? (
-          <Button asChild variant="outline" className="h-10 min-w-0 flex-1">
+          <Button asChild variant="outline" className="h-10 min-w-0 flex-1 font-semibold border-primary/40 text-primary hover:bg-primary/10">
             <a href={telHref(phone)}>
               <Icon name="phone" size="xs" />
               {callLabel}
@@ -32,8 +32,12 @@ export function LandingStickyCta({
           </Button>
         ) : null}
         {whatsapp ? (
-          <Button asChild variant="outline" className="h-10 min-w-0 flex-1">
-            <a href={whatsappHref(whatsapp)}>
+          <Button asChild className="h-10 min-w-0 flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold shadow-md shadow-[#25D366]/20">
+            <a
+              href={whatsappHref(whatsapp)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="whatsapp" size="xs" />
               {whatsappLabel}
             </a>

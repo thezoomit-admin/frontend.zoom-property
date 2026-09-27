@@ -45,6 +45,8 @@ export default async function AboutPage() {
         title={dict.about.title}
         description={dict.about.description}
         image={dict.about.backgroundImage || pageBanners.about}
+        cmsPageId="about"
+        cmsSectionId="about"
       />
 
       <StorySection />

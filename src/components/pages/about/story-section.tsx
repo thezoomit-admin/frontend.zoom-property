@@ -5,6 +5,7 @@ import { Text } from "@/components/common/text";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { getDictionary } from "@/i18n/dictionaries";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 /**
  * Who we are, and why the company exists.
@@ -23,7 +24,13 @@ export async function StorySection() {
   const t = dict.about.story;
 
   return (
-    <Section className="overflow-hidden border-b border-border bg-background">
+    <Section className="relative overflow-hidden border-b border-border bg-background">
+      <CmsSectionEditControl
+        pageId="about"
+        sectionId="story"
+        label="Story Section"
+        position="top-6 right-6"
+      />
       <div className="grid items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
         <Reveal>
           <div className="flex flex-col gap-5">

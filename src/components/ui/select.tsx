@@ -73,7 +73,9 @@ function SelectScrollThumb({
   const [thumb, setThumb] = React.useState<{ top: number; height: number } | null>(null);
   // Read during a drag, where `thumb` (state) is a render behind the pointer.
   const thumbRef = React.useRef(thumb);
-  thumbRef.current = thumb;
+  React.useEffect(() => {
+    thumbRef.current = thumb;
+  }, [thumb]);
   const dragRef = React.useRef<{ startY: number; startScrollTop: number } | null>(null);
 
   React.useEffect(() => {
@@ -129,7 +131,8 @@ function SelectScrollThumb({
     if (trackRange <= 0) return;
     const scrollRange = scrollHeight - clientHeight;
     const deltaY = event.clientY - dragRef.current.startY;
-    viewport.scrollTop =
+    const el = viewport as HTMLDivElement;
+    el.scrollTop =
       dragRef.current.startScrollTop + (deltaY / trackRange) * scrollRange;
   };
 

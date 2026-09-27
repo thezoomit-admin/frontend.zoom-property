@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 
 import { fontVariables } from "../fonts";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
@@ -7,7 +8,7 @@ import { JsonLd } from "@/components/common/json-ld";
 import { ContactDock } from "@/components/layout/contact-dock";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteFooterSwitch } from "@/components/layout/site-footer-switch";
-import { LandingFooter } from "@/components/pages/zoomalzahara/landing-footer";
+import { LandingFooter } from "@/components/pages/landing/landing-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteLeadMount } from "@/components/layout/site-lead-mount";
 import { SiteLeadSection } from "@/components/common/site-lead-section";
@@ -22,6 +23,7 @@ import { localeAlternates } from "@/i18n/alternates";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { socialProfiles } from "@/lib/contact";
 import { getLandingChrome } from "@/server/features/project-landing";
+import { getSession } from "@/server/features/auth/session";
 import { navLinks } from "@/lib/nav-links";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
@@ -80,11 +82,13 @@ export function generateStaticParams() {
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
   const locale = await getLocale();
-  const [dict, campaigns] = await Promise.all([
+  const [dict, campaigns, session] = await Promise.all([
     getDictionary(),
     getLandingChrome(locale),
+    getSession(),
   ]);
   const campaignHrefs = campaigns.map((row) => row.href);
+  const isEditor = Boolean(session?.user);
 
   return (
     <html
@@ -100,7 +104,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
-        <script
+        <Script
+          id="meta-pixel-script"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
@@ -126,7 +132,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
         {/* Site-wide entities. Page-level schemas reference these by @id. */}
         <JsonLd schema={organizationSchema(socialProfiles(dict.contact.social))} />
         <JsonLd schema={websiteSchema()} />
-        <Providers>
+        <Providers isEditor={isEditor}>
           <ScrollProgress />
           <SiteHeader
             locale={locale}

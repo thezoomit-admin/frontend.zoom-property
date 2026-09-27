@@ -9,6 +9,7 @@ import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
 import { Badge } from "@/components/ui/badge";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getLeadAreaOptions } from "@/server/features/areas";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 const photo = (id: string) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=2000&q=80`;
@@ -60,6 +61,12 @@ export async function HeroSection() {
       </div>
 
       <AppContainer className="relative z-10 w-full pb-20 pt-16 sm:pb-24 sm:pt-20">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="hero"
+          label="Hero Section"
+          position="top-2 right-4 sm:top-4 sm:right-6"
+        />
         {/* Left = copy, right = lead form (side-by-side from md up). */}
         <div className="flex flex-col gap-10 md:flex-row md:items-center md:gap-12 lg:gap-14">
           <div className="flex min-w-0 flex-1 flex-col gap-6">

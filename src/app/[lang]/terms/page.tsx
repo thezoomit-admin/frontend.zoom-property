@@ -22,5 +22,5 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function TermsPage() {
   const dict = await getDictionary();
-  return <LegalPage content={dict.terms} fallbackImage={pageBanners.blog} />;
+  return <LegalPage content={dict.terms} fallbackImage={pageBanners.blog} cmsSectionId="terms" />;
 }

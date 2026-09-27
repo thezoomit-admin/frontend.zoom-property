@@ -29,6 +29,8 @@ export default async function AgentsPage() {
         title={dict.agentsSection.pageTitle}
         description={dict.agentsSection.pageDescription}
         image={(dict.agentsSection as Record<string, unknown>).backgroundImage as string || pageBanners.agents}
+        cmsPageId="agents"
+        cmsSectionId="agents"
       />
 
       <AgentsSection />

@@ -4,6 +4,7 @@ import { Logo } from "@/components/layout/logo";
 import { localeHref } from "@/i18n/href";
 import { getLocale } from "@/i18n/dictionaries";
 import { telHref, whatsappHref } from "@/lib/contact";
+import { FooterLiveSwitch } from "@/components/layout/footer-live-switch";
 import type { LandingChrome } from "@/server/features/project-landing/types";
 
 export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
@@ -49,6 +50,8 @@ export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
             {chrome.whatsapp ? (
               <a
                 href={whatsappHref(chrome.whatsapp)}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={pill}
                 aria-label={`${chrome.whatsappLabel} ${chrome.whatsapp}`}
               >
@@ -67,6 +70,7 @@ export async function LandingFooter({ chrome }: { chrome: LandingChrome }) {
                 Facebook
               </a>
             ) : null}
+            <FooterLiveSwitch />
           </div>
         </div>
       </AppContainer>

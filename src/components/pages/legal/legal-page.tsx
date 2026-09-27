@@ -35,9 +35,11 @@ export interface LegalContent {
 export function LegalPage({
   content,
   fallbackImage,
+  cmsSectionId,
 }: {
   content: LegalContent;
   fallbackImage: string;
+  cmsSectionId?: string;
 }) {
   return (
     <>
@@ -46,6 +48,8 @@ export function LegalPage({
         title={content.title}
         description={content.description}
         image={content.backgroundImage || fallbackImage}
+        cmsPageId={cmsSectionId ? "legal" : undefined}
+        cmsSectionId={cmsSectionId}
       />
 
       <Section className="bg-background">

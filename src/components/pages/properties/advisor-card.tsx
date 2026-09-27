@@ -89,11 +89,16 @@ export function AdvisorCard({
           </a>
         </Button>
 
-        <Button asChild size="lg" variant="outline" className="w-full">
+        <Button
+          asChild
+          size="lg"
+          variant="outline"
+          className="w-full border-[#25D366]/50 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-all shadow-xs font-bold"
+        >
           <a
             href={whatsappHref(whatsapp)}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             <Icon name="whatsapp" size="xs" />
             {dict.whatsapp}

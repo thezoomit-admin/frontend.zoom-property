@@ -69,6 +69,7 @@ export function InteractiveProjects({
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
     syncUrl(selectedStage, debouncedSearchQuery, 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps

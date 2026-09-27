@@ -3,12 +3,12 @@
 import { useState } from "react";
 
 import { ImageFrame } from "@/components/media/image-frame";
-import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
+import { landingCardClass } from "./landing-card";
 import {
   ImagePreview,
   PreviewTrigger,
-} from "@/components/pages/zoomalzahara/image-preview";
-import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
+} from "./image-preview";
+import { ThumbRail } from "./thumb-rail";
 import { cn } from "@/lib/utils";
 
 export function ProjectGallery({

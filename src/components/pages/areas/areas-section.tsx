@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 import { AreaServiceCard } from "./area-service-card";
 import { AreasHeading } from "./areas-heading";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 /** The ceiling on the home grid. `/areas` paginates the rest. */
 const HOME_COUNT = 10;
@@ -28,8 +29,14 @@ export async function AreasSection({ className }: { className?: string } = {}) {
   return (
     <Section
       id="areas"
-      className={cn("overflow-hidden bg-background", className)}
+      className={cn("relative overflow-hidden bg-background", className)}
     >
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="areasSection"
+        label="Service Areas"
+        position="top-6 right-6"
+      />
       <AreasOrnaments />
 
       <AreasHeading t={t} />

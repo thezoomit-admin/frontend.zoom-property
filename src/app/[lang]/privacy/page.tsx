@@ -22,5 +22,5 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function PrivacyPage() {
   const dict = await getDictionary();
-  return <LegalPage content={dict.privacy} fallbackImage={pageBanners.about} />;
+  return <LegalPage content={dict.privacy} fallbackImage={pageBanners.about} cmsSectionId="privacy" />;
 }

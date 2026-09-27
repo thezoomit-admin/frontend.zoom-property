@@ -7,12 +7,12 @@ import { Section } from "@/components/common/section";
 import { SectionHeading } from "@/components/common/section-heading";
 import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
-import { landingCardClass, landingTitleClass } from "@/components/pages/zoomalzahara/landing-card";
-import { ThumbRail } from "@/components/pages/zoomalzahara/thumb-rail";
+import { landingCardClass, landingTitleClass } from "./landing-card";
+import { ThumbRail } from "./thumb-rail";
 import {
   ImagePreview,
   PreviewTrigger,
-} from "@/components/pages/zoomalzahara/image-preview";
+} from "./image-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,8 +34,10 @@ const HIGHLIGHT_ICONS: IconName[] = [
 
 export function ProjectResidence({
   dict,
+  editControl,
 }: {
   dict: LandingView["residences"];
+  editControl?: React.ReactNode;
 }) {
   const unit = dict.unit;
   const shots = useMemo(
@@ -53,6 +55,7 @@ export function ProjectResidence({
       spacing="sm"
       className="scroll-mt-24 border-y border-border bg-muted/30"
     >
+      {editControl}
       <div
         className={cn(
           "grid items-stretch gap-6 lg:gap-8",

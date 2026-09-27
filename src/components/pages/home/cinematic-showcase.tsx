@@ -8,6 +8,7 @@ import { Icon } from "@/components/common/icon";
 import { Text } from "@/components/common/text";
 import { shimmerDataUrl } from "@/lib/image";
 import { VideoLightbox } from "@/components/media/video-lightbox";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export interface ShowcaseDict {
   eyebrow: string;
@@ -77,7 +78,15 @@ export function CinematicShowcase({
           </span>
         </button>
 
-        <AppContainer className="pointer-events-none absolute inset-x-0 bottom-0 z-10 pb-12 sm:pb-16 lg:top-0 lg:flex lg:items-center lg:pb-0">
+        <AppContainer className="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-12 sm:pb-16 lg:top-0 lg:flex lg:items-center lg:pb-0">
+          <div onClick={(e) => e.stopPropagation()} className="pointer-events-auto">
+            <CmsSectionEditControl
+              pageId="home"
+              sectionId="showcase"
+              label="Film Showcase"
+              position="top-6 right-4 sm:top-8 sm:right-6"
+            />
+          </div>
           <div className="flex max-w-2xl flex-col gap-4">
             <Eyebrow className="flex items-center gap-2 font-semibold text-brand-green-light">
               <span aria-hidden className="size-1.5 rounded-full bg-brand-green-light" />

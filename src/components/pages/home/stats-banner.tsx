@@ -4,6 +4,7 @@ import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { getDictionary } from "@/i18n/dictionaries";
 import { toLatinDigits } from "@/lib/format";
 import Image from "next/image";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 export interface StatsBannerProps {
   backgroundImage?: string;
@@ -110,6 +111,12 @@ export async function StatsBanner({
 
       {/* Foreground Stats Content Layer (z-20) */}
       <AppContainer size="lg" className="relative z-20">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="statsBanner"
+          label="Stats Banner"
+          position="-top-4 right-0 sm:top-0 sm:right-2"
+        />
         <Stagger className="grid grid-cols-2 gap-y-6 gap-x-6 sm:gap-8 md:grid-cols-4 md:gap-8">
           {stats.map((item, index) => (
             <StaggerItem

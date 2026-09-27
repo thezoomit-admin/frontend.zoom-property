@@ -1,19 +1,80 @@
-/**
- * Contact link helpers.
- *
- * The displayed phone number keeps its spaces (`+880 1958 253301`) because that
- * is how it is read aloud; `tel:` needs them gone. Doing the strip in one place
- * stops the two drifting apart.
- */
-
 import { toLatinDigits } from "@/lib/format";
 
-export function telHref(phone: string) {
-  return `tel:${toLatinDigits(phone).replace(/[^\d+]/g, "")}`;
+/**
+ * Normalizes any phone string (Bangla/English digits, 11-digit local, +88/88 prefixed,
+ * formatted with spaces/dashes, or full URLs) into a clean, WhatsApp-compatible format.
+ */
+export function normalizeWhatsappNumber(raw: string): string {
+  if (!raw) return "";
+  const trimmed = raw.trim();
+
+  // If already a full URL or wa.me link
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("wa.me/")
+  ) {
+    if (trimmed.startsWith("wa.me/")) return `https://${trimmed}`;
+    return trimmed;
+  }
+
+  // 1. Fold any Bengali digits (০-৯) to ASCII digits (0-9)
+  const latin = toLatinDigits(trimmed);
+
+  // 2. Extract only digits
+  let digits = latin.replace(/\D/g, "");
+  if (!digits) return "";
+
+  // 3. Strip international dialing prefix "00" if present
+  if (digits.startsWith("00")) {
+    digits = digits.slice(2);
+  }
+
+  // 4. Bangladesh numbers normalization:
+  // - Already 13 digits starting with 880 (e.g. 8801711250406) -> valid
+  if (digits.startsWith("880") && digits.length === 13) {
+    return digits;
+  }
+  // - 12 digits starting with 88 followed by 1 (e.g. 881711250406 -> 8801711250406)
+  if (digits.startsWith("88") && digits.length === 12 && digits.charAt(2) === "1") {
+    return `880${digits.slice(2)}`;
+  }
+  // - 11 digits starting with 01 (e.g. 01711250406 -> 8801711250406)
+  if (digits.length === 11 && digits.startsWith("01")) {
+    return `88${digits}`;
+  }
+  // - 10 digits starting with 1 (e.g. 1711250406 -> 8801711250406)
+  if (digits.length === 10 && digits.startsWith("1")) {
+    return `880${digits}`;
+  }
+
+  return digits;
 }
 
-export function whatsappHref(phone: string) {
-  return `https://wa.me/${toLatinDigits(phone).replace(/\D/g, "")}`;
+export function telHref(phone: string) {
+  if (!phone) return "";
+  const latin = toLatinDigits(phone);
+  const hasPlus = latin.trim().startsWith("+");
+  const digits = latin.replace(/\D/g, "");
+  if (!digits) return "";
+  return `tel:${hasPlus ? `+${digits}` : digits}`;
+}
+
+export function whatsappHref(phone: string, text?: string) {
+  if (!phone) return "";
+  const normalized = normalizeWhatsappNumber(phone);
+  if (!normalized) return "";
+
+  if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+    if (text && !normalized.includes("text=")) {
+      const sep = normalized.includes("?") ? "&" : "?";
+      return `${normalized}${sep}text=${encodeURIComponent(text)}`;
+    }
+    return normalized;
+  }
+
+  const base = `https://wa.me/${normalized}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }
 
 export function mailHref(email: string) {

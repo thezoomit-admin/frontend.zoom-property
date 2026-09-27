@@ -50,7 +50,7 @@ export function Section({
       {container === false ? (
         children
       ) : (
-        <AppContainer size={container} className={containerClassName}>
+        <AppContainer size={container} className={cn("relative", containerClassName)}>
           {children}
         </AppContainer>
       )}

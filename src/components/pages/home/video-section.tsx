@@ -5,6 +5,7 @@ import { VideoCarousel } from "@/components/pages/home/video-carousel";
 import { videoSectionBackdrop } from "@/data/videos";
 import { getHomeVideos } from "@/server/features/videos";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 /**
  * Home video showcase section.
@@ -37,7 +38,13 @@ export async function VideoSection() {
         className="pointer-events-none absolute -bottom-40 -right-40 -z-10 size-96 rounded-full bg-brand/15 blur-[140px]"
       />
 
-      <AppContainer>
+      <AppContainer className="relative z-10">
+        <CmsSectionEditControl
+          pageId="home"
+          sectionId="videoSection"
+          label="Video Section"
+          position="-top-6 right-0 sm:-top-10 sm:right-2"
+        />
         <SectionHeading title={t.title} align="center" tone="inverse" />
         <OrnamentDivider tone="inverse" className="mt-7" />
         <div className="mt-8 sm:mt-12">

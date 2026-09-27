@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PhoneNumberInput } from "@/components/ui/phone-input";
 import { Textarea } from "@/components/ui/textarea";
-import { landingCardClass } from "@/components/pages/zoomalzahara/landing-card";
+import { landingCardClass } from "./landing-card";
 import { trackMeta } from "@/components/analytics/meta-pixel";
 import { submitContactForm } from "@/server/features/inquiries/action";
 import { cn } from "@/lib/utils";
@@ -212,3 +212,5 @@ function Field({
     </div>
   );
 }
+
+export const ProjectLeadForm = ZoomAlZaharaLeadForm;

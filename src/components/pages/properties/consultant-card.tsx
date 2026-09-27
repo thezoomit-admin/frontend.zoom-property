@@ -4,6 +4,7 @@ import { ImageFrame } from "@/components/media/image-frame";
 import { Button } from "@/components/ui/button";
 import type { Agent } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
+import { telHref, whatsappHref } from "@/lib/contact";
 
 interface ConsultantCardProps {
   agent: Agent;
@@ -14,8 +15,6 @@ export function ConsultantCard({ agent, locale = "en" }: ConsultantCardProps) {
   const isBn = locale === "bn";
   const name = isBn && agent.nameBn ? agent.nameBn : agent.name;
   const role = isBn && agent.roleBn ? agent.roleBn : agent.role;
-
-
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-xs">
@@ -61,21 +60,25 @@ export function ConsultantCard({ agent, locale = "en" }: ConsultantCardProps) {
       <div className="flex flex-col gap-2.5">
         <Button
           asChild
-          className="w-full bg-[#497A32] hover:bg-[#3D662A] text-white font-medium h-11"
+          className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 shadow-sm"
         >
-          <a href={`tel:${agent.phone}`}>
+          <a href={telHref(agent.phone)}>
             <Icon name="phone" size="sm" className="mr-2" />
-            {isBn ? "কল" : "Call"}
+            {isBn ? "কল করুন" : "Call"}
           </a>
         </Button>
         <Button
           variant="outline"
           asChild
-          className="w-full font-medium h-11 hover:bg-slate-50 border-gray-300"
+          className="w-full font-bold h-11 border-[#25D366]/50 bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition-all shadow-xs"
         >
-          <a href={`https://wa.me/${agent.phone.replace(/[^0-9+]/g, "")}`}>
-            <Icon name="whatsapp" size="sm" className="mr-2 text-green-600" />
-            {isBn ? "হোয়াটসঅ্যাপ" : "WhatsApp"}
+          <a
+            href={whatsappHref(agent.phone)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icon name="whatsapp" size="sm" className="mr-2" />
+            {isBn ? "হোয়াটসঅ্যাপে মেসেজ" : "WhatsApp"}
           </a>
         </Button>
       </div>

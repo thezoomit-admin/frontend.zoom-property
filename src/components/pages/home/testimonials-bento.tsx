@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/common/section-heading";
 import { Reveal } from "@/components/motion/reveal";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getVideoReviews } from "@/server/features/reviews";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 import { ReviewVideoCarousel } from "./review-video-carousel";
 
@@ -42,7 +43,13 @@ export async function TestimonialsBento() {
   if (videoReviews.length === 0) return null;
 
   return (
-    <section className="border-t border-border bg-muted/30 py-16 sm:py-24">
+    <section className="relative border-t border-border bg-muted/30 py-16 sm:py-24">
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="homeReviews"
+        label="Client Reviews"
+        position="top-6 right-6"
+      />
       <AppContainer>
         {/* No `whitespace-nowrap` override: the title is edited in the panel
             now, and a forced single line pushed a longer one off the side of a
