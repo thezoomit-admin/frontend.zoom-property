@@ -3,7 +3,7 @@
 import { BarChart3, Image as ImageIcon, MousePointerClick, Type, X } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
-import { FormSectionCard, TextPair } from "../field-inputs";
+import { FormSectionCard, IconInputField, TextPair } from "../field-inputs";
 import { ImageField } from "../image-field";
 import { resolveMedia } from "../resolve-media";
 
@@ -237,6 +237,15 @@ export function HeroFields({
                 placeholderBn="যেমন: অ্যাপার্টমেন্ট সাইজ"
                 maxLength={40}
               />
+              <div className="md:col-span-2">
+                <IconInputField
+                  label="Stat Icon (আইকন)"
+                  description="FontAwesome class or name (e.g., fa-solid fa-building, star, sparkles)"
+                  value={stat.icon ?? ""}
+                  onChange={(icon) => update({ ...stat, icon })}
+                  placeholder="e.g., fa-solid fa-building or star, bed, bath..."
+                />
+              </div>
             </div>
           )}
         />

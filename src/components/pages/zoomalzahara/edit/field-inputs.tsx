@@ -187,3 +187,43 @@ export function TextPair({
     </div>
   );
 }
+
+import { Icon } from "@/components/common/icon";
+
+export function IconInputField({
+  label = "Icon (আইকন)",
+  description = "FontAwesome class (e.g., fa-solid fa-building) or keyword",
+  value,
+  onChange,
+  placeholder = "e.g., fa-solid fa-building or check, star, car...",
+}: {
+  label?: string;
+  description?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-1.5 rounded-lg border border-border/40 bg-muted/20 p-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs font-semibold text-foreground">{label}</Label>
+        {description && (
+          <span className="text-[11px] text-muted-foreground font-normal">
+            {description}
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex size-9.5 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary shadow-xs">
+          <Icon name={value || "check"} size="sm" />
+        </div>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="h-9.5 text-xs sm:text-sm bg-background"
+        />
+      </div>
+    </div>
+  );
+}

@@ -3,7 +3,7 @@
 import { CheckCircle2, Image as ImageIcon, Sparkles } from "lucide-react";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
-import { FormSectionCard, TextPair } from "../field-inputs";
+import { FormSectionCard, IconInputField, TextPair } from "../field-inputs";
 import { ImageField } from "../image-field";
 import { resolveMedia } from "../resolve-media";
 
@@ -127,6 +127,13 @@ export function AboutFields({
                 placeholderBn="যেমন: সারাদিন পর্যাপ্ত আলো-বাতাস এবং মনোরম ভিউ নিশ্চিত করতে বিশেষ নকশা।"
                 multiline
                 maxLength={200}
+              />
+              <IconInputField
+                label="Feature Icon (আইকন)"
+                description="FontAwesome class or name"
+                value={item.icon ?? ""}
+                onChange={(icon) => update({ ...item, icon })}
+                placeholder="e.g., fa-solid fa-gem or sparkles, check..."
               />
             </div>
           )}

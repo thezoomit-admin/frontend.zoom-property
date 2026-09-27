@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
-import { TextPair } from "../field-inputs";
+import { IconInputField, TextPair } from "../field-inputs";
 
 export type AmenitiesValue = NonNullable<ApiProjectLanding["amenities"]>;
 
@@ -50,6 +50,13 @@ export function AmenitiesFields({
               <TextPair label="Distance" en={item.distance ?? ""} bn={item.distanceBn ?? ""}
                 onEnChange={(v) => update({ ...item, distance: v })}
                 onBnChange={(v) => update({ ...item, distanceBn: v })} maxLength={30} />
+              <IconInputField
+                label="Place Icon (আইকন)"
+                description="FontAwesome class or name"
+                value={item.icon ?? ""}
+                onChange={(icon) => update({ ...item, icon })}
+                placeholder="e.g., fa-solid fa-hospital, fa-solid fa-school, check..."
+              />
               <div className="space-y-1.5">
                 <Label>Google Maps URL</Label>
                 <Input value={item.mapUrl ?? ""} maxLength={500} onChange={(e) => update({ ...item, mapUrl: e.target.value })} />

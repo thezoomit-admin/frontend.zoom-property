@@ -294,7 +294,7 @@ export function MediaPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-lenis-prevent
-        className="w-[96vw] max-w-7xl h-[97vh] max-h-[97vh] flex flex-col p-4 sm:p-6 overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
+        className="w-[96vw] max-w-7xl h-[97vh] max-h-[97vh] flex flex-col p-4 sm:p-6 overflow-hidden rounded-lg border border-border bg-background shadow-2xl"
       >
         <DialogHeader className="pb-1">
           <DialogTitle className="flex items-center justify-between text-base sm:text-lg font-semibold">

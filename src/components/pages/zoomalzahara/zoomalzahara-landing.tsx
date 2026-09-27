@@ -1221,14 +1221,21 @@ function ContactPills({
             "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-bold transition-all duration-200 shadow-sm",
             onDark
               ? "border border-white/30 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 hover:border-white/50 hover:scale-[1.02]"
-              : "border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:border-primary hover:scale-[1.02]",
+              : "border border-primary/40 bg-primary/5 text-foreground hover:bg-primary/15 hover:border-primary hover:scale-[1.02]",
           )}
           aria-label={`${phoneLabel} ${phone}`}
         >
-          <span className="flex size-5 items-center justify-center rounded-full bg-white/20 text-white">
+          <span
+            className={cn(
+              "flex size-5.5 items-center justify-center rounded-full shrink-0",
+              onDark
+                ? "bg-white/25 text-white"
+                : "bg-primary text-white shadow-xs"
+            )}
+          >
             <Icon name="phone" size="xs" />
           </span>
-          <span className="tracking-wide">{phone}</span>
+          <span className="tracking-wide font-bold">{phone}</span>
         </a>
       ) : null}
       {phoneAlt ? (
@@ -1238,14 +1245,21 @@ function ContactPills({
             "inline-flex h-9 items-center gap-2 rounded-lg px-3.5 text-xs font-bold transition-all duration-200 shadow-sm",
             onDark
               ? "border border-white/30 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 hover:border-white/50 hover:scale-[1.02]"
-              : "border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 hover:border-primary hover:scale-[1.02]",
+              : "border border-primary/40 bg-primary/5 text-foreground hover:bg-primary/15 hover:border-primary hover:scale-[1.02]",
           )}
           aria-label={`${phoneLabel} ${phoneAlt}`}
         >
-          <span className="flex size-5 items-center justify-center rounded-full bg-white/20 text-white">
+          <span
+            className={cn(
+              "flex size-5.5 items-center justify-center rounded-full shrink-0",
+              onDark
+                ? "bg-white/25 text-white"
+                : "bg-primary text-white shadow-xs"
+            )}
+          >
             <Icon name="phone" size="xs" />
           </span>
-          <span className="tracking-wide">{phoneAlt}</span>
+          <span className="tracking-wide font-bold">{phoneAlt}</span>
         </a>
       ) : null}
       {whatsapp ? (
@@ -1261,7 +1275,7 @@ function ContactPills({
           )}
           aria-label={`${whatsappLabel} ${whatsapp}`}
         >
-          <span className="flex size-5 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xs">
+          <span className="flex size-5.5 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xs shrink-0">
             <Icon name="whatsapp" size="xs" />
           </span>
           <span className="font-semibold">{whatsappLabel || "হোয়াটসঅ্যাপ"}</span>

@@ -62,7 +62,7 @@ export function SectionEditModal<T extends Record<string, unknown>>({
     >
       <DialogContent
         data-lenis-prevent
-        className="w-[96vw] sm:w-[94vw] max-w-6xl sm:max-w-6xl md:max-w-6xl lg:max-w-7xl h-[97vh] max-h-[97vh] flex flex-col p-0 overflow-hidden shadow-2xl rounded-2xl border border-border bg-background"
+        className="w-[96vw] sm:w-[94vw] max-w-6xl sm:max-w-6xl md:max-w-6xl lg:max-w-7xl h-[97vh] max-h-[97vh] flex flex-col p-0 overflow-hidden shadow-2xl rounded-lg border border-border bg-background"
       >
         {/* ── Modal Header ───────────────────────────────────────────── */}
         <DialogHeader className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-border/80 bg-background/95 backdrop-blur-sm shrink-0">
@@ -86,7 +86,7 @@ export function SectionEditModal<T extends Record<string, unknown>>({
         </div>
 
         {/* ── Modal Footer ───────────────────────────────────────────── */}
-        <DialogFooter className="m-0 px-4 sm:px-6 py-3 sm:py-4 pb-4 sm:pb-5 border-t border-border/80 bg-background/95 backdrop-blur-sm shrink-0 flex flex-col-reverse sm:flex-row items-center justify-between gap-2.5 sm:gap-4 rounded-b-2xl">
+        <DialogFooter className="m-0 px-4 sm:px-6 py-3 sm:py-4 pb-4 sm:pb-5 border-t border-border/80 bg-background/95 backdrop-blur-sm shrink-0 flex flex-col-reverse sm:flex-row items-center justify-between gap-2.5 sm:gap-4 rounded-b-lg">
           <p className="text-[11px] sm:text-xs text-muted-foreground hidden sm:block">
             Changes will be saved and reflected on the live landing page.
           </p>
