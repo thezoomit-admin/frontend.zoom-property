@@ -1,4 +1,3 @@
-import Image from "@/components/common/image";
 import { AppContainer } from "@/components/common/app-container";
 import { Heading } from "@/components/common/heading";
 import { Icon } from "@/components/common/icon";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -87,6 +87,18 @@ export function MediaPicker({
 
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const handleDialogChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setCurrentFolderId(null);
+      setBreadcrumbs([]);
+      setSearch("");
+      setIsCreatingFolder(false);
+      setNewFolderName("");
+      setSelectedMedia(null);
+    }
+    onOpenChange(nextOpen);
+  };
+
   // Fetch folders and media whenever modal opens, folder changes, or search changes
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -108,10 +120,10 @@ export function MediaPicker({
         .then((r) => r.json())
         .then((res) => {
           if (res?.success && Array.isArray(res.data?.data)) {
-            return res.data.data.map((m: any) => ({
-              id: m._id || m.id,
+            return res.data.data.map((m: { _id?: string; id?: string; name: string; url?: string; path?: string }) => ({
+              id: m._id || m.id || "",
               name: m.name,
-              url: m.url || m.path,
+              url: m.url || m.path || "",
             }));
           }
           return [];
@@ -122,62 +134,61 @@ export function MediaPicker({
 
       setFolders(folderList);
       setItems(mediaList);
+
+      // Match initial selection
+      if (initialSelected && mediaList.length > 0) {
+        const rawTarget = Array.isArray(initialSelected)
+          ? initialSelected[0]
+          : initialSelected;
+
+        if (rawTarget) {
+          const target =
+            typeof rawTarget === "string"
+              ? rawTarget
+              : (rawTarget as PickedMedia).url || (rawTarget as PickedMedia).id;
+
+          if (target) {
+            const found = mediaList.find((item: MediaRow) => {
+              if (item.id === target) return true;
+              if (item.url === target) return true;
+              if (item.name === target) return true;
+              const cleanTarget = target.split("?")[0];
+              const cleanItemUrl = item.url.split("?")[0];
+              if (cleanTarget === cleanItemUrl) return true;
+              if (cleanTarget.endsWith(item.name) || cleanItemUrl.endsWith(target)) return true;
+              return false;
+            });
+
+            if (found) {
+              setSelectedMedia(found);
+            }
+          }
+        }
+      }
     } catch {
       // ignored if aborted
     } finally {
       setLoading(false);
     }
-  }, [currentFolderId, search]);
+  }, [currentFolderId, search, initialSelected]);
 
   useEffect(() => {
-    if (!open) {
-      // Reset navigation when modal is closed
-      setCurrentFolderId(null);
-      setBreadcrumbs([]);
-      setSearch("");
-      setIsCreatingFolder(false);
-      setNewFolderName("");
-      setSelectedMedia(null);
-      return;
-    }
+    if (!open) return;
 
+    let ignore = false;
     const controller = new AbortController();
-    void fetchData(controller.signal);
-    return () => controller.abort();
-  }, [open, currentFolderId, search, fetchData]);
 
-  // Match initialSelected when items load or when modal opens
-  useEffect(() => {
-    if (!open || items.length === 0 || !initialSelected) return;
-
-    const rawTarget = Array.isArray(initialSelected)
-      ? initialSelected[0]
-      : initialSelected;
-
-    if (!rawTarget) return;
-
-    const target =
-      typeof rawTarget === "string"
-        ? rawTarget
-        : (rawTarget as PickedMedia).url || (rawTarget as PickedMedia).id;
-
-    if (!target) return;
-
-    const found = items.find((item) => {
-      if (item.id === target) return true;
-      if (item.url === target) return true;
-      if (item.name === target) return true;
-      const cleanTarget = target.split("?")[0];
-      const cleanItemUrl = item.url.split("?")[0];
-      if (cleanTarget === cleanItemUrl) return true;
-      if (cleanTarget.endsWith(item.name) || cleanItemUrl.endsWith(target)) return true;
-      return false;
+    Promise.resolve().then(() => {
+      if (!ignore) {
+        void fetchData(controller.signal);
+      }
     });
 
-    if (found) {
-      setSelectedMedia(found);
-    }
-  }, [open, items, initialSelected]);
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [open, fetchData]);
 
   const handleOpenFolder = (folder: FolderRow) => {
     setBreadcrumbs((prev) => [...prev, { id: folder._id, name: folder.name }]);
@@ -291,7 +302,7 @@ export function MediaPicker({
     breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].name : "All Media";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent
         data-lenis-prevent
         className="w-[95vw] sm:w-[95vw] max-w-[95vw] sm:max-w-[95vw] h-[95vh] max-h-[95vh] flex flex-col p-4 sm:p-6 overflow-hidden rounded-lg border border-border bg-background shadow-2xl"
@@ -299,6 +310,9 @@ export function MediaPicker({
         <DialogHeader className="pb-1">
           <DialogTitle className="flex items-center justify-between text-base sm:text-lg font-semibold">
             <span>{title}</span>
+            <span className="text-xs font-normal text-muted-foreground px-2 py-0.5 rounded bg-muted">
+              {selectionMode === "multiple" ? "Multi-select" : "Single Select"}
+            </span>
           </DialogTitle>
         </DialogHeader>
 
