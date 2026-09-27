@@ -3,9 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { baseApi } from "@/server/base-api";
 import { getSession } from "@/server/features/auth/session";
 
-/** Same shape as the admin's own upload, re-posted with the caller's token —
- * read fully into memory and forwarded rather than streamed, since landing
- * page images are a handful of megabytes at most, not video. */
+/** Same shape as the admin's own upload, re-posted with the caller's token.
+ *
+ * Edge runtime, deliberately — a Node (Serverless Function) route here would
+ * cap every upload at Vercel's ~4.5MB request-body limit before this code
+ * even runs, which is well under a single phone photo. Edge Functions stream
+ * the body instead of buffering it against that ceiling. */
+export const runtime = "edge";
+
 export async function POST(request: NextRequest) {
   const session = await getSession();
   if (!session) {
@@ -23,11 +28,27 @@ export async function POST(request: NextRequest) {
   const folder = incoming.get("folder");
   if (typeof folder === "string" && folder) outgoing.set("folder", folder);
 
-  const res = await fetch(baseApi.url("media-library"), {
-    method: "POST",
-    headers: { Authorization: `Bearer ${session.token}` },
-    body: outgoing,
-  });
-  const json = await res.json().catch(() => null);
-  return NextResponse.json(json, { status: res.status });
+  try {
+    const res = await fetch(baseApi.url("media-library"), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.token}` },
+      body: outgoing,
+    });
+    const json = await res.json().catch(() => null);
+    if (!json) {
+      const text = await res.text().catch(() => "");
+      console.error(`[media upload] non-JSON response from backend, status ${res.status}:`, text.slice(0, 500));
+      return NextResponse.json(
+        { success: false, message: `Upload backend returned ${res.status}` },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json(json, { status: res.status });
+  } catch (err) {
+    console.error("[media upload] fetch to backend failed:", err);
+    return NextResponse.json(
+      { success: false, message: `Could not reach upload server: ${(err as Error).message}` },
+      { status: 502 },
+    );
+  }
 }
