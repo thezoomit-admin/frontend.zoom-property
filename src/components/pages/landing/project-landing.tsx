@@ -8,7 +8,7 @@ import { ImageFrame } from "@/components/media/image-frame";
 import { Reveal } from "@/components/motion/reveal";
 import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
 import { landingCardClass, landingTitleClass } from "@/components/pages/landing/landing-card";
-import { ZoomAlZaharaLeadForm } from "@/components/pages/landing/lead-form";
+import { ProjectLeadForm } from "@/components/pages/landing/lead-form";
 import { LandingStickyCta } from "@/components/pages/landing/landing-sticky-cta";
 import { ProjectElevations } from "@/components/pages/landing/project-elevations";
 import { ProjectFilms } from "@/components/pages/landing/project-films";
@@ -118,8 +118,8 @@ export function ProjectLanding({
       )}
       {show("amenities") ||
       show("gallery") ||
-      Boolean(raw?.amenities) ||
-      Boolean(raw?.gallery) ? (
+      (visibleOf("amenities") && Boolean(raw?.amenities)) ||
+      (visibleOf("gallery") && Boolean(raw?.gallery)) ? (
         <Lifestyle
           amenities={show("amenities") ? landing.amenities : null}
           amenitiesRaw={raw?.amenities}
@@ -140,8 +140,8 @@ export function ProjectLanding({
       ) : null}
       {show("location") ||
       show("process") ||
-      Boolean(raw?.location) ||
-      Boolean(raw?.process) ? (
+      (visibleOf("location") && Boolean(raw?.location)) ||
+      (visibleOf("process") && Boolean(raw?.process)) ? (
         <Place
           location={show("location") ? landing.location : null}
           locationRaw={raw?.location}
@@ -176,8 +176,8 @@ export function ProjectLanding({
       )}
       {show("faq") ||
       show("enquire") ||
-      Boolean(raw?.faq) ||
-      Boolean(raw?.enquire) ? (
+      (visibleOf("faq") && Boolean(raw?.faq)) ||
+      (visibleOf("enquire") && Boolean(raw?.enquire)) ? (
         <Close
           faq={show("faq") ? landing.faq : null}
           faqRaw={raw?.faq}
@@ -445,7 +445,7 @@ function Hero({
                 </p>
               ) : null}
               <div className="mt-5">
-                <ZoomAlZaharaLeadForm
+                <ProjectLeadForm
                   dict={enquire.form}
                   projectName={landing.projectName}
                   source={landing.source}
@@ -1213,7 +1213,7 @@ function Close({
               />
             </div>
             <div className="mt-4">
-              <ZoomAlZaharaLeadForm
+              <ProjectLeadForm
                 dict={enquire.form}
                 projectName={projectName}
                 source={source}

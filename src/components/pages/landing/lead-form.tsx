@@ -30,7 +30,7 @@ interface LeadFormDict {
   successBody: string;
 }
 
-export function ZoomAlZaharaLeadForm({
+export function ProjectLeadForm({
   dict,
   projectName,
   source,
@@ -213,4 +213,4 @@ function Field({
   );
 }
 
-export const ProjectLeadForm = ZoomAlZaharaLeadForm;
+export const ZoomAlZaharaLeadForm = ProjectLeadForm;

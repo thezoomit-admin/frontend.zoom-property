@@ -31,7 +31,7 @@ export function HiddenSectionNotice<T extends Record<string, unknown>>({
   visible?: boolean;
 }) {
   const { isEditor, isLiveEdit } = useEditor();
-  if (!isEditor || !isLiveEdit) return null;
+  if (!isEditor || !isLiveEdit || !visible) return null;
 
   return (
     <div className="mx-auto my-3 flex w-full max-w-7xl items-center justify-between gap-3 rounded-lg border border-dashed border-primary/40 bg-primary/5 px-4 py-2.5 sm:px-6">
