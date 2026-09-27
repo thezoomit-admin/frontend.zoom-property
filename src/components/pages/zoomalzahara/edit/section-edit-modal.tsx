@@ -113,7 +113,7 @@ export function SectionEditModal<T extends Record<string, unknown>>({
               ) : (
                 <Save className="size-4 mr-1.5" />
               )}
-              Save Changes
+              {saving ? "Saving Changes..." : "Save Changes"}
             </Button>
           </div>
         </DialogFooter>
