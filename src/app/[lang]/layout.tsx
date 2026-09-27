@@ -101,6 +101,10 @@ export default async function RootLayout({
       className={`${fontVariables} antialiased`}
     >
       <head>
+        <meta
+          name="facebook-domain-verification"
+          content="27uwce7hr329q5lsfv1twnym1rvd8x"
+        />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
