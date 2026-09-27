@@ -38,21 +38,6 @@ export function AboutFields({
         icon={Sparkles}
       >
         <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">
-              Featured About Section Photo
-            </label>
-            <p className="text-[11px] text-muted-foreground">
-              Displays prominently alongside the project story text.
-            </p>
-            <div className="p-3 rounded-lg border border-border/60 bg-muted/20 inline-block">
-              <ImageField
-                previewUrl={image?.url}
-                onChange={(media) => setValue({ ...value, image: media.id })}
-              />
-            </div>
-          </div>
-
           <TextPair
             label="Section Eyebrow Tag"
             description="Small badge above the about heading"
@@ -89,6 +74,21 @@ export function AboutFields({
             multiline
             maxLength={500}
           />
+
+          <div className="space-y-1.5 pt-2 border-t border-border/50">
+            <label className="text-xs font-semibold text-foreground">
+              Featured About Section Photo
+            </label>
+            <p className="text-[11px] text-muted-foreground">
+              Displays prominently alongside the project story text.
+            </p>
+            <div className="p-3 rounded-lg border border-border/60 bg-muted/20 inline-block">
+              <ImageField
+                previewUrl={image?.url}
+                onChange={(media) => setValue({ ...value, image: media.id })}
+              />
+            </div>
+          </div>
         </div>
       </FormSectionCard>
 

@@ -187,53 +187,6 @@ export function ResidencesFields({
         </div>
       </FormSectionCard>
 
-      {/* ── Residence Gallery Photos ──────────────────────────────────── */}
-      <FormSectionCard
-        title="Apartment / Interior Photos"
-        description="Interior layout photos, living room, master bedroom, and modern kitchen views."
-        icon={ImageIcon}
-      >
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-foreground">
-            Interior Photo Gallery
-          </p>
-          <div className="flex flex-wrap gap-3 p-3 rounded-lg border border-border/60 bg-muted/20">
-            {images.map((img, index) => {
-              const resolved = resolveMedia(img);
-              return (
-                <div key={index} className="relative group">
-                  <ImageField
-                    previewUrl={resolved?.url}
-                    onChange={(media) => {
-                      const next = images.slice();
-                      next[index] = media.id;
-                      setValue({ ...value, images: next });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = images.filter((_, i) => i !== index);
-                      setValue({ ...value, images: next });
-                    }}
-                    className="absolute -top-2 -right-2 size-5.5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer z-10 border border-white"
-                    title="Remove image"
-                    aria-label="Remove image"
-                  >
-                    <X className="size-3.5 text-white stroke-[2.5]" />
-                  </button>
-                </div>
-              );
-            })}
-            <ImageField
-              onChange={(media) =>
-                setValue({ ...value, images: [...images, media.id] })
-              }
-            />
-          </div>
-        </div>
-      </FormSectionCard>
-
       {/* ── Residence Highlights List ─────────────────────────────────── */}
       <FormSectionCard
         title="Residence Highlights & Amenities"
@@ -281,6 +234,53 @@ export function ResidencesFields({
             </div>
           )}
         />
+      </FormSectionCard>
+
+      {/* ── Residence Gallery Photos ──────────────────────────────────── */}
+      <FormSectionCard
+        title="Apartment / Interior Photos"
+        description="Interior layout photos, living room, master bedroom, and modern kitchen views."
+        icon={ImageIcon}
+      >
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-foreground">
+            Interior Photo Gallery
+          </p>
+          <div className="flex flex-wrap gap-3 p-3 rounded-lg border border-border/60 bg-muted/20">
+            {images.map((img, index) => {
+              const resolved = resolveMedia(img);
+              return (
+                <div key={index} className="relative group">
+                  <ImageField
+                    previewUrl={resolved?.url}
+                    onChange={(media) => {
+                      const next = images.slice();
+                      next[index] = media.id;
+                      setValue({ ...value, images: next });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = images.filter((_, i) => i !== index);
+                      setValue({ ...value, images: next });
+                    }}
+                    className="absolute -top-2 -right-2 size-5.5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer z-10 border border-white"
+                    title="Remove image"
+                    aria-label="Remove image"
+                  >
+                    <X className="size-3.5 text-white stroke-[2.5]" />
+                  </button>
+                </div>
+              );
+            })}
+            <ImageField
+              onChange={(media) =>
+                setValue({ ...value, images: [...images, media.id] })
+              }
+            />
+          </div>
+        </div>
       </FormSectionCard>
     </div>
   );

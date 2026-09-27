@@ -42,54 +42,7 @@ export function HeroFields({
 
   return (
     <div className="space-y-6">
-      {/* ── Background Media Card ────────────────────────────────────── */}
-      <FormSectionCard
-        title="Hero Background Media"
-        description="High-resolution banner photos that display as the fullscreen background on the hero section."
-        icon={ImageIcon}
-      >
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-foreground">
-            Slider Photos (Select and order hero background images)
-          </p>
-          <div className="flex flex-wrap gap-3 p-3 rounded-lg border border-border/60 bg-muted/20">
-            {images.map((img, index) => {
-              const resolved = resolveMedia(img);
-              return (
-                <div key={index} className="relative group">
-                  <ImageField
-                    previewUrl={resolved?.url}
-                    onChange={(media) => {
-                      const next = images.slice();
-                      next[index] = media.id;
-                      setValue({ ...value, images: next });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = images.filter((_, i) => i !== index);
-                      setValue({ ...value, images: next });
-                    }}
-                    className="absolute -top-2 -right-2 size-5.5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer z-10 border border-white"
-                    title="Remove image"
-                    aria-label="Remove image"
-                  >
-                    <X className="size-3.5 text-white stroke-[2.5]" />
-                  </button>
-                </div>
-              );
-            })}
-            <ImageField
-              onChange={(media) =>
-                setValue({ ...value, images: [...images, media.id] })
-              }
-            />
-          </div>
-        </div>
-      </FormSectionCard>
-
-      {/* ── Headings & Story Card ────────────────────────────────────── */}
+      {/* ── 1. Headings & Story Content ─────────────────────────────── */}
       <FormSectionCard
         title="Hero Content & Headings"
         description="Main headline, subtitles, and introductory description visible above the fold."
@@ -170,7 +123,7 @@ export function HeroFields({
         />
       </FormSectionCard>
 
-      {/* ── Call to Action Buttons Card ───────────────────────────────── */}
+      {/* ── 2. Call to Action Buttons ───────────────────────────────── */}
       <FormSectionCard
         title="Call to Action (CTA) Buttons"
         description="Button labels triggering inquiries, brochures, or booking tours."
@@ -202,7 +155,7 @@ export function HeroFields({
         </div>
       </FormSectionCard>
 
-      {/* ── Key Highlights & Statistics Card ─────────────────────────── */}
+      {/* ── 3. Key Highlights & Statistics ──────────────────────────── */}
       <FormSectionCard
         title="Key Highlights / Stats Row"
         description="Quick metrics shown at the bottom of the hero (e.g. 3,200 sqft, 12 Floors, G+14)."
@@ -249,6 +202,53 @@ export function HeroFields({
             </div>
           )}
         />
+      </FormSectionCard>
+
+      {/* ── 4. Background Media Card ────────────────────────────────── */}
+      <FormSectionCard
+        title="Hero Background Media"
+        description="High-resolution banner photos that display as the fullscreen background on the hero section."
+        icon={ImageIcon}
+      >
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-foreground">
+            Slider Photos (Select and order hero background images)
+          </p>
+          <div className="flex flex-wrap gap-3 p-3 rounded-lg border border-border/60 bg-muted/20">
+            {images.map((img, index) => {
+              const resolved = resolveMedia(img);
+              return (
+                <div key={index} className="relative group">
+                  <ImageField
+                    previewUrl={resolved?.url}
+                    onChange={(media) => {
+                      const next = images.slice();
+                      next[index] = media.id;
+                      setValue({ ...value, images: next });
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = images.filter((_, i) => i !== index);
+                      setValue({ ...value, images: next });
+                    }}
+                    className="absolute -top-2 -right-2 size-5.5 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer z-10 border border-white"
+                    title="Remove image"
+                    aria-label="Remove image"
+                  >
+                    <X className="size-3.5 text-white stroke-[2.5]" />
+                  </button>
+                </div>
+              );
+            })}
+            <ImageField
+              onChange={(media) =>
+                setValue({ ...value, images: [...images, media.id] })
+              }
+            />
+          </div>
+        </div>
       </FormSectionCard>
     </div>
   );
