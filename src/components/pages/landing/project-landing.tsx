@@ -301,7 +301,7 @@ function Hero({
   }
 
   return (
-    <section className="relative isolate overflow-hidden bg-[#1b2318] min-h-[520px] lg:min-h-[580px] flex flex-col justify-between">
+    <section className="relative isolate overflow-hidden bg-[#1b2318] min-h-[540px] sm:min-h-[600px] lg:min-h-[640px] flex flex-col justify-between">
       {images.length ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <HeroBackdrop images={images} className="absolute inset-0 size-full object-cover" />
@@ -313,7 +313,7 @@ function Hero({
         className="absolute inset-y-0 left-0 z-1 w-full lg:w-[56%] bg-gradient-to-r from-black/90 via-black/60 via-55% to-transparent pointer-events-none"
       />
 
-      <AppContainer className="relative z-10 py-12 sm:py-16 lg:py-20 flex-1 flex flex-col justify-center">
+      <AppContainer className="relative z-10 py-12 sm:py-14 lg:py-16 flex-1 flex flex-col justify-center">
         <SectionEditControl
           section="hero"
           title="Hero"
@@ -324,14 +324,14 @@ function Hero({
           visible={visible}
         />
         <div className="max-w-lg lg:max-w-xl">
-          <Reveal className="flex flex-col gap-4 text-white sm:gap-5">
+          <Reveal className="flex flex-col gap-3.5 text-white sm:gap-4">
             {hero.title ? (
               <Heading
                 as="h1"
                 size="h1"
                 tone="inverse"
                 weight="bold"
-                className="!font-extrabold [text-shadow:0_2px_18px_rgba(0,0,0,0.8)] text-3xl sm:text-4xl lg:text-5xl leading-tight"
+                className="!font-extrabold [text-shadow:0_2px_18px_rgba(0,0,0,0.8)] text-2xl sm:text-3xl lg:text-4xl xl:text-5xl leading-tight"
               >
                 {hero.title}
               </Heading>
