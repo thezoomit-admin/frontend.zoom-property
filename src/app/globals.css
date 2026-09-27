@@ -160,40 +160,61 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /*  Scrollbar — tailwind-scrollbar                                     */
-  /*                                                                     */
-  /*  The plugin writes both standards at once: `scrollbar-width` /      */
-  /*  `scrollbar-color` for Firefox and current Chrome, and the          */
-  /*  `::-webkit-scrollbar` pseudo-elements for everything older. One    */
-  /*  set of classes instead of two hand-maintained rule blocks.         */
-  /*                                                                     */
-  /*  Applied to `html` so inner scroll containers (the area comparison  */
-  /*  table, the mobile nav sheet) inherit it.                           */
+  /*  Scrollbar — Universal Slim Modern Scrollbar                       */
   /* ------------------------------------------------------------------ */
-  html {
-    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-primary/35 hover:scrollbar-thumb-primary/60;
-    scrollbar-width: thin;
-
-    /* Radius is set through the plugin's own custom property rather than its
-     * `scrollbar-thumb-rounded-*` class: that utility is registered from the
-     * legacy `theme(borderRadius)` scale, which Tailwind v4 does not define, so
-     * the class never exists — not even with an arbitrary value. The variable
-     * is what the utility would have written anyway. */
-    --scrollbar-thumb-radius: 999px;
-
-    /* Reserve the gutter permanently.
-     *
-     * Radix (Select, Sheet, Dialog) locks scrolling by setting
-     * `overflow: hidden` on the body. Without a reserved gutter the scrollbar
-     * disappears, the viewport gains its width back, and everything — most
-     * visibly the fixed header — jumps sideways for as long as the overlay is
-     * open. With `stable` the space stays whether or not the bar is drawn. */
+  html, body {
     scrollbar-gutter: stable;
   }
 
-  html::-webkit-scrollbar {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--brand-green) 35%, transparent) transparent;
+  }
+
+  *::-webkit-scrollbar {
     width: 6px;
     height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--brand-green) 30%, transparent);
+    transition: background-color 0.2s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--brand-green) 60%, transparent);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--brand-green) 35%, transparent) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--brand-green) 30%, transparent);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--brand-green) 60%, transparent);
   }
 
   /* Mobile thumbs use Embla — hide any leftover native bar. */
@@ -249,28 +270,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /*  Scroll lock                                                        */
-  /*                                                                     */
-  /*  Radix overlays lock the page through react-remove-scroll, which    */
-  /*  stamps `data-scroll-locked` on the body and injects                */
-  /*                                                                     */
-  /*      body[data-scroll-locked] { overflow: hidden; padding-right: N }*/
-  /*                                                                     */
-  /*  Two problems with that here:                                       */
-  /*                                                                     */
-  /*  1. `overflow: hidden` removes the scrollbar. On a Select that is   */
-  /*     wrong — a native <select> does not freeze the page — and the    */
-  /*     bar vanishing mid-interaction reads as a glitch.                */
-  /*  2. The padding is a second correction for a shift that cannot      */
-  /*     happen any more, because `scrollbar-gutter: stable` above       */
-  /*     already reserves the space. Left alone it pushes content left.  */
-  /*                                                                     */
-  /*  A Sheet or Dialog *is* modal, so those keep the lock. `:has()`     */
-  /*  tells the two cases apart: the rule only releases the page when no */
-  /*  sheet or dialog is open, i.e. when a Select or dropdown locked it. */
-  /*                                                                     */
-  /*  `!important` because the rules being overridden are injected at    */
-  /*  runtime by the library, not authored here.                         */
+  /*  Scroll lock & Layout Shift Prevention                             */
   /* ------------------------------------------------------------------ */
   body[data-scroll-locked]:not(
       :has(
@@ -278,9 +278,6 @@
           [data-slot="dialog-content"][data-state="open"]
         )
     ) {
-    /* Every declaration the library injects is listed, not just `overflow`:
-       leaving any of them in place lets the body geometry change by a pixel or
-       two as an overlay opens, which reads as a flinch. */
     overflow: visible !important;
     overscroll-behavior: auto !important;
     padding-right: 0 !important;
@@ -291,10 +288,16 @@
     margin-right: 0 !important;
   }
 
-  /* A Sheet or Dialog keeps its lock, but never the width compensation — the
-     gutter above is already reserved, so padding here would shift the page. */
-  body[data-scroll-locked] {
-    padding-right: 0 !important;
+  /* Prevent background UI shift when a Sheet or Dialog locks scroll */
+  body[data-scroll-locked],
+  html[data-scroll-locked],
+  [data-radix-scroll-lock],
+  [data-scroll-locked] {
+    padding-right: 0px !important;
+    margin-right: 0px !important;
+    padding-left: 0px !important;
+    margin-left: 0px !important;
+    --removed-body-scroll-bar-size: 0px !important;
   }
 }
 /* -------------------------------------------------------------------------- */

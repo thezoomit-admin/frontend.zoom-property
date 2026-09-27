@@ -64,7 +64,7 @@ export function SectionEditModal<T extends Record<string, unknown>>({
     >
       <DialogContent
         data-lenis-prevent
-        className="max-h-[85vh] max-w-lg overflow-y-auto sm:max-w-xl"
+        className="custom-scrollbar max-h-[85vh] max-w-lg overflow-y-auto sm:max-w-xl"
       >
         <DialogHeader>
           <DialogTitle>Edit {title}</DialogTitle>
