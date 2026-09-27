@@ -301,44 +301,19 @@ function Hero({
   }
 
   return (
-    <section className="relative isolate overflow-hidden bg-[#1b2318]">
+    <section className="relative isolate overflow-hidden bg-[#1b2318] min-h-[520px] lg:min-h-[580px] flex flex-col justify-between">
       {images.length ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <HeroBackdrop images={images} className="absolute inset-0 size-full" />
+          <HeroBackdrop images={images} className="absolute inset-0 size-full object-cover" />
         </div>
       ) : null}
-      {/* Desktop — primary heavy, black medium, secondary light (no blur) */}
+      {/* Smooth soft gradient overlay on the left fading seamlessly towards the right photo */}
       <div
         aria-hidden
-        className="absolute inset-0 hidden bg-black/75 lg:block"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 hidden bg-primary/35 lg:block"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 hidden bg-secondary/12 lg:block"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 hidden bg-linear-to-r from-black/40 via-primary/30 to-secondary/8 lg:block"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 hidden bg-linear-to-t from-black/70 via-primary/20 to-transparent lg:block"
-      />
-      {/* Mobile — same readable wash as before */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-linear-to-b from-black/55 via-black/50 to-black/78 lg:hidden"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-black/30 lg:hidden [mask-image:linear-gradient(to_top,black_58%,transparent)]"
+        className="absolute inset-y-0 left-0 z-1 w-full lg:w-[56%] bg-gradient-to-r from-black/90 via-black/60 via-55% to-transparent pointer-events-none"
       />
 
-      <AppContainer className="relative z-10 pb-8 pt-16 sm:pt-20 lg:pb-10">
+      <AppContainer className="relative z-10 py-12 sm:py-16 lg:py-20 flex-1 flex flex-col justify-center">
         <SectionEditControl
           section="hero"
           title="Hero"
@@ -348,75 +323,38 @@ function Hero({
           position="top-2 right-4 sm:top-4 sm:right-6"
           visible={visible}
         />
-        <div
-          className={cn(
-            "grid items-center gap-6 lg:gap-8",
-            showForm
-              ? "lg:grid-cols-[minmax(0,1fr)_minmax(28rem,calc(38rem-50px))]"
-              : "lg:grid-cols-1",
-          )}
-        >
-          <Reveal className="flex flex-col gap-4 text-white sm:gap-5 max-lg:rounded-xl max-lg:border max-lg:border-white/15 max-lg:bg-black/40 max-lg:p-4 max-lg:shadow-[0_12px_40px_rgba(0,0,0,0.35)] sm:max-lg:p-5">
-            {hero.badge || hero.handover ? (
-              <div className="flex flex-wrap items-center gap-2">
-                {hero.badge ? (
-                  <Badge className="w-fit gap-1.5 border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold text-white">
-                    {hero.badge}
-                  </Badge>
-                ) : null}
-                {hero.handover ? (
-                  <Badge className="w-fit gap-1.5 border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold text-white">
-                    {hero.handover}
-                  </Badge>
-                ) : null}
-              </div>
-            ) : null}
-            {hero.eyebrow ? (
-              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white/90 sm:text-xs">
-                {hero.eyebrow}
-              </p>
-            ) : null}
+        <div className="max-w-lg lg:max-w-xl">
+          <Reveal className="flex flex-col gap-4 text-white sm:gap-5">
             {hero.title ? (
               <Heading
                 as="h1"
                 size="h1"
                 tone="inverse"
                 weight="bold"
-                className="!font-extrabold [text-shadow:0_2px_18px_rgba(0,0,0,0.55)]"
+                className="!font-extrabold [text-shadow:0_2px_18px_rgba(0,0,0,0.8)] text-3xl sm:text-4xl lg:text-5xl leading-tight"
               >
                 {hero.title}
               </Heading>
             ) : null}
             {hero.lead ? (
-              <p className="max-w-xl text-[15px] leading-relaxed text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.45)] sm:text-base sm:leading-7">
+              <p className="max-w-md text-[15px] leading-relaxed text-white/95 [text-shadow:0_1px_8px_rgba(0,0,0,0.8)] sm:text-base sm:leading-7">
                 {hero.lead}
               </p>
             ) : null}
             {hero.location ? (
-              <p className="flex items-center gap-2 text-sm font-medium text-white">
-                <Icon name="fa-location-dot" size="xs" className="text-brand-green-light" />
-                {hero.location}
+              <p className="flex items-center gap-2 text-sm font-semibold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]">
+                <Icon name="fa-location-dot" size="xs" className="text-brand-green-light shrink-0" />
+                <span>{hero.location}</span>
               </p>
             ) : null}
-            {hero.ctaPrimary || hero.ctaSecondary ? (
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:hidden">
-                {hero.ctaPrimary ? (
-                  <Button asChild className="h-10 px-5">
-                    <a href="#enquire">
-                      {hero.ctaPrimary}
-                      <Icon name="arrowRight" size="xs" />
-                    </a>
-                  </Button>
-                ) : null}
-                {hero.ctaSecondary ? (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="h-10 border-white/50 bg-white/15 px-5 text-white hover:bg-white/25 hover:text-white"
-                  >
-                    <a href="#residences">{hero.ctaSecondary}</a>
-                  </Button>
-                ) : null}
+            {hero.ctaPrimary ? (
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap pt-1">
+                <Button asChild className="h-11 px-6 font-bold shadow-lg">
+                  <a href="#enquire">
+                    {hero.ctaPrimary}
+                    <Icon name="arrowRight" size="xs" />
+                  </a>
+                </Button>
               </div>
             ) : null}
             <ContactPills
@@ -428,38 +366,11 @@ function Hero({
               tone="onDark"
             />
           </Reveal>
-
-          {showForm ? (
-            <Reveal
-              delay={0.08}
-              className="hidden w-full rounded-lg border border-white/20 bg-white p-5 shadow-2xl lg:block lg:p-7"
-            >
-              {enquire.title ? (
-                <p className="font-heading text-lg font-extrabold text-foreground">
-                  {enquire.title}
-                </p>
-              ) : null}
-              {enquire.description ? (
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  {enquire.description}
-                </p>
-              ) : null}
-              <div className="mt-5">
-                <ProjectLeadForm
-                  dict={enquire.form}
-                  projectName={landing.projectName}
-                  source={landing.source}
-                  path={landing.path}
-                  variant="compact"
-                />
-              </div>
-            </Reveal>
-          ) : null}
         </div>
       </AppContainer>
 
       {hero.stats.length ? (
-        <div className="relative z-10 border-t border-primary/30 bg-primary">
+        <div className="relative z-10 border-t border-primary/30 bg-primary mt-auto">
           <AppContainer>
             <ul className="grid grid-cols-2 lg:grid-cols-4">
               {hero.stats.map((stat, index) => (
