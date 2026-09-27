@@ -3,9 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { baseApi } from "@/server/base-api";
 import { getSession } from "@/server/features/auth/session";
 
-/** Same shape as the admin's own upload, re-posted with the caller's token —
- * read fully into memory and forwarded rather than streamed, since landing
- * page images are a handful of megabytes at most, not video. */
+/** Same shape as the admin's own upload, re-posted with the caller's token.
+ *
+ * Edge runtime, deliberately — a Node (Serverless Function) route here would
+ * cap every upload at Vercel's ~4.5MB request-body limit before this code
+ * even runs, which is well under a single phone photo. Edge Functions stream
+ * the body instead of buffering it against that ceiling. */
+export const runtime = "edge";
+
 export async function POST(request: NextRequest) {
   const session = await getSession();
   if (!session) {
