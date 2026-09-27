@@ -610,15 +610,6 @@ function Lifestyle({
 
   return (
     <Section id="lifestyle" spacing="sm" className="scroll-mt-24">
-      {gallery ? (
-        <SectionEditControl
-          section="gallery"
-          title="Gallery"
-          value={galleryRaw}
-          empty={emptyGallery}
-          Fields={GalleryFields}
-        />
-      ) : null}
       {amenities ? (
         <SectionEditControl
           section="amenities"
@@ -626,7 +617,6 @@ function Lifestyle({
           value={amenitiesRaw}
           empty={emptyAmenities}
           Fields={AmenitiesFields}
-          position="top-16 right-4"
         />
       ) : null}
       {showAmenities && amenities ? (
@@ -713,20 +703,30 @@ function Lifestyle({
         </>
       ) : null}
 
-      {showGallery && gallery ? (
-        <div className={showAmenities ? "mt-10" : undefined}>
-          {gallery.eyebrow || gallery.title ? (
+      {(showGallery && gallery) || galleryRaw ? (
+        <div className={cn("relative", showAmenities ? "mt-10 pt-2" : undefined)}>
+          <SectionEditControl
+            section="gallery"
+            title="Gallery"
+            value={galleryRaw}
+            empty={emptyGallery}
+            Fields={GalleryFields}
+            position="top-0 right-0"
+          />
+          {gallery?.eyebrow || gallery?.title ? (
             <SectionHeading
-              eyebrow={gallery.eyebrow || undefined}
-              title={gallery.title || gallery.eyebrow}
+              eyebrow={gallery?.eyebrow || undefined}
+              title={gallery?.title || gallery?.eyebrow}
               titleClassName={landingTitleClass}
             />
           ) : null}
-          <ProjectGallery
-            shots={gallery.shots}
-            openLabel={gallery.open}
-            closeLabel={gallery.close}
-          />
+          {gallery?.shots ? (
+            <ProjectGallery
+              shots={gallery.shots}
+              openLabel={gallery.open}
+              closeLabel={gallery.close}
+            />
+          ) : null}
         </div>
       ) : null}
     </Section>
@@ -767,16 +767,6 @@ function Place({
           value={locationRaw}
           empty={emptyLocation}
           Fields={LocationFields}
-        />
-      ) : null}
-      {process ? (
-        <SectionEditControl
-          section="process"
-          title="Process"
-          value={processRaw}
-          empty={emptyProcess}
-          Fields={ProcessFields}
-          position="top-16 right-4"
         />
       ) : null}
       <div
@@ -825,20 +815,28 @@ function Place({
               ) : null}
             </>
           ) : null}
-          {showProcess && process ? (
-            <div>
-              {process.eyebrow ? (
+          {(showProcess && process) || processRaw ? (
+            <div className="relative mt-2 pt-2">
+              <SectionEditControl
+                section="process"
+                title="Process"
+                value={processRaw}
+                empty={emptyProcess}
+                Fields={ProcessFields}
+                position="top-0 right-0"
+              />
+              {process?.eyebrow ? (
                 <p className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-primary">
                   {process.eyebrow}
                 </p>
               ) : null}
-              {process.title ? (
-                <h3 className="mt-2 font-heading text-lg font-extrabold text-foreground">
+              {process?.title ? (
+                <h3 className="mt-2 font-heading text-lg font-extrabold text-foreground pr-10">
                   {process.title}
                 </h3>
               ) : null}
               <ol className="mt-4 grid gap-3">
-                {process.steps.map((step, index) => (
+                {(process?.steps || []).map((step, index) => (
                   <li
                     key={`${step.title}-${index}`}
                     className={`grid grid-cols-[auto_1fr] gap-3 p-3.5 ${landingCardClass}`}
