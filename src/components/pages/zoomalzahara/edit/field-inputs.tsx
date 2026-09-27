@@ -143,8 +143,8 @@ export function TextPair({
       </div>
 
       {/* Two Column Grid for English and Bangla */}
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        <div className="space-y-1">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 items-stretch">
+        <div className="flex flex-col space-y-1 h-full">
           <div className="flex items-center justify-between text-[11px] text-muted-foreground px-0.5">
             <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
               <span className="size-1.5 rounded-full bg-blue-500" />
@@ -158,13 +158,13 @@ export function TextPair({
             placeholder={placeholderEn || `Enter ${label.toLowerCase()} in English...`}
             className={cn(
               "text-xs sm:text-sm bg-background transition-all duration-150 rounded-lg shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary",
-              multiline ? "min-h-[80px]" : "h-9.5",
+              multiline ? "h-24 sm:h-28 min-h-[96px] [field-sizing:normal] resize-y" : "h-9.5",
               near(en) && "border-amber-500 focus-visible:ring-amber-500/40"
             )}
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="flex flex-col space-y-1 h-full">
           <div className="flex items-center justify-between text-[11px] text-muted-foreground px-0.5">
             <span className="font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
               <span className="size-1.5 rounded-full bg-emerald-500" />
@@ -178,7 +178,7 @@ export function TextPair({
             placeholder={placeholderBn || `বাংলায় ${label.toLowerCase()} লিখুন...`}
             className={cn(
               "text-xs sm:text-sm bg-background transition-all duration-150 rounded-lg shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary",
-              multiline ? "min-h-[80px]" : "h-9.5",
+              multiline ? "h-24 sm:h-28 min-h-[96px] [field-sizing:normal] resize-y" : "h-9.5",
               near(bn) && "border-amber-500 focus-visible:ring-amber-500/40"
             )}
           />
