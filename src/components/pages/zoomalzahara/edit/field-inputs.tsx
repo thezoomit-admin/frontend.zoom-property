@@ -17,7 +17,6 @@ import { translateToBangla } from "@/lib/translate";
 export function FormSectionCard({
   title,
   description,
-  icon: Icon,
   children,
   className,
 }: {
@@ -36,12 +35,9 @@ export function FormSectionCard({
     >
       <div className="flex items-start justify-between border-b border-border/60 pb-3">
         <div className="space-y-0.5">
-          <div className="flex items-center gap-2">
-            {Icon && <Icon className="size-4 text-primary shrink-0" />}
-            <h3 className="text-sm font-semibold text-foreground tracking-tight">
-              {title}
-            </h3>
-          </div>
+          <h3 className="text-sm font-semibold text-foreground tracking-tight">
+            {title}
+          </h3>
           {description && (
             <p className="text-xs text-muted-foreground">{description}</p>
           )}
@@ -161,8 +157,8 @@ export function TextPair({
             onChange={(e) => onEnChange(e.target.value.slice(0, maxLength))}
             placeholder={placeholderEn || `Enter ${label.toLowerCase()} in English...`}
             className={cn(
-              "text-xs sm:text-sm bg-background transition-colors",
-              multiline ? "min-h-[75px]" : "h-9",
+              "text-xs sm:text-sm bg-background transition-all duration-150 rounded-lg shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary",
+              multiline ? "min-h-[80px]" : "h-9.5",
               near(en) && "border-amber-500 focus-visible:ring-amber-500/40"
             )}
           />
@@ -181,8 +177,8 @@ export function TextPair({
             onChange={(e) => onBnChange(e.target.value.slice(0, maxLength))}
             placeholder={placeholderBn || `বাংলায় ${label.toLowerCase()} লিখুন...`}
             className={cn(
-              "text-xs sm:text-sm bg-background transition-colors",
-              multiline ? "min-h-[75px]" : "h-9",
+              "text-xs sm:text-sm bg-background transition-all duration-150 rounded-lg shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary",
+              multiline ? "min-h-[80px]" : "h-9.5",
               near(bn) && "border-amber-500 focus-visible:ring-amber-500/40"
             )}
           />

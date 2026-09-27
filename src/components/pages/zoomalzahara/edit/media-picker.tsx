@@ -294,14 +294,11 @@ export function MediaPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-lenis-prevent
-        className="w-[94vw] max-w-6xl sm:max-w-6xl h-[95vh] max-h-[95vh] flex flex-col p-4 sm:p-6"
+        className="w-[96vw] max-w-7xl h-[97vh] max-h-[97vh] flex flex-col p-4 sm:p-6 overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
       >
         <DialogHeader className="pb-1">
           <DialogTitle className="flex items-center justify-between text-base sm:text-lg font-semibold">
-            <span className="flex items-center gap-2">
-              <FolderOpen className="size-5 text-primary" />
-              {title}
-            </span>
+            <span>{title}</span>
           </DialogTitle>
         </DialogHeader>
 

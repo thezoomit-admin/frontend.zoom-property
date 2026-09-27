@@ -1,6 +1,5 @@
 "use client";
 
-import { Film, Video } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,8 +12,6 @@ import {
 import type { ApiProjectLanding } from "@/server/features/project-landing/types";
 import { EditableList } from "../editable-list";
 import { FormSectionCard, TextPair } from "../field-inputs";
-import { ImageField } from "../image-field";
-import { resolveMedia } from "../resolve-media";
 
 export type FilmsValue = NonNullable<ApiProjectLanding["films"]>;
 
@@ -30,7 +27,10 @@ export const emptyFilms: FilmsValue = {
   items: [],
 };
 
-const PROVIDERS = ["youtube", "facebook", "vimeo"] as const;
+const PROVIDERS = [
+  { value: "youtube", label: "YouTube Video / Reel" },
+  { value: "facebook", label: "Facebook Video / Reel" },
+] as const;
 
 export function FilmsFields({
   value,
@@ -45,7 +45,6 @@ export function FilmsFields({
       <FormSectionCard
         title="Project Films & Video Section Header"
         description="Introduction narrative and headline for documentary / walkthrough videos."
-        icon={Film}
       >
         <TextPair
           label="Films Eyebrow"
@@ -87,9 +86,8 @@ export function FilmsFields({
 
       {/* ── Video Items List ─────────────────────────────────────────── */}
       <FormSectionCard
-        title="Video Items & Media Sources"
-        description="Video links (YouTube, Facebook, Vimeo), custom poster thumbnails, and titles."
-        icon={Video}
+        title="Video Items (YouTube & Facebook)"
+        description="Add YouTube or Facebook video/reel links. Thumbnails and player embeds are generated automatically."
       >
         <EditableList
           items={value.items ?? []}
@@ -103,70 +101,64 @@ export function FilmsFields({
             poster: null,
             provider: "youtube" as const,
           })}
-          addLabel="Add Video Item"
+          addLabel="Add YouTube or Facebook Video"
           renderItem={(item, _index, update) => {
-            const poster = resolveMedia(item.poster);
             return (
               <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4 items-start">
-                  <div className="space-y-1 shrink-0">
-                    <label className="text-[11px] font-semibold text-muted-foreground">
-                      Custom Video Poster / Thumbnail
-                    </label>
-                    <ImageField
-                      previewUrl={poster?.url}
-                      onChange={(media) => update({ ...item, poster: media.id })}
+                <TextPair
+                  label="Video Title"
+                  description="Displayed on video card / banner"
+                  en={item.title ?? ""}
+                  bn={item.titleBn ?? ""}
+                  onEnChange={(v) => update({ ...item, title: v })}
+                  onBnChange={(v) => update({ ...item, titleBn: v })}
+                  placeholderEn="e.g., Official Project Walkthrough"
+                  placeholderBn="যেমন: অফিশিয়াল প্রজেক্ট ওয়াকথ্রু"
+                  maxLength={100}
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label className="text-xs font-medium text-foreground">
+                      Video URL Link (YouTube or Facebook)
+                    </Label>
+                    <Input
+                      value={item.url ?? ""}
+                      maxLength={500}
+                      placeholder="e.g., https://www.youtube.com/watch?v=... or https://www.facebook.com/watch/..."
+                      onChange={(e) => {
+                        const url = e.target.value;
+                        const autoProvider = /facebook\.com|fb\.watch|fb\.com/i.test(url)
+                          ? "facebook"
+                          : "youtube";
+                        update({ ...item, url, provider: autoProvider });
+                      }}
+                      className="h-9.5 text-xs sm:text-sm bg-background transition-all duration-150 rounded-lg shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary"
                     />
                   </div>
-                  <div className="flex-1 w-full space-y-3">
-                    <TextPair
-                      label="Video Title"
-                      description="Displayed on video card / banner"
-                      en={item.title ?? ""}
-                      bn={item.titleBn ?? ""}
-                      onEnChange={(v) => update({ ...item, title: v })}
-                      onBnChange={(v) => update({ ...item, titleBn: v })}
-                      placeholderEn="e.g., Official Project Walkthrough"
-                      placeholderBn="যেমন: অফিশিয়াল প্রজেক্ট ওয়াকথ্রু"
-                      maxLength={100}
-                    />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="space-y-1 sm:col-span-2">
-                        <Label className="text-xs font-medium">Video URL Link</Label>
-                        <Input
-                          value={item.url ?? ""}
-                          maxLength={500}
-                          placeholder="e.g., https://www.youtube.com/watch?v=..."
-                          onChange={(e) => update({ ...item, url: e.target.value })}
-                          className="h-9 text-xs sm:text-sm bg-background"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label className="text-xs font-medium">Platform</Label>
-                        <Select
-                          value={item.provider ?? "youtube"}
-                          onValueChange={(v) =>
-                            update({
-                              ...item,
-                              provider: v as (typeof PROVIDERS)[number],
-                            })
-                          }
-                        >
-                          <SelectTrigger className="h-9 w-full bg-background text-xs capitalize">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PROVIDERS.map((p) => (
-                              <SelectItem key={p} value={p} className="capitalize">
-                                {p}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-foreground">Platform</Label>
+                    <Select
+                      value={item.provider ?? "youtube"}
+                      onValueChange={(v) =>
+                        update({
+                          ...item,
+                          provider: v as "youtube" | "facebook",
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-9.5 w-full bg-background text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PROVIDERS.map((p) => (
+                          <SelectItem key={p.value} value={p.value}>
+                            {p.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
