@@ -12,12 +12,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { saveLandingSection } from "@/server/features/project-landing/edit-action";
 import type { LandingSectionKey } from "@/server/features/project-landing/types";
 
 /**
- * The shared shell every section's editor sits inside: title, Save/Cancel,
- * a submitting state, and the save call itself.
+ * The shared shell every section's editor sits inside: title, a
+ * show/hide-on-page switch, Save/Cancel, a submitting state, and the save
+ * call itself.
  * Full 97vh modal height with ultra-smooth responsiveness across all screen sizes.
  */
 export function SectionEditModal<T extends Record<string, unknown>>({
@@ -27,6 +29,9 @@ export function SectionEditModal<T extends Record<string, unknown>>({
   projectId,
   section,
   initialValue,
+  /** Current `sections.<key>.visible` flag — omit for sections (like
+   * "publishing") that don't have a show/hide toggle at all. */
+  initialVisible,
   children,
 }: {
   open: boolean;
@@ -35,14 +40,18 @@ export function SectionEditModal<T extends Record<string, unknown>>({
   projectId: string;
   section: LandingSectionKey;
   initialValue: T;
+  initialVisible?: boolean;
   children: (value: T, setValue: (next: T) => void) => ReactNode;
 }) {
   const [value, setValue] = useState<T>(initialValue);
+  const [visible, setVisible] = useState<boolean>(initialVisible ?? true);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
-    const result = await saveLandingSection(projectId, section, value);
+    const body =
+      initialVisible === undefined ? value : { ...value, visible };
+    const result = await saveLandingSection(projectId, section, body);
     setSaving(false);
     if (!result.success) {
       toast.error(result.error);
@@ -56,7 +65,10 @@ export function SectionEditModal<T extends Record<string, unknown>>({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) setValue(initialValue); // discard edits on cancel
+        if (!next) {
+          setValue(initialValue); // discard edits on cancel
+          setVisible(initialVisible ?? true);
+        }
         onOpenChange(next);
       }}
     >
@@ -66,7 +78,7 @@ export function SectionEditModal<T extends Record<string, unknown>>({
       >
         {/* ── Modal Header ───────────────────────────────────────────── */}
         <DialogHeader className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-border/80 bg-background/95 backdrop-blur-sm shrink-0">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <DialogTitle className="text-base sm:text-lg font-semibold tracking-tight text-foreground">
                 Edit {title} Section
@@ -75,6 +87,14 @@ export function SectionEditModal<T extends Record<string, unknown>>({
                 Update content, bilingual text (English & Bangla), and photos for this section
               </p>
             </div>
+            {initialVisible === undefined ? null : (
+              <label className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5">
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  {visible ? "Visible on page" : "Hidden from visitors"}
+                </span>
+                <Switch checked={visible} onCheckedChange={setVisible} />
+              </label>
+            )}
           </div>
         </DialogHeader>
 

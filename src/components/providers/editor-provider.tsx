@@ -65,8 +65,10 @@ export function EditorProvider({
       if (isEditor) {
         const stored = localStorage.getItem(LIVE_EDIT_STORAGE_KEY);
         const next = stored === null ? true : stored === "true";
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLiveEditState((prev) => (prev !== next ? next : prev));
       } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLiveEditState((prev) => (prev !== false ? false : prev));
       }
     }

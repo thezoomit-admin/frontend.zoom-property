@@ -172,6 +172,7 @@ export function FilmsFields({
                   return (
                     <div className="flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 p-2.5">
                       <div className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-zinc-900 shadow-xs">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
                           alt="YouTube Preview"

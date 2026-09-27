@@ -59,3 +59,44 @@ export async function saveLandingSection(
   revalidateTag(CACHE_TAGS.projects, { expire: 0 });
   return { success: true };
 }
+
+/**
+ * Saves the "publishing" meta-section of a project landing page:
+ * isActive, path, phone numbers, SEO meta, and nav labels.
+ *
+ * The backend accepts "publishing" as a valid PATCH section key
+ * (see LANDING_PATCH_SECTIONS in the server module).
+ */
+export async function savePublishing(
+  projectId: string,
+  body: Record<string, unknown>,
+): Promise<{ success: true } | { success: false; error: string }> {
+  const session = await getSession();
+  if (!session) {
+    return { success: false, error: "Your session has expired. Please sign in again." };
+  }
+
+  try {
+    const res = await fetch(
+      baseApi.url(`projects/${encodeURIComponent(projectId)}/landing/publishing`),
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`,
+        },
+        body: JSON.stringify(body),
+        cache: "no-store",
+      },
+    );
+    const json = (await res.json().catch(() => null)) as ApiEnvelope<unknown> | null;
+    if (!res.ok || !json?.success) {
+      return { success: false, error: json?.message || "Could not save publishing settings" };
+    }
+  } catch {
+    return { success: false, error: "Could not reach the server" };
+  }
+
+  revalidateTag(CACHE_TAGS.projects, { expire: 0 });
+  return { success: true };
+}

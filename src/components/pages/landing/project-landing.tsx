@@ -28,6 +28,7 @@ import { resolveAmenityMaps } from "@/lib/maps-distance";
 import { cn } from "@/lib/utils";
 import type { ApiProjectLanding, LandingView } from "@/server/features/project-landing/types";
 import { SectionEditControl } from "@/components/pages/landing/edit/section-edit-control";
+import { HiddenSectionNotice } from "@/components/pages/landing/edit/hidden-section-notice";
 import { AboutFields, emptyAbout } from "@/components/pages/landing/edit/section-fields/about-fields";
 import { GalleryFields, emptyGallery } from "@/components/pages/landing/edit/section-fields/gallery-fields";
 import { FaqFields, emptyFaq } from "@/components/pages/landing/edit/section-fields/faq-fields";
@@ -55,6 +56,8 @@ export function ProjectLanding({
   raw?: ApiProjectLanding | null;
 }) {
   const show = (key: keyof LandingView["sections"]) => landing.sections[key];
+  const visibleOf = (key: keyof LandingView["sections"]) =>
+    raw?.sections?.[key]?.visible ?? true;
   const sticky =
     landing.phone ||
     landing.whatsapp ||
@@ -62,10 +65,16 @@ export function ProjectLanding({
 
   return (
     <div className="bg-background">
-      {show("hero") ? <Hero landing={landing} raw={raw?.hero} /> : null}
+      {show("hero") ? (
+        <Hero landing={landing} raw={raw?.hero} />
+      ) : (
+        <HiddenSectionNotice section="hero" title="Hero" value={raw?.hero} empty={emptyHero} Fields={HeroFields} visible={visibleOf("hero")} />
+      )}
       {show("about") && hasAbout(landing) ? (
-        <About dict={landing.about} raw={raw?.about} />
-      ) : null}
+        <About dict={landing.about} raw={raw?.about} visible={visibleOf("about")} />
+      ) : (
+        <HiddenSectionNotice section="about" title="About" value={raw?.about} empty={emptyAbout} Fields={AboutFields} visible={visibleOf("about")} />
+      )}
       {show("residences") && hasResidences(landing) ? (
         <ProjectResidence
           dict={landing.residences}
@@ -76,22 +85,48 @@ export function ProjectLanding({
               value={raw?.residences}
               empty={emptyResidences}
               Fields={ResidencesFields}
+              visible={visibleOf("residences")}
             />
           }
         />
-      ) : null}
+      ) : (
+        <HiddenSectionNotice
+          section="residences"
+          title="Residences"
+          value={raw?.residences}
+          empty={emptyResidences}
+          Fields={ResidencesFields}
+          visible={visibleOf("residences")}
+        />
+      )}
       {show("elevation") && landing.elevation.views.length ? (
-        <Elevation dict={landing.elevation} raw={raw?.elevation} />
-      ) : null}
+        <Elevation dict={landing.elevation} raw={raw?.elevation} visible={visibleOf("elevation")} />
+      ) : (
+        <HiddenSectionNotice
+          section="elevation"
+          title="Elevation"
+          value={raw?.elevation}
+          empty={emptyElevation}
+          Fields={ElevationFields}
+          visible={visibleOf("elevation")}
+        />
+      )}
       {show("films") && landing.films.items.length ? (
-        <Films dict={landing.films} raw={raw?.films} />
-      ) : null}
-      {show("amenities") || show("gallery") ? (
+        <Films dict={landing.films} raw={raw?.films} visible={visibleOf("films")} />
+      ) : (
+        <HiddenSectionNotice section="films" title="Films" value={raw?.films} empty={emptyFilms} Fields={FilmsFields} visible={visibleOf("films")} />
+      )}
+      {show("amenities") ||
+      show("gallery") ||
+      Boolean(raw?.amenities) ||
+      Boolean(raw?.gallery) ? (
         <Lifestyle
           amenities={show("amenities") ? landing.amenities : null}
           amenitiesRaw={raw?.amenities}
+          amenitiesVisible={visibleOf("amenities")}
           gallery={show("gallery") ? landing.gallery : null}
           galleryRaw={raw?.gallery}
+          galleryVisible={visibleOf("gallery")}
           projectMapUrl={
             landing.location.mapLinkUrl || landing.location.mapEmbedUrl || ""
           }
@@ -103,12 +138,17 @@ export function ProjectLanding({
           }
         />
       ) : null}
-      {show("location") || show("process") ? (
+      {show("location") ||
+      show("process") ||
+      Boolean(raw?.location) ||
+      Boolean(raw?.process) ? (
         <Place
           location={show("location") ? landing.location : null}
           locationRaw={raw?.location}
+          locationVisible={visibleOf("location")}
           process={show("process") ? landing.process : null}
           processRaw={raw?.process}
+          processVisible={visibleOf("process")}
         />
       ) : null}
       {show("cta") && hasCta(landing) ? (
@@ -117,17 +157,34 @@ export function ProjectLanding({
           raw={raw?.cta}
           phone={landing.phone}
           whatsapp={landing.whatsapp}
+          visible={visibleOf("cta")}
         />
-      ) : null}
+      ) : (
+        <HiddenSectionNotice section="cta" title="Call to action" value={raw?.cta} empty={emptyCta} Fields={CtaFields} visible={visibleOf("cta")} />
+      )}
       {show("reviews") && landing.reviews.items.length ? (
-        <Reviews dict={landing.reviews} raw={raw?.reviews} />
-      ) : null}
-      {show("faq") || show("enquire") ? (
+        <Reviews dict={landing.reviews} raw={raw?.reviews} visible={visibleOf("reviews")} />
+      ) : (
+        <HiddenSectionNotice
+          section="reviews"
+          title="Reviews"
+          value={raw?.reviews}
+          empty={emptyReviews}
+          Fields={ReviewsFields}
+          visible={visibleOf("reviews")}
+        />
+      )}
+      {show("faq") ||
+      show("enquire") ||
+      Boolean(raw?.faq) ||
+      Boolean(raw?.enquire) ? (
         <Close
           faq={show("faq") ? landing.faq : null}
           faqRaw={raw?.faq}
+          faqVisible={visibleOf("faq")}
           enquire={show("enquire") ? landing.enquire : null}
           enquireRaw={raw?.enquire}
+          enquireVisible={visibleOf("enquire")}
           projectName={landing.projectName}
           source={landing.source}
           path={landing.path}
@@ -137,8 +194,17 @@ export function ProjectLanding({
         />
       ) : null}
       {show("custom") && hasCustom(landing) ? (
-        <CustomContent dict={landing.custom} raw={raw?.custom} />
-      ) : null}
+        <CustomContent dict={landing.custom} raw={raw?.custom} visible={visibleOf("custom")} />
+      ) : (
+        <HiddenSectionNotice
+          section="custom"
+          title="Custom Content"
+          value={raw?.custom}
+          empty={emptyCustom}
+          Fields={CustomFields}
+          visible={visibleOf("custom")}
+        />
+      )}
       {sticky ? (
         <LandingStickyCta
           phone={landing.phone}
@@ -149,7 +215,22 @@ export function ProjectLanding({
           showBook={show("enquire")}
         />
       ) : null}
-      <EditorBar />
+      <EditorBar
+        publishing={raw ? {
+          path: raw.path,
+          isActive: raw.isActive,
+          facebookUrl: raw.facebookUrl,
+          phonePrimary: raw.phonePrimary,
+          phoneSecondary: raw.phoneSecondary,
+          whatsapp: raw.whatsapp,
+          metaTitle: raw.metaTitle,
+          metaTitleBn: raw.metaTitleBn,
+          metaDescription: raw.metaDescription,
+          metaDescriptionBn: raw.metaDescriptionBn,
+          navEnquire: raw.navEnquire,
+          navEnquireBn: raw.navEnquireBn,
+        } : undefined}
+      />
     </div>
   );
 }
@@ -184,9 +265,11 @@ function hasCta(landing: LandingView) {
 function Hero({
   landing,
   raw,
+  visible,
 }: {
   landing: LandingView;
   raw?: ApiProjectLanding["hero"];
+  visible?: boolean;
 }) {
   const hero = landing.hero;
   const enquire = landing.enquire;
@@ -205,7 +288,16 @@ function Hero({
     !hero.stats.length &&
     !showForm
   ) {
-    return null;
+    return raw ? (
+      <HiddenSectionNotice
+        section="hero"
+        title="Hero"
+        value={raw}
+        empty={emptyHero}
+        Fields={HeroFields}
+        visible={visible}
+      />
+    ) : null;
   }
 
   return (
@@ -254,6 +346,7 @@ function Hero({
           empty={emptyHero}
           Fields={HeroFields}
           position="top-2 right-4 sm:top-4 sm:right-6"
+          visible={visible}
         />
         <div
           className={cn(
@@ -402,9 +495,11 @@ function Hero({
 function About({
   dict,
   raw,
+  visible,
 }: {
   dict: LandingView["about"];
   raw?: ApiProjectLanding["about"];
+  visible?: boolean;
 }) {
   return (
     <Section id="about" spacing="sm" className="scroll-mt-24">
@@ -414,6 +509,7 @@ function About({
         value={raw}
         empty={emptyAbout}
         Fields={AboutFields}
+        visible={visible}
       />
       <div
         className={cn(
@@ -487,9 +583,11 @@ function About({
 function Elevation({
   dict,
   raw,
+  visible,
 }: {
   dict: LandingView["elevation"];
   raw?: ApiProjectLanding["elevation"];
+  visible?: boolean;
 }) {
   return (
     <Section id="elevation" spacing="sm" className="scroll-mt-24">
@@ -499,6 +597,7 @@ function Elevation({
         value={raw}
         empty={emptyElevation}
         Fields={ElevationFields}
+        visible={visible}
       />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
@@ -520,9 +619,11 @@ function Elevation({
 function Films({
   dict,
   raw,
+  visible,
 }: {
   dict: LandingView["films"];
   raw?: ApiProjectLanding["films"];
+  visible?: boolean;
 }) {
   return (
     <Section
@@ -536,6 +637,7 @@ function Films({
         value={raw}
         empty={emptyFilms}
         Fields={FilmsFields}
+        visible={visible}
       />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
@@ -553,9 +655,11 @@ function Films({
 function Reviews({
   dict,
   raw,
+  visible,
 }: {
   dict: LandingView["reviews"];
   raw?: ApiProjectLanding["reviews"];
+  visible?: boolean;
 }) {
   return (
     <Section
@@ -569,6 +673,7 @@ function Reviews({
         value={raw}
         empty={emptyReviews}
         Fields={ReviewsFields}
+        visible={visible}
       />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
@@ -590,15 +695,19 @@ function Reviews({
 function Lifestyle({
   amenities,
   amenitiesRaw,
+  amenitiesVisible,
   gallery,
   galleryRaw,
+  galleryVisible,
   projectMapUrl = "",
   projectAddress = "",
 }: {
   amenities: LandingView["amenities"] | null;
   amenitiesRaw?: ApiProjectLanding["amenities"];
+  amenitiesVisible?: boolean;
   gallery: LandingView["gallery"] | null;
   galleryRaw?: ApiProjectLanding["gallery"];
+  galleryVisible?: boolean;
   projectMapUrl?: string;
   projectAddress?: string;
 }) {
@@ -619,8 +728,18 @@ function Lifestyle({
           value={amenitiesRaw}
           empty={emptyAmenities}
           Fields={AmenitiesFields}
+          visible={amenitiesVisible}
         />
-      ) : null}
+      ) : (
+        <HiddenSectionNotice
+          section="amenities"
+          title="Amenities"
+          value={amenitiesRaw}
+          empty={emptyAmenities}
+          Fields={AmenitiesFields}
+          visible={amenitiesVisible}
+        />
+      )}
       {showAmenities && amenities ? (
         <>
           {amenities.eyebrow || amenities.title || amenities.description ? (
@@ -714,6 +833,7 @@ function Lifestyle({
             empty={emptyGallery}
             Fields={GalleryFields}
             position="top-0 right-0"
+            visible={galleryVisible}
           />
           {gallery?.eyebrow || gallery?.title ? (
             <SectionHeading
@@ -738,13 +858,17 @@ function Lifestyle({
 function Place({
   location,
   locationRaw,
+  locationVisible,
   process,
   processRaw,
+  processVisible,
 }: {
   location: LandingView["location"] | null;
   locationRaw?: ApiProjectLanding["location"];
+  locationVisible?: boolean;
   process: LandingView["process"] | null;
   processRaw?: ApiProjectLanding["process"];
+  processVisible?: boolean;
 }) {
   const showLocation = Boolean(
     location &&
@@ -754,7 +878,9 @@ function Place({
         location.facts.length),
   );
   const showProcess = Boolean(process?.steps.length);
-  if (!showLocation && !showProcess) return null;
+  // Same empty-section allowance as Lifestyle: an editor needs the section
+  // (and its buttons) present to add first content or re-enable it.
+  if (!showLocation && !showProcess && !locationRaw && !processRaw) return null;
 
   return (
     <Section
@@ -769,8 +895,18 @@ function Place({
           value={locationRaw}
           empty={emptyLocation}
           Fields={LocationFields}
+          visible={locationVisible}
         />
-      ) : null}
+      ) : (
+        <HiddenSectionNotice
+          section="location"
+          title="Location"
+          value={locationRaw}
+          empty={emptyLocation}
+          Fields={LocationFields}
+          visible={locationVisible}
+        />
+      )}
       <div
         className={cn(
           "grid gap-6 lg:gap-6",
@@ -826,6 +962,7 @@ function Place({
                 empty={emptyProcess}
                 Fields={ProcessFields}
                 position="top-0 right-0"
+                visible={processVisible}
               />
               {process?.eyebrow ? (
                 <p className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-primary">
@@ -952,8 +1089,10 @@ function Place({
 function Close({
   faq,
   faqRaw,
+  faqVisible,
   enquire,
   enquireRaw,
+  enquireVisible,
   projectName,
   source,
   path,
@@ -963,8 +1102,10 @@ function Close({
 }: {
   faq: LandingView["faq"] | null;
   faqRaw?: ApiProjectLanding["faq"];
+  faqVisible?: boolean;
   enquire: LandingView["enquire"] | null;
   enquireRaw?: ApiProjectLanding["enquire"];
+  enquireVisible?: boolean;
   projectName: string;
   source: string;
   path: string;
@@ -975,7 +1116,7 @@ function Close({
   // Same empty-section allowance as Gallery: an editor needs the block (and
   // its button) present to add the very first question.
   const showFaq = Boolean(faq?.items.length) || Boolean(faqRaw);
-  const showEnquire = Boolean(enquire);
+  const showEnquire = Boolean(enquire) || Boolean(enquireRaw);
 
   return (
     <Section
@@ -999,6 +1140,7 @@ function Close({
               value={faqRaw}
               empty={emptyFaq}
               Fields={FaqFields}
+              visible={faqVisible}
             />
             {faq.eyebrow || faq.title || faq.description ? (
               <SectionHeading
@@ -1032,6 +1174,15 @@ function Close({
               ))}
             </Accordion>
           </div>
+        ) : showFaq ? (
+          <HiddenSectionNotice
+            section="faq"
+            title="FAQ"
+            value={faqRaw}
+            empty={emptyFaq}
+            Fields={FaqFields}
+            visible={faqVisible}
+          />
         ) : null}
 
         {showEnquire && enquire ? (
@@ -1042,6 +1193,7 @@ function Close({
               value={enquireRaw}
               empty={emptyEnquire}
               Fields={EnquireFields}
+              visible={enquireVisible}
             />
             {enquire.eyebrow || enquire.title || enquire.description ? (
               <SectionHeading
@@ -1069,6 +1221,15 @@ function Close({
               />
             </div>
           </aside>
+        ) : showEnquire ? (
+          <HiddenSectionNotice
+            section="enquire"
+            title="Enquire"
+            value={enquireRaw}
+            empty={emptyEnquire}
+            Fields={EnquireFields}
+            visible={enquireVisible}
+          />
         ) : null}
       </div>
     </Section>
@@ -1079,9 +1240,11 @@ function Close({
 function CustomContent({
   dict,
   raw,
+  visible,
 }: {
   dict: LandingView["custom"];
   raw?: ApiProjectLanding["custom"];
+  visible?: boolean;
 }) {
   return (
     <Section
@@ -1095,6 +1258,7 @@ function CustomContent({
         value={raw}
         empty={emptyCustom}
         Fields={CustomFields}
+        visible={visible}
       />
       <div className="landing-custom">
         {dict.eyebrow || dict.title ? (
@@ -1117,11 +1281,13 @@ function LandingCta({
   raw,
   phone,
   whatsapp,
+  visible,
 }: {
   dict: LandingView["cta"];
   raw?: ApiProjectLanding["cta"];
   phone: string;
   whatsapp: string;
+  visible?: boolean;
 }) {
   return (
     <Section spacing="sm">
@@ -1131,6 +1297,7 @@ function LandingCta({
         value={raw}
         empty={emptyCta}
         Fields={CtaFields}
+        visible={visible}
       />
       <div className="flex flex-col gap-4 rounded-lg bg-primary px-5 py-5 text-primary-foreground shadow-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-8 sm:py-6">
         <div className="min-w-0 max-w-xl">
