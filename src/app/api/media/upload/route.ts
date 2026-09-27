@@ -23,11 +23,27 @@ export async function POST(request: NextRequest) {
   const folder = incoming.get("folder");
   if (typeof folder === "string" && folder) outgoing.set("folder", folder);
 
-  const res = await fetch(baseApi.url("media-library"), {
-    method: "POST",
-    headers: { Authorization: `Bearer ${session.token}` },
-    body: outgoing,
-  });
-  const json = await res.json().catch(() => null);
-  return NextResponse.json(json, { status: res.status });
+  try {
+    const res = await fetch(baseApi.url("media-library"), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.token}` },
+      body: outgoing,
+    });
+    const json = await res.json().catch(() => null);
+    if (!json) {
+      const text = await res.text().catch(() => "");
+      console.error(`[media upload] non-JSON response from backend, status ${res.status}:`, text.slice(0, 500));
+      return NextResponse.json(
+        { success: false, message: `Upload backend returned ${res.status}` },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json(json, { status: res.status });
+  } catch (err) {
+    console.error("[media upload] fetch to backend failed:", err);
+    return NextResponse.json(
+      { success: false, message: `Could not reach upload server: ${(err as Error).message}` },
+      { status: 502 },
+    );
+  }
 }
