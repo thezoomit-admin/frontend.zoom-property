@@ -41,9 +41,9 @@ export function EditableList<T>({
               </span>
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="h-7 px-2 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="h-7 px-2.5 text-xs font-semibold border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white hover:border-destructive transition-all shadow-2xs"
                 onClick={() => onChange(items.filter((_, i) => i !== index))}
                 title="Remove this item"
               >
