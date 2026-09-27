@@ -66,7 +66,7 @@ export function ProjectLanding({
       {show("about") && hasAbout(landing) ? (
         <About dict={landing.about} raw={raw?.about} />
       ) : null}
-      {(show("residences") && hasResidences(landing)) || raw?.residences ? (
+      {show("residences") && hasResidences(landing) ? (
         <div className="relative">
           <SectionEditControl
             section="residences"
@@ -78,10 +78,10 @@ export function ProjectLanding({
           <ProjectResidence dict={landing.residences} />
         </div>
       ) : null}
-      {(show("elevation") && landing.elevation.views.length) || raw?.elevation ? (
+      {show("elevation") && landing.elevation.views.length ? (
         <Elevation dict={landing.elevation} raw={raw?.elevation} />
       ) : null}
-      {(show("films") && landing.films.items.length) || raw?.films ? (
+      {show("films") && landing.films.items.length ? (
         <Films dict={landing.films} raw={raw?.films} />
       ) : null}
       {show("amenities") || show("gallery") ? (
@@ -117,7 +117,7 @@ export function ProjectLanding({
           whatsapp={landing.whatsapp}
         />
       ) : null}
-      {(show("reviews") && landing.reviews.items.length) || raw?.reviews ? (
+      {show("reviews") && landing.reviews.items.length ? (
         <Reviews dict={landing.reviews} raw={raw?.reviews} />
       ) : null}
       {show("faq") || show("enquire") ? (

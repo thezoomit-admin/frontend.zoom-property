@@ -37,10 +37,10 @@ export function SectionEditControl<T extends Record<string, unknown>>({
   Fields: (props: { value: T; setValue: (next: T) => void }) => React.ReactNode;
   position?: string;
 }) {
-  const { isEditor, projectId } = useEditor();
+  const { isEditor, isLiveEdit, projectId } = useEditor();
   const [open, setOpen] = useState(false);
 
-  if (!isEditor || !projectId) return null;
+  if (!isEditor || !isLiveEdit || !projectId) return null;
 
   return (
     <>
