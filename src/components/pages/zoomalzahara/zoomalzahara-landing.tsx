@@ -27,9 +27,34 @@ import {
 import { telHref, whatsappHref } from "@/lib/contact";
 import { resolveAmenityMaps } from "@/lib/maps-distance";
 import { cn } from "@/lib/utils";
-import type { LandingView } from "@/server/features/project-landing/types";
+import type { ApiProjectLanding, LandingView } from "@/server/features/project-landing/types";
+import { SectionEditControl } from "@/components/pages/zoomalzahara/edit/section-edit-control";
+import { AboutFields, emptyAbout } from "@/components/pages/zoomalzahara/edit/section-fields/about-fields";
+import { GalleryFields, emptyGallery } from "@/components/pages/zoomalzahara/edit/section-fields/gallery-fields";
+import { FaqFields, emptyFaq } from "@/components/pages/zoomalzahara/edit/section-fields/faq-fields";
+import { EditorBar } from "@/components/pages/zoomalzahara/edit/editor-bar";
+import { HeroFields, emptyHero } from "@/components/pages/zoomalzahara/edit/section-fields/hero-fields";
+import { ResidencesFields, emptyResidences } from "@/components/pages/zoomalzahara/edit/section-fields/residences-fields";
+import { ElevationFields, emptyElevation } from "@/components/pages/zoomalzahara/edit/section-fields/elevation-fields";
+import { FilmsFields, emptyFilms } from "@/components/pages/zoomalzahara/edit/section-fields/films-fields";
+import { AmenitiesFields, emptyAmenities } from "@/components/pages/zoomalzahara/edit/section-fields/amenities-fields";
+import { LocationFields, emptyLocation } from "@/components/pages/zoomalzahara/edit/section-fields/location-fields";
+import { ProcessFields, emptyProcess } from "@/components/pages/zoomalzahara/edit/section-fields/process-fields";
+import { CtaFields, emptyCta } from "@/components/pages/zoomalzahara/edit/section-fields/cta-fields";
+import { ReviewsFields, emptyReviews } from "@/components/pages/zoomalzahara/edit/section-fields/reviews-fields";
+import { EnquireFields, emptyEnquire } from "@/components/pages/zoomalzahara/edit/section-fields/enquire-fields";
+import { CustomFields, emptyCustom } from "@/components/pages/zoomalzahara/edit/section-fields/custom-fields";
 
-export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
+export function ZoomAlZaharaLanding({
+  landing,
+  raw,
+}: {
+  landing: LandingView;
+  /** The raw, bilingual document — only fetched (and only passed) when the
+   * request is from a logged-in editor; every section-editing control reads
+   * its own slice of it for the form's initial values. */
+  raw?: ApiProjectLanding | null;
+}) {
   const show = (key: keyof LandingView["sections"]) => landing.sections[key];
   const sticky =
     landing.phone ||
@@ -38,21 +63,34 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
 
   return (
     <div className="bg-background">
-      {show("hero") ? <Hero landing={landing} /> : null}
-      {show("about") && hasAbout(landing) ? <About dict={landing.about} /> : null}
-      {show("residences") && hasResidences(landing) ? (
-        <ProjectResidence dict={landing.residences} />
+      {show("hero") ? <Hero landing={landing} raw={raw?.hero} /> : null}
+      {show("about") && hasAbout(landing) ? (
+        <About dict={landing.about} raw={raw?.about} />
       ) : null}
-      {show("elevation") && landing.elevation.views.length ? (
-        <Elevation dict={landing.elevation} />
+      {(show("residences") && hasResidences(landing)) || raw?.residences ? (
+        <div className="relative">
+          <SectionEditControl
+            section="residences"
+            title="Residences"
+            value={raw?.residences}
+            empty={emptyResidences}
+            Fields={ResidencesFields}
+          />
+          <ProjectResidence dict={landing.residences} />
+        </div>
       ) : null}
-      {show("films") && landing.films.items.length ? (
-        <Films dict={landing.films} />
+      {(show("elevation") && landing.elevation.views.length) || raw?.elevation ? (
+        <Elevation dict={landing.elevation} raw={raw?.elevation} />
+      ) : null}
+      {(show("films") && landing.films.items.length) || raw?.films ? (
+        <Films dict={landing.films} raw={raw?.films} />
       ) : null}
       {show("amenities") || show("gallery") ? (
         <Lifestyle
           amenities={show("amenities") ? landing.amenities : null}
+          amenitiesRaw={raw?.amenities}
           gallery={show("gallery") ? landing.gallery : null}
+          galleryRaw={raw?.gallery}
           projectMapUrl={
             landing.location.mapLinkUrl || landing.location.mapEmbedUrl || ""
           }
@@ -67,23 +105,28 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
       {show("location") || show("process") ? (
         <Place
           location={show("location") ? landing.location : null}
+          locationRaw={raw?.location}
           process={show("process") ? landing.process : null}
+          processRaw={raw?.process}
         />
       ) : null}
       {show("cta") && hasCta(landing) ? (
         <LandingCta
           dict={landing.cta}
+          raw={raw?.cta}
           phone={landing.phone}
           whatsapp={landing.whatsapp}
         />
       ) : null}
-      {show("reviews") && landing.reviews.items.length ? (
-        <Reviews dict={landing.reviews} />
+      {(show("reviews") && landing.reviews.items.length) || raw?.reviews ? (
+        <Reviews dict={landing.reviews} raw={raw?.reviews} />
       ) : null}
       {show("faq") || show("enquire") ? (
         <Close
           faq={show("faq") ? landing.faq : null}
+          faqRaw={raw?.faq}
           enquire={show("enquire") ? landing.enquire : null}
+          enquireRaw={raw?.enquire}
           projectName={landing.projectName}
           source={landing.source}
           path={landing.path}
@@ -93,7 +136,7 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
         />
       ) : null}
       {show("custom") && hasCustom(landing) ? (
-        <CustomContent dict={landing.custom} />
+        <CustomContent dict={landing.custom} raw={raw?.custom} />
       ) : null}
       {sticky ? (
         <LandingStickyCta
@@ -105,6 +148,7 @@ export function ZoomAlZaharaLanding({ landing }: { landing: LandingView }) {
           showBook={show("enquire")}
         />
       ) : null}
+      <EditorBar />
     </div>
   );
 }
@@ -136,7 +180,13 @@ function hasCta(landing: LandingView) {
   return Boolean(row.title || row.description || row.primary);
 }
 
-function Hero({ landing }: { landing: LandingView }) {
+function Hero({
+  landing,
+  raw,
+}: {
+  landing: LandingView;
+  raw?: ApiProjectLanding["hero"];
+}) {
   const hero = landing.hero;
   const enquire = landing.enquire;
   const showForm = landing.sections.enquire;
@@ -159,6 +209,13 @@ function Hero({ landing }: { landing: LandingView }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-[#1b2318]">
+      <SectionEditControl
+        section="hero"
+        title="Hero"
+        value={raw}
+        empty={emptyHero}
+        Fields={HeroFields}
+      />
       {images.length ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <HeroBackdrop images={images} className="absolute inset-0 size-full" />
@@ -340,9 +397,22 @@ function Hero({ landing }: { landing: LandingView }) {
   );
 }
 
-function About({ dict }: { dict: LandingView["about"] }) {
+function About({
+  dict,
+  raw,
+}: {
+  dict: LandingView["about"];
+  raw?: ApiProjectLanding["about"];
+}) {
   return (
     <Section id="about" spacing="sm" className="scroll-mt-24">
+      <SectionEditControl
+        section="about"
+        title="About"
+        value={raw}
+        empty={emptyAbout}
+        Fields={AboutFields}
+      />
       <div
         className={cn(
           "grid items-stretch gap-6 lg:gap-8",
@@ -412,9 +482,22 @@ function About({ dict }: { dict: LandingView["about"] }) {
   );
 }
 
-function Elevation({ dict }: { dict: LandingView["elevation"] }) {
+function Elevation({
+  dict,
+  raw,
+}: {
+  dict: LandingView["elevation"];
+  raw?: ApiProjectLanding["elevation"];
+}) {
   return (
     <Section id="elevation" spacing="sm" className="scroll-mt-24">
+      <SectionEditControl
+        section="elevation"
+        title="Elevation"
+        value={raw}
+        empty={emptyElevation}
+        Fields={ElevationFields}
+      />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
           eyebrow={dict.eyebrow || undefined}
@@ -432,13 +515,26 @@ function Elevation({ dict }: { dict: LandingView["elevation"] }) {
   );
 }
 
-function Films({ dict }: { dict: LandingView["films"] }) {
+function Films({
+  dict,
+  raw,
+}: {
+  dict: LandingView["films"];
+  raw?: ApiProjectLanding["films"];
+}) {
   return (
     <Section
       id="video"
       spacing="sm"
       className="scroll-mt-24 border-y border-border bg-muted/30"
     >
+      <SectionEditControl
+        section="films"
+        title="Films"
+        value={raw}
+        empty={emptyFilms}
+        Fields={FilmsFields}
+      />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
           eyebrow={dict.eyebrow || undefined}
@@ -452,13 +548,26 @@ function Films({ dict }: { dict: LandingView["films"] }) {
   );
 }
 
-function Reviews({ dict }: { dict: LandingView["reviews"] }) {
+function Reviews({
+  dict,
+  raw,
+}: {
+  dict: LandingView["reviews"];
+  raw?: ApiProjectLanding["reviews"];
+}) {
   return (
     <Section
       id="reviews"
       spacing="sm"
       className="scroll-mt-24 border-y border-border bg-muted/30"
     >
+      <SectionEditControl
+        section="reviews"
+        title="Reviews"
+        value={raw}
+        empty={emptyReviews}
+        Fields={ReviewsFields}
+      />
       {dict.eyebrow || dict.title || dict.description ? (
         <SectionHeading
           eyebrow={dict.eyebrow || undefined}
@@ -478,21 +587,48 @@ function Reviews({ dict }: { dict: LandingView["reviews"] }) {
 
 function Lifestyle({
   amenities,
+  amenitiesRaw,
   gallery,
+  galleryRaw,
   projectMapUrl = "",
   projectAddress = "",
 }: {
   amenities: LandingView["amenities"] | null;
+  amenitiesRaw?: ApiProjectLanding["amenities"];
   gallery: LandingView["gallery"] | null;
+  galleryRaw?: ApiProjectLanding["gallery"];
   projectMapUrl?: string;
   projectAddress?: string;
 }) {
   const showAmenities = Boolean(amenities?.items.length);
   const showGallery = Boolean(gallery?.shots.length);
-  if (!showAmenities && !showGallery) return null;
+  // An editor still needs the section (and its edit button) to add the
+  // first photo to a gallery that's currently empty — `raw` is only ever
+  // passed for a logged-in editor's render, so its presence here doubles as
+  // that signal without this Server Component needing `useEditor()` itself.
+  if (!showAmenities && !showGallery && !galleryRaw && !amenitiesRaw) return null;
 
   return (
     <Section id="lifestyle" spacing="sm" className="scroll-mt-24">
+      {gallery ? (
+        <SectionEditControl
+          section="gallery"
+          title="Gallery"
+          value={galleryRaw}
+          empty={emptyGallery}
+          Fields={GalleryFields}
+        />
+      ) : null}
+      {amenities ? (
+        <SectionEditControl
+          section="amenities"
+          title="Amenities"
+          value={amenitiesRaw}
+          empty={emptyAmenities}
+          Fields={AmenitiesFields}
+          position="top-16 right-4"
+        />
+      ) : null}
       {showAmenities && amenities ? (
         <>
           {amenities.eyebrow || amenities.title || amenities.description ? (
@@ -599,10 +735,14 @@ function Lifestyle({
 
 function Place({
   location,
+  locationRaw,
   process,
+  processRaw,
 }: {
   location: LandingView["location"] | null;
+  locationRaw?: ApiProjectLanding["location"];
   process: LandingView["process"] | null;
+  processRaw?: ApiProjectLanding["process"];
 }) {
   const showLocation = Boolean(
     location &&
@@ -620,6 +760,25 @@ function Place({
       spacing="sm"
       className="scroll-mt-24 border-y border-border bg-muted/30"
     >
+      {location ? (
+        <SectionEditControl
+          section="location"
+          title="Location"
+          value={locationRaw}
+          empty={emptyLocation}
+          Fields={LocationFields}
+        />
+      ) : null}
+      {process ? (
+        <SectionEditControl
+          section="process"
+          title="Process"
+          value={processRaw}
+          empty={emptyProcess}
+          Fields={ProcessFields}
+          position="top-16 right-4"
+        />
+      ) : null}
       <div
         className={cn(
           "grid gap-6 lg:gap-6",
@@ -792,7 +951,9 @@ function Place({
 
 function Close({
   faq,
+  faqRaw,
   enquire,
+  enquireRaw,
   projectName,
   source,
   path,
@@ -801,7 +962,9 @@ function Close({
   whatsapp,
 }: {
   faq: LandingView["faq"] | null;
+  faqRaw?: ApiProjectLanding["faq"];
   enquire: LandingView["enquire"] | null;
+  enquireRaw?: ApiProjectLanding["enquire"];
   projectName: string;
   source: string;
   path: string;
@@ -809,7 +972,9 @@ function Close({
   phoneAlt: string;
   whatsapp: string;
 }) {
-  const showFaq = Boolean(faq?.items.length);
+  // Same empty-section allowance as Gallery: an editor needs the block (and
+  // its button) present to add the very first question.
+  const showFaq = Boolean(faq?.items.length) || Boolean(faqRaw);
   const showEnquire = Boolean(enquire);
 
   return (
@@ -827,7 +992,14 @@ function Close({
         )}
       >
         {showFaq && faq ? (
-          <div id="faq" className="min-w-0 scroll-mt-24">
+          <div id="faq" className="relative min-w-0 scroll-mt-24">
+            <SectionEditControl
+              section="faq"
+              title="FAQ"
+              value={faqRaw}
+              empty={emptyFaq}
+              Fields={FaqFields}
+            />
             {faq.eyebrow || faq.title || faq.description ? (
               <SectionHeading
                 eyebrow={faq.eyebrow || undefined}
@@ -863,7 +1035,14 @@ function Close({
         ) : null}
 
         {showEnquire && enquire ? (
-          <aside className="order-first min-w-0 self-start lg:sticky lg:top-28 lg:order-none">
+          <aside className="relative order-first min-w-0 self-start lg:sticky lg:top-28 lg:order-none">
+            <SectionEditControl
+              section="enquire"
+              title="Enquire"
+              value={enquireRaw}
+              empty={emptyEnquire}
+              Fields={EnquireFields}
+            />
             {enquire.eyebrow || enquire.title || enquire.description ? (
               <SectionHeading
                 eyebrow={enquire.eyebrow || undefined}
@@ -897,13 +1076,26 @@ function Close({
 }
 
 /** Free-form rich HTML band at the bottom of the landing (admin TinyMCE). */
-function CustomContent({ dict }: { dict: LandingView["custom"] }) {
+function CustomContent({
+  dict,
+  raw,
+}: {
+  dict: LandingView["custom"];
+  raw?: ApiProjectLanding["custom"];
+}) {
   return (
     <Section
       id="custom"
       spacing="none"
       className="scroll-mt-24 border-t border-border/60 bg-background pt-8 pb-8 sm:pt-10 sm:pb-12 lg:pt-12 lg:pb-14"
     >
+      <SectionEditControl
+        section="custom"
+        title="Custom"
+        value={raw}
+        empty={emptyCustom}
+        Fields={CustomFields}
+      />
       <div className="landing-custom">
         {dict.eyebrow || dict.title ? (
           <SectionHeading
@@ -922,15 +1114,24 @@ function CustomContent({ dict }: { dict: LandingView["custom"] }) {
 
 function LandingCta({
   dict,
+  raw,
   phone,
   whatsapp,
 }: {
   dict: LandingView["cta"];
+  raw?: ApiProjectLanding["cta"];
   phone: string;
   whatsapp: string;
 }) {
   return (
     <Section spacing="sm">
+      <SectionEditControl
+        section="cta"
+        title="Call to action"
+        value={raw}
+        empty={emptyCta}
+        Fields={CtaFields}
+      />
       <div className="flex flex-col gap-4 rounded-lg bg-primary px-5 py-5 text-primary-foreground shadow-md sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-8 sm:py-6">
         <div className="min-w-0 max-w-xl">
           {dict.eyebrow ? (

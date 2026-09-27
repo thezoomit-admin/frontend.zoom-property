@@ -9,8 +9,10 @@ import { getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { siteConfig } from "@/data/site";
 import { absoluteUrl } from "@/lib/seo";
-import { getLandingByPath } from "@/server/features/project-landing";
+import { getLandingByPath, getRawLandingByPath } from "@/server/features/project-landing";
 import type { LandingView } from "@/server/features/project-landing/types";
+import { EditorProvider } from "@/components/providers/editor-provider";
+import { getSession } from "@/server/features/auth/session";
 
 function digits(value: string) {
   return value.replace(/\D/g, "");
@@ -84,8 +86,16 @@ function landingSchemas(landing: LandingView, localePath: string) {
 
 export async function ProjectLandingRoute({ path }: { path: string }) {
   const locale = await getLocale();
-  const landing = await getLandingByPath(path, locale);
+  const [landing, session] = await Promise.all([
+    getLandingByPath(path, locale),
+    getSession(),
+  ]);
   if (!landing) notFound();
+
+  // Only fetched for a logged-in request — an anonymous render never pays
+  // for it, and when it does run it shares the public read's URL/cache tag,
+  // so Next's request memoization collapses the two into one network call.
+  const raw = session ? await getRawLandingByPath(path) : null;
 
   const schemas = landingSchemas(landing, localeHref(locale, landing.href));
 
@@ -94,7 +104,12 @@ export async function ProjectLandingRoute({ path }: { path: string }) {
       {schemas.map((schema, index) => (
         <JsonLd key={index} schema={schema} />
       ))}
-      <ZoomAlZaharaLanding landing={landing} />
+      <EditorProvider
+        isEditor={Boolean(session)}
+        projectId={raw?.project?._id ?? null}
+      >
+        <ZoomAlZaharaLanding landing={landing} raw={raw} />
+      </EditorProvider>
     </>
   );
 }
