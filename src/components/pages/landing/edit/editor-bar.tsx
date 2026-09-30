@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe, LogOut, PencilLine } from "lucide-react";
+import { LogOut, PencilLine } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useEditor } from "@/hooks/use-editor";

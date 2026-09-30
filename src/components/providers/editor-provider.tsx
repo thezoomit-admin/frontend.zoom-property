@@ -68,7 +68,6 @@ export function EditorProvider({
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLiveEditState((prev) => (prev !== next ? next : prev));
       } else {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLiveEditState((prev) => (prev !== false ? false : prev));
       }
     }
@@ -125,6 +124,7 @@ export function EditorProvider({
       setIsLiveEditState(false);
       localStorage.removeItem(LIVE_EDIT_STORAGE_KEY);
       toast.success("Logged out successfully");
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/";
     } catch {
       toast.error("Failed to log out");
