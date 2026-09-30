@@ -52,10 +52,16 @@ export function ShowcaseVideoGrid({
   const pageHref = (nextPage: number) =>
     localeHref(locale, `${basePath}?${pageParam}=${nextPage}#videos`);
 
-  // Embla measures the track on mount, but with `loop: true` that first pass
-  // can settle on an off-center start position — a `reInit` once the real
-  // widths are in hand snaps it to the correct centered slide instead of
-  // leaving the first view looking flush-left until the visitor interacts.
+  // Embla's `align: "center"` + `loop: true` needs the slide track to run
+  // noticeably wider than the viewport to have room to loop through — with
+  // only a handful of videos on a page it doesn't, and the carousel rests
+  // flush-left instead of centered. Repeating the reel is the standard fix;
+  // each replay still opens the same video, so nothing reads as duplicated.
+  const loopVideos =
+    videos.length > 0 && videos.length < 6
+      ? Array.from({ length: Math.ceil(6 / videos.length) }, () => videos).flat()
+      : videos;
+
   useEffect(() => {
     if (!api) return;
     queueMicrotask(() => api.reInit());
@@ -84,7 +90,7 @@ export function ShowcaseVideoGrid({
           className="mt-6 sm:mt-10"
         >
             <CarouselContent className="-ml-4">
-              {videos.map((video) => {
+              {loopVideos.map((video, index) => {
                 const titleText = locale === "bn" ? video.titleBn : video.title;
                 const category = locale === "bn" ? video.categoryBn : video.category;
                 const location = locale === "bn" ? video.locationBn : video.location;
@@ -92,17 +98,18 @@ export function ShowcaseVideoGrid({
 
                 return (
                   <CarouselItem
-                    key={video.id}
-                    className="basis-[78%] pl-4 sm:basis-[60%] lg:basis-[46%]"
+                    key={`${video.id}-${index}`}
+                    className="basis-[92%] pl-4 sm:basis-[80%] lg:basis-[68%]"
                   >
                     {/* The whole card is the photo — no caption panel
                         underneath. Badge, title, location and play all sit
-                        on top of it. */}
+                        on top of it. `aspect-video` — the standard 16:9 a
+                        YouTube thumbnail uses. */}
                     <button
                       type="button"
                       onClick={() => setActiveId(video.id)}
                       aria-label={`${playLabel}: ${titleText}`}
-                      className="group relative aspect-4/3 w-full cursor-pointer overflow-hidden rounded-lg bg-black text-left shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)] transition-all duration-500 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)] focus-visible:outline-2 focus-visible:outline-primary"
+                      className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-black text-left shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)] transition-all duration-500 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)] focus-visible:outline-2 focus-visible:outline-primary"
                     >
                       <Image
                         src={video.poster}

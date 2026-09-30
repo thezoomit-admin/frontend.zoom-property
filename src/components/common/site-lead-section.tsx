@@ -3,6 +3,7 @@ import { Heading } from "@/components/common/heading";
 import { Icon, type IconName } from "@/components/common/icon";
 import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
+import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { getLeadAreaOptions } from "@/server/features/areas";
@@ -80,6 +81,12 @@ export async function SiteLeadSection({
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-linear-to-b from-primary/10 to-transparent"
+      />
+      <CmsSectionEditControl
+        pageId="contact"
+        sectionId="contact"
+        label="Contact Details"
+        position="top-4 right-4 sm:top-6 sm:right-6"
       />
       <AppContainer className="relative">
         <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,22rem)_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,18rem)_minmax(0,24rem)_minmax(0,1fr)] xl:gap-8">

@@ -14,5 +14,6 @@ export interface ApiAgent {
   respondsIn: number;
   languages: string[];
   image?: ApiMedia;
+  isActive?: boolean;
   isDeleted?: boolean;
 }

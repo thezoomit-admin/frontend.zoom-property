@@ -17,6 +17,10 @@ export function FooterLiveSwitch() {
   const active = mounted && isLiveEdit;
   const loggedIn = mounted && isEditor;
 
+  if (!mounted || !loggedIn) {
+    return null;
+  }
+
   return (
     <div className="flex items-center gap-2">
       <button
