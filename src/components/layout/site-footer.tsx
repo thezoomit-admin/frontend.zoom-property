@@ -7,7 +7,6 @@ import { Text } from "@/components/common/text";
 import { getProjects } from "@/server/features/projects";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
-import { footerLinks } from "@/lib/footer-links";
 import { mailHref, socialProfiles, telHref } from "@/lib/contact";
 import { FooterLiveSwitch } from "@/components/layout/footer-live-switch";
 
@@ -50,20 +49,21 @@ export async function SiteFooter() {
     .slice(0, 6);
   const t = dict.footer;
   /**
-   * The two link columns.
-   *
-   * The list lives in the database rather than in the site's dictionary, and
-   * that is deliberate: an empty box in the panel means "unchanged", so a
-   * built-in default can be renamed but never removed. Owning the list makes
-   * the remove button in the panel do what it says.
-   *
-   * `footerLinks` drops half-filled rows and the gap a removed row leaves, so
-   * a column is whatever survives. A column with nothing in it is not drawn.
+   * One link column: About and Contact. The panel's Explore/Services lists
+   * used to feed two columns here, but most of what they pointed at
+   * (Projects, Areas, Landowners, Blog...) was retired from the site — kept
+   * to a fixed pair instead of a CMS list so a stale row in the panel can't
+   * bring a dead link back.
    */
   const columns = [
-    { heading: t.explore, links: footerLinks(t.exploreLinks) },
-    { heading: t.services, links: footerLinks(t.serviceLinks) },
-  ].filter((column) => column.links.length);
+    {
+      heading: t.explore,
+      links: [
+        { href: "/about", label: dict.nav.about },
+        { href: "/contact", label: dict.nav.contact },
+      ],
+    },
+  ];
   // Same source as the contact page: one edit in the panel moves the
   // number in both places, which is the only way a phone number on two
   // pages stays the same phone number.
@@ -73,8 +73,8 @@ export async function SiteFooter() {
   return (
     <footer className="border-t border-footer-foreground/10 bg-footer pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-footer-foreground lg:pb-0">
       <AppContainer className="py-12 sm:py-16">
-        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr_1fr]">
-          <div className="flex max-w-md flex-col gap-5">
+        <div className="flex flex-col gap-10 md:flex-row md:flex-wrap lg:flex-nowrap lg:gap-16">
+          <div className="flex max-w-md flex-col gap-5 md:shrink-0">
             <Link href={localeHref(locale, "/")} aria-label={t.companyName}>
               {/* White lockup — the navy one would vanish into the background. */}
               <Logo variant="onDark" className="h-9 w-auto" />
@@ -139,7 +139,7 @@ export async function SiteFooter() {
           </div>
 
           {columns.map((column) => (
-            <nav key={column.heading} className="flex flex-col gap-4">
+            <nav key={column.heading} className="flex min-w-32 flex-col gap-4 md:flex-1">
               <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-footer-foreground">
                 {column.heading}
               </h3>
@@ -160,7 +160,7 @@ export async function SiteFooter() {
           {/* Projects get their own column rather than a link to the index:
               there are three of them, they are what the company is actually
               building, and the fourth column was empty without them. */}
-          <nav className="flex flex-col gap-4">
+          <nav className="flex min-w-32 flex-col gap-4 md:flex-1">
             <h3 className="font-heading text-xs font-bold uppercase tracking-[0.16em] text-footer-foreground">
               {dict.nav.projects}
             </h3>
