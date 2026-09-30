@@ -6,7 +6,6 @@ import { Icon, type IconName } from "@/components/common/icon";
 import { ProjectCard } from "./project-card";
 import type { Project } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
-import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -282,16 +281,14 @@ export function InteractiveProjects({
       </div>
 
       {paginated.length > 0 ? (
-        <Stagger
-          key={`${selectedStage}-${page}-${searchQuery}`}
-          className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-        >
+        // Plain grid, not <Stagger> — that reveal is gated on scrolling into
+        // view, and a filter/page change mounts this without a scroll event,
+        // so cards could get stuck at their pre-animation opacity: 0.
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {paginated.map((project) => (
-            <StaggerItem key={project.id}>
-              <ProjectCard project={project} locale={locale} />
-            </StaggerItem>
+            <ProjectCard key={project.id} project={project} locale={locale} />
           ))}
-        </Stagger>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16 text-center">
           <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">

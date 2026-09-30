@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Icon } from "@/components/common/icon";
 import Image from "@/components/common/image";
 import { AppContainer } from "@/components/common/app-container";
 import { VideoLightbox } from "@/components/media/video-lightbox";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import type { VideoItem } from "@/data/videos";
 import type { Locale } from "@/i18n/config";
 import { localeHref } from "@/i18n/href";
@@ -39,12 +47,22 @@ export function ShowcaseVideoGrid({
   className?: string;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [api, setApi] = useState<CarouselApi>();
   const activeVideo = videos.find((video) => video.id === activeId);
   const pageHref = (nextPage: number) =>
     localeHref(locale, `${basePath}?${pageParam}=${nextPage}#videos`);
 
+  // Embla measures the track on mount, but with `loop: true` that first pass
+  // can settle on an off-center start position — a `reInit` once the real
+  // widths are in hand snaps it to the correct centered slide instead of
+  // leaving the first view looking flush-left until the visitor interacts.
+  useEffect(() => {
+    if (!api) return;
+    queueMicrotask(() => api.reInit());
+  }, [api]);
+
   return (
-    <section id="videos" className={`border-t border-border bg-muted/30 pt-10 pb-4 sm:py-20 ${className}`}>
+    <section id="videos" className={`border-t border-border pt-10 pb-4 sm:py-20 ${className}`}>
       <AppContainer>
         <div className="max-w-2xl">
           <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -54,66 +72,97 @@ export function ShowcaseVideoGrid({
             {description}
           </p>
         </div>
+      </AppContainer>
 
-        {videos.length ? (
-          <div className="mt-6 sm:mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {videos.map((video) => {
-              const titleText = locale === "bn" ? video.titleBn : video.title;
-              const descriptionText = locale === "bn" ? video.descriptionBn : video.description;
-              const category = locale === "bn" ? video.categoryBn : video.category;
-              const location = locale === "bn" ? video.locationBn : video.location;
+      {/* Full-bleed, deliberately outside AppContainer — the carousel reads
+          as a filmstrip running edge to edge, not content boxed to the
+          page's usual measure. */}
+      {videos.length ? (
+        <Carousel
+          setApi={setApi}
+          opts={{ align: "center", loop: true }}
+          className="mt-6 sm:mt-10"
+        >
+            <CarouselContent className="-ml-4">
+              {videos.map((video) => {
+                const titleText = locale === "bn" ? video.titleBn : video.title;
+                const category = locale === "bn" ? video.categoryBn : video.category;
+                const location = locale === "bn" ? video.locationBn : video.location;
+                const verified = locale === "bn" ? "ভেরিফাইড ওয়াকথ্রু" : "Verified Walkthrough";
 
-              return (
-                <button
-                  key={video.id}
-                  type="button"
-                  onClick={() => setActiveId(video.id)}
-                  aria-label={`${playLabel}: ${locale === "bn" ? video.titleBn : video.title}`}
-                  className="group flex flex-col h-full cursor-pointer overflow-hidden rounded-lg border border-border/60 bg-card text-left transition-all duration-300 ease-out shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)] hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)] focus-visible:outline-2 focus-visible:outline-primary transform-gpu"
-                >
-                  <div className="relative aspect-[3/2] overflow-hidden bg-black">
-                    <Image
-                      src={video.poster}
-                      alt={titleText}
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      placeholder="blur"
-                      blurDataURL={shimmerDataUrl()}
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/10 to-black/20" />
-                    <Badge className="absolute left-3 top-3 border-0 bg-primary text-primary-foreground">
-                      {category}
-                    </Badge>
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      <span className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform group-hover:scale-110">
-                        <Icon name="play" size="sm" className="ml-1 fill-current" />
+                return (
+                  <CarouselItem
+                    key={video.id}
+                    className="basis-[78%] pl-4 sm:basis-[60%] lg:basis-[46%]"
+                  >
+                    {/* The whole card is the photo — no caption panel
+                        underneath. Badge, title, location and play all sit
+                        on top of it. */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveId(video.id)}
+                      aria-label={`${playLabel}: ${titleText}`}
+                      className="group relative aspect-4/3 w-full cursor-pointer overflow-hidden rounded-lg bg-black text-left shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)] transition-all duration-500 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)] focus-visible:outline-2 focus-visible:outline-primary"
+                    >
+                      <Image
+                        src={video.poster}
+                        alt={titleText}
+                        fill
+                        sizes="(min-width: 1024px) 42vw, (min-width: 640px) 50vw, 85vw"
+                        placeholder="blur"
+                        blurDataURL={shimmerDataUrl()}
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/10 to-black/25" />
+
+                      <div className="absolute inset-x-3.5 top-3.5 flex items-center justify-between gap-2">
+                        <Badge className="border-0 bg-primary text-primary-foreground">
+                          {category}
+                        </Badge>
+                        <span className="flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-md tabular-nums">
+                          <Icon name="clock" size="xs" />
+                          {video.duration}
+                        </span>
+                      </div>
+
+                      <div className="absolute inset-x-5 bottom-16 flex flex-col gap-1.5 sm:bottom-20">
+                        <h3 className="line-clamp-2 font-heading text-xl font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.4)] sm:text-2xl">
+                          {titleText}
+                        </h3>
+                        <span className="flex items-center gap-1.5 text-sm text-white/85">
+                          <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
+                          <span className="truncate">{location}</span>
+                          <span className="mx-1 text-white/40">•</span>
+                          <Icon name="approved" size="xs" className="shrink-0 text-brand-green-light" />
+                          <span className="truncate">{verified}</span>
+                        </span>
+                      </div>
+
+                      <span
+                        aria-hidden
+                        className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform duration-300 ease-out group-hover:scale-110 sm:size-12"
+                      >
+                        <Icon name="play" size="sm" className="ml-0.5 fill-current" />
                       </span>
-                    </span>
-                    <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white">
-                      {video.duration}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col gap-2 p-5">
-                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Icon name="location" size="xs" className="text-primary" />
-                      {location}
-                    </p>
-                    <h3 className="line-clamp-2 font-heading text-lg font-semibold text-foreground group-hover:text-primary">
-                      {titleText}
-                    </h3>
-                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                      {descriptionText}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
+                    </button>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+            <div className="mt-6 flex items-center justify-center gap-3 sm:hidden">
+              <CarouselPrevious className="static translate-x-0 translate-y-0" />
+              <CarouselNext className="static translate-x-0 translate-y-0" />
+            </div>
+            <CarouselPrevious className="left-4 hidden sm:flex lg:left-8" />
+            <CarouselNext className="right-4 hidden sm:flex lg:right-8" />
+          </Carousel>
+      ) : (
+        <AppContainer>
           <p className="mt-10 text-sm text-muted-foreground">No videos found.</p>
-        )}
+        </AppContainer>
+      )}
 
+      <AppContainer>
         {totalPage > 1 ? (
           <nav className="mt-6 sm:mt-10 flex items-center justify-center gap-3" aria-label="Video pagination">
             {page > 1 ? (

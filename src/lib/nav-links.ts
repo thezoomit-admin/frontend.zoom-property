@@ -5,16 +5,26 @@ export interface NavLink {
 }
 
 /**
- * True when a chrome link points at the Properties catalogue.
- * Paths may be absolute (`/properties`) or locale-prefixed (`/bn/properties`).
+ * Nav items the desk has retired from the header but not deleted from the
+ * panel's stored rows — dropped here instead, so re-adding one is a CMS edit
+ * again rather than a code change.
  */
-function isPropertiesHref(href: string): boolean {
+const RETIRED_NAV_PATHS = new Set([
+  "properties",
+  "projects",
+  "areas",
+  "landowners",
+  "blog",
+]);
+
+/**
+ * True when a chrome link points at a retired section.
+ * Paths may be absolute (`/blog`) or locale-prefixed (`/bn/blog`).
+ */
+function isRetiredHref(href: string): boolean {
   const path = href.trim().split(/[?#]/)[0].replace(/\/+$/, "").toLowerCase();
-  return (
-    path === "/properties" ||
-    path.endsWith("/properties") ||
-    /^\/(en|bn)\/properties$/.test(path)
-  );
+  const segment = path.replace(/^\/(en|bn)(?=\/|$)/, "") || "/";
+  return RETIRED_NAV_PATHS.has(segment.replace(/^\//, ""));
 }
 
 /**
@@ -27,7 +37,8 @@ function isPropertiesHref(href: string): boolean {
  *
  * A row needs both halves: a label with no destination is text pretending to
  * be a link, and a destination with no label is invisible.
- * Properties catalogue links are dropped — the desk retired that nav item.
+ * Retired sections (see `RETIRED_NAV_PATHS`) are dropped even if the panel
+ * still has a row for one.
  */
 export function navLinks(rows: unknown): NavLink[] {
   if (!Array.isArray(rows)) return [];
@@ -37,7 +48,7 @@ export function navLinks(rows: unknown): NavLink[] {
     const { label, href } = row as Record<string, unknown>;
     if (typeof label !== "string" || !label.trim()) return [];
     if (typeof href !== "string" || !href.trim()) return [];
-    if (isPropertiesHref(href)) return [];
+    if (isRetiredHref(href)) return [];
     return [{ label: label.trim(), href: href.trim() }];
   });
 }

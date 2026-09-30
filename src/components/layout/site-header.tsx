@@ -8,7 +8,6 @@ import { useLenis } from "lenis/react";
 
 import { AppContainer } from "@/components/common/app-container";
 import { Icon } from "@/components/common/icon";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -139,11 +138,10 @@ export function SiteHeader({
       className="fixed inset-x-0 top-0 z-40 border-b border-border/80 bg-background shadow-xs"
     >
 
-      {/* 54 / 70 rather than the 64 / 80 it used to be: ten pixels off both,
-          which the logo and the controls had to spare. Nothing offsets against
-          these numbers — the hero and the page banners clear the bar with
-          their own generous top padding — so this is a safe trim. */}
-      <AppContainer className="relative flex h-[54px] items-center justify-between gap-4 sm:h-[70px]">
+      {/* 44 / 56 — thinner than the 54 / 70 this used to be. Nothing offsets
+          against these numbers — the hero and the page banners clear the bar
+          with their own generous top padding — so this is a safe trim. */}
+      <AppContainer className="relative flex h-11 items-center justify-between gap-4 sm:h-14">
         {/* `flex items-center`, not just `shrink-0`: the lockup is an
             inline-flex box, so in a plain anchor it sat on the text baseline
             and the line box reserved descender space under it — which pushed
@@ -224,12 +222,6 @@ export function SiteHeader({
               <span className="hidden sm:inline">{campaignPhone}</span>
             </a>
           ) : null}
-
-          <LanguageSwitcher
-            locale={locale}
-            label={dict.language}
-            onDark={false}
-          />
 
           <Button
             size="lg"

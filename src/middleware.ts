@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { DEFAULT_LOCALE, LOCALES, isLocale } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
 import { PATHNAME_HEADER } from "@/lib/not-found";
 import {
   ACCESS_COOKIE,
@@ -28,10 +28,13 @@ import {
  */
 const LOCALE_COOKIE = "locale";
 
-function pickLocale(request: NextRequest) {
-  const saved = request.cookies.get(LOCALE_COOKIE)?.value;
-  if (saved && isLocale(saved)) return saved;
-
+/**
+ * Always English. There is no switcher left to set the cookie to anything
+ * else, but a browser that visited before this changed can still be carrying
+ * an old "bn" cookie — reading it back would lock that visitor out of the
+ * only language the site offers now.
+ */
+function pickLocale(_request: NextRequest) {
   return DEFAULT_LOCALE;
 }
 

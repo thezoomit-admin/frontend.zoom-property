@@ -32,7 +32,6 @@ export function ProjectCard({
     locale === "bn" && project.nameBn ? project.nameBn : project.name;
   const sold = project.units - project.unitsLeft;
   const soldPercent = project.units ? Math.round((sold / project.units) * 100) : 0;
-  const progress = Math.max(0, Math.min(100, project.progress));
 
   const status = project.status?.toLowerCase();
   const statusTone: { icon: IconName; className: string } =
@@ -65,7 +64,7 @@ export function ProjectCard({
         <ImageFrame
           src={project.image}
           alt={`${displayName}, ${project.area}`}
-          ratio="3/2"
+          ratio="4/3"
           rounded="none"
           sizes="third"
         >
@@ -138,48 +137,6 @@ export function ProjectCard({
                 {project.handover}
               </span>
             </div>
-          </div>
-
-          {/* Progress */}
-          <div className="flex flex-col gap-2 rounded-md bg-muted/70 p-3.5">
-            <div className="flex items-baseline justify-between">
-              <span className="text-xs font-semibold text-foreground">
-                Construction progress
-              </span>
-              <span className="font-heading text-lg font-bold leading-none text-primary">
-                {progress}%
-              </span>
-            </div>
-            <div
-              className="h-2 w-full overflow-hidden rounded-full bg-border/70"
-              role="img"
-              aria-label={`${progress} percent complete`}
-            >
-              <div
-                className="h-full rounded-full bg-linear-to-r from-primary to-brand-green transition-[width] duration-1000 ease-out"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {project.milestones.length ? (
-              <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                {project.milestones.slice(0, 2).map((m) => (
-                  <li
-                    key={m.label}
-                    className="flex items-center justify-between gap-2 text-[11px]"
-                  >
-                    <span className="flex min-w-0 items-center gap-1 text-muted-foreground">
-                      <Icon
-                        name={m.completed ? "check" : "clock"}
-                        size="xs"
-                        className={cn("size-3 shrink-0", m.completed ? "text-primary" : "text-muted-foreground")}
-                      />
-                      <span className="truncate">{m.label}</span>
-                    </span>
-                    <span className="shrink-0 font-semibold text-foreground">{m.percent}%</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
           </div>
 
           {/* Sizes */}

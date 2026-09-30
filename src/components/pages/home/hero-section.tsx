@@ -1,14 +1,6 @@
-import { AppContainer } from "@/components/common/app-container";
-import { Heading } from "@/components/common/heading";
-import { Icon } from "@/components/common/icon";
-import { Text } from "@/components/common/text";
 import { Parallax } from "@/components/motion/parallax";
-import { Reveal } from "@/components/motion/reveal";
 import { HeroBackdrop } from "@/components/pages/home/hero-backdrop";
-import { HeroLeadForm } from "@/components/pages/home/hero-lead-form";
-import { Badge } from "@/components/ui/badge";
-import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { getLeadAreaOptions } from "@/server/features/areas";
+import { getDictionary } from "@/i18n/dictionaries";
 import { CmsSectionEditControl } from "@/components/cms/cms-section-edit-control";
 
 const photo = (id: string) =>
@@ -33,14 +25,7 @@ const HERO_IMAGES = [
 ];
 
 export async function HeroSection() {
-  // `getLocale()` just reads the route param — no network cost — so it
-  // resolves first and the two real fetches below run in parallel instead of
-  // one gating the other.
-  const locale = await getLocale();
-  const [dict, areaOptions] = await Promise.all([
-    getDictionary(),
-    getLeadAreaOptions(locale, 60),
-  ]);
+  const dict = await getDictionary();
 
   const cmsImages = (dict.hero.backgroundImages ?? []).filter(
     (url): url is string => typeof url === "string" && url.trim().length > 0,
@@ -48,58 +33,19 @@ export async function HeroSection() {
   const images = cmsImages.length > 0 ? cmsImages : HERO_IMAGES;
 
   return (
-    <section className="relative z-10 flex min-h-[80svh] items-center overflow-x-clip overflow-y-visible sm:min-h-[84svh]">
+    <section className="relative z-10 min-h-svh overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Parallax speed={0.18} zoom className="absolute inset-0 size-full">
           <HeroBackdrop images={images} fallbackImages={HERO_IMAGES} />
         </Parallax>
-
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-black via-black/70 to-black/40"
-        />
       </div>
 
-      <AppContainer className="relative z-10 w-full pb-20 pt-16 sm:pb-24 sm:pt-20">
-        <CmsSectionEditControl
-          pageId="home"
-          sectionId="hero"
-          label="Hero Section"
-          position="top-2 right-4 sm:top-4 sm:right-6"
-        />
-        {/* Left = copy, right = lead form (side-by-side from md up). */}
-        <div className="flex flex-col gap-10 md:flex-row md:items-center md:gap-12 lg:gap-14">
-          <div className="flex min-w-0 flex-1 flex-col gap-6">
-            <Reveal>
-              <Badge className="w-fit gap-1.5 px-3 py-1 text-xs font-semibold">
-                <Icon name="approved" size="xs" />
-                {dict.hero.badge}
-              </Badge>
-            </Reveal>
-
-            <Heading as="h1" size="h1" className="text-white">
-              {dict.hero.title}
-            </Heading>
-
-            <Reveal delay={0.12}>
-              <Text size="lead" className="max-w-xl leading-relaxed text-white/80 lg:max-w-2xl">
-                {dict.hero.lead}
-              </Text>
-            </Reveal>
-          </div>
-
-          <Reveal
-            delay={0.2}
-            className="w-full shrink-0 md:w-[32rem] lg:w-[34rem]"
-          >
-            <HeroLeadForm
-              dict={dict.contact.form}
-              title={dict.contact.formTitle}
-              areas={areaOptions}
-            />
-          </Reveal>
-        </div>
-      </AppContainer>
+      <CmsSectionEditControl
+        pageId="home"
+        sectionId="hero"
+        label="Hero Section"
+        position="top-4 right-4 sm:top-6 sm:right-6"
+      />
     </section>
   );
 }

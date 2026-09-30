@@ -54,7 +54,13 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
       setCurrent(api.selectedScrollSnap());
     };
 
+    // Embla measures the track on mount, but with `loop: true` that first
+    // pass can settle on an off-center start position — a `reInit` once the
+    // real widths are in hand snaps it to the correct centered slide instead
+    // of leaving the first view looking flush-left until the visitor
+    // interacts with it.
     queueMicrotask(() => {
+      api.reInit();
       setCount(api.scrollSnapList().length);
       setCurrent(api.selectedScrollSnap());
     });
@@ -79,8 +85,8 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
   return (
     <div className="relative w-full">
       {/* Navigation Header / Controls */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70">
+      <div className="mb-6 flex items-center justify-between px-5 sm:px-6 lg:px-10 xl:px-16">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           <span className="size-2 rounded-full bg-brand animate-pulse" />
           <span>
             {String(current + 1).padStart(2, "0")} / {String(count || videos.length).padStart(2, "0")}
@@ -93,7 +99,7 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
             type="button"
             onClick={scrollPrev}
             aria-label={prevLabel}
-            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:border-brand-green-light hover:bg-primary hover:text-white active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-xs transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
           >
             <Icon name="chevronLeft" size="sm" />
           </button>
@@ -101,7 +107,7 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
             type="button"
             onClick={scrollNext}
             aria-label={nextLabel}
-            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-200 hover:border-brand-green-light hover:bg-primary hover:text-white active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-xs transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
           >
             <Icon name="chevronRight" size="sm" />
           </button>
@@ -112,92 +118,76 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
       <Carousel
         setApi={setApi}
         opts={{
-          align: "start",
+          align: "center",
           loop: true,
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-3">
+        <CarouselContent className="-ml-4">
           {videos.map((video) => {
             const title = locale === "bn" ? video.titleBn : video.title;
-            const description = locale === "bn" ? video.descriptionBn : video.description;
             const category = locale === "bn" ? video.categoryBn : video.category;
             const location = locale === "bn" ? video.locationBn : video.location;
 
             return (
               <CarouselItem
                 key={video.id}
-                className="basis-full pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+                className="basis-[78%] pl-4 sm:basis-[60%] lg:basis-[46%]"
               >
-                <div className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-white/15 bg-white/6 backdrop-blur-xl shadow-xl transition-all duration-500 hover:border-brand-green-light/50 hover:bg-white/9 hover:shadow-2xl hover:shadow-primary/10">
-                  {/* Top: poster only. Playback moved to the dialog — a quarter-width
-                      card is too small to actually watch a walkthrough in. */}
-                  <div className="relative h-56.25 w-full overflow-hidden bg-black sm:h-60">
-                    <Image
-                      src={video.poster}
-                      alt={title}
-                      fill
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      placeholder="blur"
-                      blurDataURL={shimmerDataUrl()}
-                      className="object-cover"
-                    />
-                    {/* Gradient Scrims */}
-                    <div
-                      aria-hidden
-                      className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/40"
-                    />
+                {/* The whole card is the photo — no caption panel underneath.
+                    Everything (badge, title, location, play) sits on top of
+                    it, the way the reference showed it. */}
+                <div className="group relative aspect-4/3 w-full overflow-hidden rounded-lg bg-black shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)] transition-all duration-500 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)]">
+                  <Image
+                    src={video.poster}
+                    alt={title}
+                    fill
+                    sizes="(min-width: 1024px) 42vw, (min-width: 640px) 50vw, 85vw"
+                    placeholder="blur"
+                    blurDataURL={shimmerDataUrl()}
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  {/* Gradient scrim: dark enough at the foot for the title,
+                      clear enough up top that the badge reads on its own chip. */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-linear-to-t from-black/90 via-black/10 to-black/25"
+                  />
 
-                    {/* Badges on poster */}
-                    <div className="absolute inset-x-3.5 top-3.5 flex items-center justify-between gap-2">
-                      <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
-                        <span className="size-1.5 rounded-full bg-brand" />
-                        {category}
-                      </span>
+                  {/* Top: category badge + duration */}
+                  <div className="absolute inset-x-3.5 top-3.5 flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                      <span className="size-1.5 rounded-full bg-brand" />
+                      {category}
+                    </span>
 
-                      <span className="flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-md tabular-nums">
-                        <Icon name="clock" size="xs" />
-                        {video.duration}
-                      </span>
-                    </div>
-
-                    {/* Play affordance — decorative; the whole card is the button. */}
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <span className="relative flex size-14 items-center justify-center rounded-full border border-white/40 bg-white/20 text-white backdrop-blur-md shadow-xl transition-all duration-300 ease-out group-hover:scale-110 group-hover:border-brand-green-light group-hover:bg-primary sm:size-16">
-                        <span className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-60 group-hover:bg-brand-green-light/40" />
-                        <Icon
-                          name="play"
-                          size="md"
-                          className="ml-1 fill-white text-white transition-transform group-hover:scale-110"
-                        />
-                      </span>
+                    <span className="flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-md tabular-nums">
+                      <Icon name="clock" size="xs" />
+                      {video.duration}
                     </span>
                   </div>
 
-                  {/* Bottom: Info & Details */}
-                  <div className="flex flex-col gap-2.5 p-4 sm:p-5">
-                    <div className="flex items-center justify-between text-xs text-white/70">
-                      <span className="flex items-center gap-1.5 font-medium text-white/80">
-                        <Icon name="location" size="xs" className="text-brand" />
-                        {location}
-                      </span>
-                      <span className="flex items-center gap-1 text-[11px] text-brand-green-light">
-                        <Icon name="approved" size="xs" />
-                        {verifiedLabel}
-                      </span>
-                    </div>
-
-                    <h3 className="line-clamp-2 font-heading text-base font-semibold text-white transition-colors duration-300 group-hover:text-brand-green-light sm:text-lg leading-snug">
+                  {/* Foot: title + location, on the photo. */}
+                  <div className="absolute inset-x-5 bottom-16 flex flex-col gap-1.5 sm:bottom-20">
+                    <h3 className="line-clamp-2 font-heading text-xl font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.4)] sm:text-2xl">
                       {title}
                     </h3>
-
-                    <p className="line-clamp-2 text-xs sm:text-sm leading-relaxed text-white/70 transition-colors duration-300 group-hover:text-white/90">
-                      {description}
-                    </p>
+                    <span className="flex items-center gap-1.5 text-sm text-white/85">
+                      <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
+                      <span className="truncate">{location}</span>
+                      <span className="mx-1 text-white/40">•</span>
+                      <Icon name="approved" size="xs" className="shrink-0 text-brand-green-light" />
+                      <span className="truncate">{verifiedLabel}</span>
+                    </span>
                   </div>
+
+                  {/* Play — bottom-right corner, like the reference. */}
+                  <span
+                    aria-hidden
+                    className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform duration-300 ease-out group-hover:scale-110 sm:size-12"
+                  >
+                    <Icon name="play" size="sm" className="ml-0.5 fill-current" />
+                  </span>
 
                   {/* Stretched trigger: the whole card opens the player. Last in the
                       DOM so it sits over the scrims without a z-index war. */}
@@ -227,8 +217,8 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
               className={cn(
                 "h-1.5 rounded-full transition-all duration-300",
                 current === index
-                  ? "w-8 bg-brand-green-light shadow-sm shadow-brand-green-light/50"
-                  : "w-2 bg-white/20 hover:bg-white/40",
+                  ? "w-8 bg-primary shadow-sm shadow-primary/50"
+                  : "w-2 bg-border hover:bg-muted-foreground/40",
               )}
             />
           ))}

@@ -19,7 +19,7 @@ export function CampaignMain({
     <main
       id="top"
       className={cn(
-        "flex-1 pt-13.5 sm:pt-17.5 lg:pb-0",
+        "flex-1 pt-11 sm:pt-14 lg:pb-0",
         campaign ? "pb-0" : "pb-18",
       )}
     >

@@ -8,7 +8,7 @@ export const LOCALES = ["en", "bn"] as const;
 
 export type Locale = (typeof LOCALES)[number];
 
-export const DEFAULT_LOCALE: Locale = "bn";
+export const DEFAULT_LOCALE: Locale = "en";
 
 export const LOCALE_LABELS: Record<Locale, { native: string; english: string }> = {
   en: { native: "English", english: "English" },
