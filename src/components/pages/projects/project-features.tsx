@@ -53,11 +53,12 @@ export function ProjectFeatures({
                   <ImageFrame
                     src={feature.image!}
                     alt={title}
-                    ratio="4/3"
+                    ratio="auto"
                     rounded="2xl"
                     sizes="half"
                     unoptimized
                     className="w-full"
+
                   />
                 )}
 
@@ -81,9 +82,10 @@ export function ProjectFeatures({
                   <ImageFrame
                     src={feature.image!}
                     alt={title}
-                    ratio="4/3"
+                    ratio="auto"
                     rounded="2xl"
                     sizes="half"
+
                   />
                 )}
                 <div className="flex flex-col gap-3">
@@ -126,9 +128,10 @@ export function ProjectFeatures({
                       <ImageFrame
                         src={feature.image!}
                         alt={title}
-                        ratio="4/3"
+                        ratio="auto"
                         rounded="xl"
                         sizes="half"
+
                       />
                     </div>
                   )}
@@ -159,10 +162,11 @@ export function ProjectFeatures({
                   <ImageFrame
                     src={feature.image!}
                     alt={title}
-                    ratio="3/2"
+                    ratio="auto"
                     rounded="2xl"
                     sizes="half"
                     className="w-full max-w-xl"
+
                   />
                 )}
               </section>
@@ -192,11 +196,12 @@ export function ProjectFeatures({
                     <ImageFrame
                       src={feature.image!}
                       alt={title}
-                      ratio="portrait"
+                      ratio="auto"
                       rounded="2xl"
                       sizes="half"
                       unoptimized
                       className="w-full shadow-2xl md:max-w-md md:ml-auto"
+
                     />
                   </div>
                 )}

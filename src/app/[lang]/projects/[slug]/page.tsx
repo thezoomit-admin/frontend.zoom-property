@@ -199,25 +199,24 @@ export default async function ProjectDetailPage({
             </div>
           </Section>
 
-          <Section className="border-t border-border bg-footer pt-14 pb-14 sm:pt-16 sm:pb-16">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
+          <Section className="border-t border-border bg-footer pt-8 pb-8 sm:pt-10 sm:pb-10">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
                 <span className="font-heading text-xs font-bold tracking-wider text-footer-foreground/60 uppercase">
                   {t.videoLabel}
                 </span>
 
-                <Heading as="h2" size="h3" className="text-footer-foreground">
+                <Heading as="h2" size="h4" className="text-footer-foreground">
                   {lang === "bn" ? project.video.titleBn : project.video.title}
                 </Heading>
-
-                <Text className="max-w-2xl text-footer-foreground/70">{t.videoLead}</Text>
               </div>
 
               <VideoEmbed
                 url={project.video.youtubeUrl}
                 title={lang === "bn" ? project.video.titleBn : project.video.title}
                 poster={project.video.poster}
-                className="overflow-hidden rounded-lg"
+                ratio="auto"
+                className="aspect-[21/6] overflow-hidden rounded-xl"
               />
             </div>
           </Section>
