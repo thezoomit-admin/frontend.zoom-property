@@ -43,16 +43,19 @@ export function VideoEmbed({
   const isAuto = ratio === "auto";
 
   if (active) {
+    const src = embedUrl(id, provider);
     return (
       <div className={cn("relative overflow-hidden rounded-xl bg-black", className)}>
         <div className={isAuto ? "absolute inset-0" : "aspect-video"}>
-          <iframe
-            src={embedUrl(id, provider)}
-            title={title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="size-full"
-          />
+          {src ? (
+            <iframe
+              src={src}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="size-full"
+            />
+          ) : null}
         </div>
       </div>
     );
