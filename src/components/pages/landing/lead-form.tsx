@@ -47,7 +47,14 @@ export function ProjectLeadForm({
   glass?: boolean;
 }) {
   const compact = variant === "compact";
-  const id = compact ? "azh" : "az";
+  // Derive a stable, unique id prefix from the project name so label clicks
+  // never accidentally target a field in another form on the same page.
+  const idSlug = projectName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 20);
+  const id = compact ? `${idSlug}-c` : idSlug;
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
 

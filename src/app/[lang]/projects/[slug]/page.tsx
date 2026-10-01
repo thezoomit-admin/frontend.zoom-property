@@ -17,6 +17,7 @@ import { RelatedProjects } from "@/components/pages/projects/related-projects";
 import { ConsultantCard } from "@/components/pages/properties/consultant-card";
 import { AreaFacts } from "@/components/pages/properties/area-facts";
 import { ContactCta } from "@/components/common/contact-cta";
+import { SiteLeadSection } from "@/components/common/site-lead-section";
 
 import { localeAlternates } from "@/i18n/alternates";
 import { LOCALES, type Locale } from "@/i18n/config";
@@ -264,6 +265,11 @@ export default async function ProjectDetailPage({
           </Section>
         </TabsContent>
       </Tabs>
+
+      {/* Replaces the layout's site-wide lead block — same form, filed against this project. */}
+      <Suspense fallback={null}>
+        <SiteLeadSection project={{ name: project.name, slug: project.slug }} />
+      </Suspense>
     </>
   );
 }

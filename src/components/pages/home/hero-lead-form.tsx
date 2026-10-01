@@ -73,10 +73,14 @@ export interface HeroLeadFormDict {
   privacy: string;
   successTitle: string;
   successBody: string;
+  /** Label for the locked project field on project detail pages. */
+  project?: string;
 }
 
 /**
  * Home / site CTA lead form — name, phone, email, area → sub-area, message.
+ * With `project` set (project detail pages) the area picker becomes a locked
+ * project field and the lead is filed against that project.
  */
 export function HeroLeadForm({
   dict,
@@ -89,6 +93,7 @@ export function HeroLeadForm({
   formClassName,
   trackName = "Home hero",
   variant = "default",
+  project,
 }: {
   dict: HeroLeadFormDict;
   title?: string;
@@ -101,6 +106,8 @@ export function HeroLeadForm({
   trackName?: string;
   /** `glass` — frosted panel for the home hero veil. */
   variant?: "default" | "glass";
+  /** Project this lead is about — replaces the area picker. */
+  project?: string;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
@@ -139,10 +146,17 @@ export function HeroLeadForm({
     const formData = new FormData(form);
     formData.set("phone", phone);
     formData.set("source", source);
-    formData.set("subject", subject);
+    formData.set("subject", project ? `${project} enquiry` : subject);
     formData.set("enquiry", "buy");
     // Home + site CTA lead forms → Bond CRM lead (contact page does not).
     formData.set("createLead", "1");
+    if (project) {
+      // Bond CRM files the lead under `budget` when no area is sent.
+      const note = String(formData.get("message") ?? "").trim();
+      const projectLine = `Project: ${project}`;
+      formData.set("budget", project);
+      formData.set("message", note ? `${projectLine}\n${note}` : projectLine);
+    }
     if (area) {
       formData.set("area", area);
     } else {
@@ -158,7 +172,7 @@ export function HeroLeadForm({
 
     if (res.success) {
       setLastSubmitAt(Date.now());
-      trackMeta("Lead", { content_name: trackName });
+      trackMeta("Lead", { content_name: project || trackName });
       toast.success(dict.successTitle, { description: dict.successBody });
       form.reset();
       setPhone("");
@@ -242,27 +256,58 @@ export function HeroLeadForm({
           />
         </Field>
 
-        <Field
-          id={`${idPrefix}-area`}
-          label={dict.area || "Area"}
-          glass={glass}
-        >
-          <Select value={combinedArea} onValueChange={setCombinedArea}>
-            <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
-              <SelectValue placeholder={dict.areaAny || "Select area"} />
-            </SelectTrigger>
-            <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
-              <SelectItem value={AREA_ANY}>
-                {dict.areaAny || "Any area"}
-              </SelectItem>
-              {combinedAreaOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+        {project ? (
+          <Field
+            id={`${idPrefix}-project`}
+            label={dict.project || "Project"}
+            glass={glass}
+          >
+            <div className="relative">
+              <Input
+                id={`${idPrefix}-project`}
+                value={project}
+                readOnly
+                tabIndex={-1}
+                className={cn(
+                  "h-11 pr-10 font-medium",
+                  glass
+                    ? "border-white/20 bg-white/15 text-white"
+                    : "bg-muted/40 text-foreground",
+                )}
+              />
+              <Icon
+                name="building"
+                size="sm"
+                className={cn(
+                  "pointer-events-none absolute top-1/2 right-3 -translate-y-1/2",
+                  glass ? "text-white/80" : "text-primary",
+                )}
+              />
+            </div>
+          </Field>
+        ) : (
+          <Field
+            id={`${idPrefix}-area`}
+            label={dict.area || "Area"}
+            glass={glass}
+          >
+            <Select value={combinedArea} onValueChange={setCombinedArea}>
+              <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
+                <SelectValue placeholder={dict.areaAny || "Select area"} />
+              </SelectTrigger>
+              <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
+                <SelectItem value={AREA_ANY}>
+                  {dict.areaAny || "Any area"}
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+                {combinedAreaOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        )}
 
         <Field id={`${idPrefix}-message`} label={dict.message} glass={glass}>
           <Textarea
