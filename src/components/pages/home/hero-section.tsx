@@ -18,7 +18,7 @@ const photo = (id: string) =>
  * does, and what shows if the API cannot be reached.
  */
 const HERO_IMAGES = [
-  photo("photo-1600596542815-ffad4c1539a9"),
+  "/images/hero/building-01.jpg",
   photo("photo-1600607687939-ce8a6c25118c"),
   photo("photo-1613977257363-707ba9348227"),
   photo("photo-1512917774080-9991f1c4c750"),

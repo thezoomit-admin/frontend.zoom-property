@@ -27,6 +27,7 @@ import { getProperties, getPropertyBySlug } from "@/server/features/properties";
 import { telHref } from "@/lib/contact";
 import { formatArea, formatBdt, formatKatha, formatRent } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
+import { getMapEmbedUrl } from "@/lib/utils";
 import { absoluteUrl, breadcrumbSchema, propertySchema } from "@/lib/seo";
 import { ContactCta } from "@/components/common/contact-cta";
 
@@ -308,13 +309,7 @@ export default async function PropertyDetailPage({
           </Heading>
           <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
             <iframe
-              src={property.mapUrl.includes("/embed") ? property.mapUrl : (
-                property.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) 
-                  ? `https://maps.google.com/maps?q=${property.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)?.[1]},${property.mapUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)?.[2]}&hl=${lang}&z=14&output=embed`
-                  : property.mapUrl.match(/\/place\/([^/]+)/)
-                    ? `https://maps.google.com/maps?q=${property.mapUrl.match(/\/place\/([^/]+)/)?.[1]}&hl=${lang}&z=14&output=embed`
-                    : property.mapUrl
-              )}
+              src={getMapEmbedUrl(property.mapUrl, lang)}
               width="100%"
               height="100%"
               style={{ border: 0 }}

@@ -73,6 +73,15 @@ export interface Project {
   cctvStreamActive: boolean;
   rajukPermitNo: string;
   milestones: ConstructionMilestone[];
+  features?: {
+    eyebrow?: string;
+    eyebrowBn?: string;
+    title: string;
+    titleBn?: string;
+    description?: string;
+    descriptionBn?: string;
+    image?: string;
+  }[];
   agent?: Agent;
 }
 
@@ -122,6 +131,38 @@ export const projects: Project[] = [
       { label: "Basement & Structure", percent: 100, completed: true },
       { label: "MEP & Fire Systems", percent: 85, completed: false },
       { label: "Interior Marble & Glass", percent: 55, completed: false },
+    ],
+    features: [
+      {
+        eyebrow: "Exterior",
+        title: "Building",
+        description: "A striking modern façade designed for a clean, lasting presence.",
+        image: "photo-1545324418-cc1a3fa10c00",
+      },
+      {
+        eyebrow: "Living",
+        title: "Drawing Room",
+        description: "A bright, open living space built for everyday comfort.",
+        image: "photo-1591825729269-caeb344f6df2",
+      },
+      {
+        eyebrow: "Automation",
+        title: "Smart Home",
+        description: "Control locks, lighting, and more from your phone, anywhere.",
+        image: "photo-1558002038-1055907df827",
+      },
+      {
+        eyebrow: "Comfort",
+        title: "Bedroom",
+        description: "Spacious, well-lit bedrooms designed for a quiet rest.",
+        image: "photo-1616594039964-ae9021a400a0",
+      },
+      {
+        eyebrow: "Design",
+        title: "Modern Architecture",
+        description: "A masterpiece of contemporary design, featuring elegant brickwork, expansive balconies, and a structure built for modern living.",
+        image: "photo-1545324418-cc1a3fa10c00",
+      },
     ],
   },
   {

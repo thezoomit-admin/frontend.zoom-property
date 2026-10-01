@@ -131,10 +131,8 @@ function SelectScrollThumb({
     if (trackRange <= 0) return;
     const scrollRange = scrollHeight - clientHeight;
     const deltaY = event.clientY - dragRef.current.startY;
-    const el = viewport as HTMLDivElement;
-    // eslint-disable-next-line react-hooks/immutability
-    el.scrollTop =
-      dragRef.current.startScrollTop + (deltaY / trackRange) * scrollRange;
+    const top = dragRef.current.startScrollTop + (deltaY / trackRange) * scrollRange;
+    viewport.scrollTo({ top });
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {

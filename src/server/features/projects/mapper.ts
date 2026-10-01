@@ -50,6 +50,15 @@ export const toProject = (p: ApiProject): Project => ({
     percent: m.percent,
     completed: m.completed,
   })),
+  features: (p.features ?? []).map((f) => ({
+    eyebrow: f.eyebrow,
+    eyebrowBn: f.eyebrowBn,
+    title: f.title,
+    titleBn: f.titleBn,
+    description: f.description,
+    descriptionBn: f.descriptionBn,
+    image: mediaUrl(f.image),
+  })),
   agent: p.agent
     ? {
         id: p.agent._id,
