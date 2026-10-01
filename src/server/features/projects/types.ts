@@ -37,6 +37,10 @@ export interface ApiProject {
   images?: ApiMedia[];
   description?: string[];
   descriptionBn?: string[];
+  specs?: {
+    heroImage?: ApiMedia;
+    description?: string;
+  } | null;
   video?: {
     title?: string;
     titleBn?: string;

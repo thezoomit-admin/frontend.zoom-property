@@ -55,13 +55,17 @@ export function ProjectShowcase({
                 aria-label={alt}
                 className="block w-full cursor-pointer"
               >
+                {/* Banner shape (project banners are 1344x527), filled edge to
+                    edge — no empty bands. Other shapes are cropped to fit. */}
                 <ImageFrame
                   src={src}
                   alt={position === 0 ? alt : `${alt} — ${position + 1}`}
-                  ratio="video"
+                  ratio="auto"
+                  className="aspect-1344/527"
                   rounded="lg"
-                  hover="zoom"
+                  hover="none"
                   sizes="100vw"
+                  priority={position === 0}
                 />
               </button>
             </CarouselItem>

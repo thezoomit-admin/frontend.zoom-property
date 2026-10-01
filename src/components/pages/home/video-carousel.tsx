@@ -104,12 +104,12 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
         </div>
 
         {/* Prev / Next controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={scrollPrev}
             aria-label={prevLabel}
-            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-xs transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-transparent bg-primary text-primary-foreground shadow-md transition-all duration-200 hover:bg-primary/90 hover:shadow-lg active:scale-95 disabled:pointer-events-none disabled:opacity-40"
           >
             <Icon name="chevronLeft" size="sm" />
           </button>
@@ -117,7 +117,7 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
             type="button"
             onClick={scrollNext}
             aria-label={nextLabel}
-            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-foreground shadow-xs transition-all duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-transparent bg-primary text-primary-foreground shadow-md transition-all duration-200 hover:bg-primary/90 hover:shadow-lg active:scale-95 disabled:pointer-events-none disabled:opacity-40"
           >
             <Icon name="chevronRight" size="sm" />
           </button>
@@ -192,12 +192,15 @@ export function VideoCarousel({ videos, locale, dict }: VideoCarouselProps) {
                     </span>
                   </div>
 
-                  {/* Play — bottom-right corner, like the reference. */}
+                  {/* Play — centered and blinking */}
                   <span
                     aria-hidden
-                    className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform duration-300 ease-out group-hover:scale-110 sm:size-12"
+                    className="absolute inset-0 m-auto flex size-14 items-center justify-center sm:size-16"
                   >
-                    <Icon name="play" size="sm" className="ml-0.5 fill-current" />
+                    <span className="absolute inset-0 m-auto h-full w-full animate-ping rounded-full bg-primary/60" />
+                    <span className="relative flex h-full w-full items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform duration-300 ease-out group-hover:scale-110">
+                      <Icon name="play" size="md" className="ml-1 fill-current" />
+                    </span>
                   </span>
 
                   {/* Stretched trigger: the whole card opens the player. Last in the

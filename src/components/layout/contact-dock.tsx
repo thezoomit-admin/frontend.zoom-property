@@ -18,7 +18,9 @@ import { cn } from "@/lib/utils";
  * name, and a mouse held still gets it as a tooltip.
  *
  * Every cell is primary with a white icon — one brand strip, not three muted
- * glyphs. Hover darkens the cell slightly so the press still has a response.
+ * glyphs — except WhatsApp, which wears its own green so it reads as the app
+ * people already know, and keeps it on hover. The primary cells darken
+ * slightly on hover so the press still has a response.
  *
  * The call cell rings. Three cells that all sit still make the most valuable
  * one no easier to find than the other two, so the handset rocks — for about
@@ -49,13 +51,24 @@ export async function ContactDock() {
   // icons is noise, and a ringing envelope is nonsense.
   const ringAt = links.findIndex((link) => link.href.startsWith("tel:"));
 
+  // Icons come from the CMS as a keyword, a FontAwesome class or a whole
+  // `<i>` tag, so match on either the icon or the wa.me link.
+  const isWhatsapp = (link?: (typeof links)[number]) =>
+    !!link && /whatsapp|wa\.me/i.test(`${link.icon} ${link.href}`);
+
+  // WhatsApp gets its own green, rounded tile — the colour people already know
+  // from their phone — and keeps it on hover. Everything else stays on the
+  // primary strip.
+  const tileClass = (link?: (typeof links)[number]) =>
+    isWhatsapp(link) ? "rounded-lg bg-[#25D366]" : undefined;
+
   return (
     <nav
       aria-label={dict.nav.contact}
       // Flush to the edge, so the border runs top, left and bottom — there is
       // no right edge to draw, it is off the screen. Primary fill on the strip
       // itself so rounded corners never flash the page behind.
-      className="fixed top-1/2 right-0 z-40 hidden -translate-y-1/2 flex-col divide-y divide-white/25 overflow-hidden rounded-l-lg border border-r-0 border-primary bg-primary shadow-[-8px_0_28px_-14px] shadow-foreground/40 lg:flex"
+      className="fixed top-1/2 right-0 z-40 hidden -translate-y-1/2 flex-col overflow-hidden rounded-l-lg border border-r-0 border-primary bg-primary shadow-[-8px_0_28px_-14px] shadow-foreground/40 lg:flex"
     >
       <CallChime />
 
@@ -64,6 +77,12 @@ export async function ContactDock() {
         // Anything that leaves the site opens in its own tab; `tel:` and
         // `mailto:` hand off to an app and must not.
         const external = /^https?:/i.test(link.href);
+        const whatsapp = isWhatsapp(link);
+        const tile = tileClass(link);
+        // Hairline between cells, except either side of a rounded tile — a
+        // line cutting into its corners looks like a seam.
+        const next = links[index + 1];
+        const divider = next && !tile && !tileClass(next);
 
         return (
           <a
@@ -72,7 +91,11 @@ export async function ContactDock() {
             aria-label={link.label || undefined}
             title={link.label || undefined}
             {...(external ? { target: "_blank", rel: "noreferrer" } : undefined)}
-            className="group relative flex size-12 items-center justify-center bg-primary text-white transition-colors hover:bg-primary/90 focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-white"
+            className={cn(
+              "group relative flex size-12 items-center justify-center text-white transition-colors focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-white",
+              tile ?? "bg-primary hover:bg-primary/90",
+              divider && "border-b border-white/25",
+            )}
           >
             <span
               className={cn(
@@ -81,7 +104,11 @@ export async function ContactDock() {
                   "animate-(--animate-phone-ring) group-hover:animate-none motion-reduce:animate-none",
               )}
             >
-              <Icon name={link.icon} size="md" className="text-white" />
+              <Icon
+                name={link.icon}
+                size={whatsapp ? "lg" : "md"}
+                className="text-white"
+              />
             </span>
           </a>
         );

@@ -12,6 +12,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { VideoEmbed } from "@/components/media/video-embed";
 import { ProjectShowcase } from "@/components/pages/projects/project-showcase";
 import { ProjectFeatures } from "@/components/pages/projects/project-features";
+import { ProjectSpecs } from "@/components/pages/projects/project-specs";
 import { RelatedProjects } from "@/components/pages/projects/related-projects";
 import { ConsultantCard } from "@/components/pages/properties/consultant-card";
 import { AreaFacts } from "@/components/pages/properties/area-facts";
@@ -26,6 +27,7 @@ import { formatBdt } from "@/lib/format";
 import { FormatBdt } from "@/components/ui/format-bdt";
 import { getMapEmbedUrl } from "@/lib/utils";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 /** Prebuild every project detail so card clicks hit a warm page — no loading UI. */
 export const dynamic = "force-static";
@@ -133,99 +135,136 @@ export default async function ProjectDetailPage({
         ])}
       />
 
-      <Section
-        spacing="none"
-        className="bg-background pt-3 pb-12 sm:pt-4 sm:pb-20 lg:pb-24"
-      >
-        <h1 className="sr-only">
-          {project.name}, {project.area}
-        </h1>
+      {/* Specs shows only its own hero and write-up; everything else on the page belongs to Overview. */}
+      <Tabs defaultValue="overview" className="w-full gap-0">
+        <Section spacing="none" className="bg-background pt-3 sm:pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
+            <div>
+              <h3 className="text-xl text-primary font-bold tracking-tight ">
+                {project.name}
+              </h3>
 
-        <Reveal delay={0.08}>
-          <ProjectShowcase
-            images={project.images}
-            alt={`${project.name}, ${project.area}`}
-          />
-        </Reveal>
-
-        <div className={`mt-12 grid gap-10 ${agent ? "lg:grid-cols-[1.6fr_1fr]" : "lg:grid-cols-1"}`}>
-          <div className="flex flex-col gap-10">
-            <ProjectFeatures features={project.features} locale={lang} />
-            
-
-
-            <AreaFacts
-              areaName={project.area}
-              dict={{
-                heading: t.neighbourhood,
-                pricePerSqft: t.pricePerSqft,
-                rentalYield: t.rentalYield,
-                security: t.security,
-                metro: t.metro,
-                listingsHere: t.listingsHere,
-              }}
-            />
-          </div>
-
-          {agent && (
-            <aside className="lg:sticky lg:top-28 lg:self-start">
-              <ConsultantCard agent={agent} locale={lang} />
-            </aside>
-          )}
-        </div>
-      </Section>
-
-      <Section className="border-t border-border bg-footer pt-14 pb-14 sm:pt-16 sm:pb-16">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <span className="font-heading text-xs font-bold tracking-wider text-footer-foreground/60 uppercase">
-              {t.videoLabel}
-            </span>
-
-            <Heading as="h2" size="h3" className="text-footer-foreground">
-              {lang === "bn" ? project.video.titleBn : project.video.title}
-            </Heading>
-
-            <Text className="max-w-2xl text-footer-foreground/70">{t.videoLead}</Text>
-          </div>
-
-          <VideoEmbed
-            url={project.video.youtubeUrl}
-            title={lang === "bn" ? project.video.titleBn : project.video.title}
-            poster={project.video.poster}
-            className="overflow-hidden rounded-lg"
-          />
-        </div>
-      </Section>
-
-      {project.mapUrl ? (
-        <Section className="border-t border-border">
-          <Heading as="h2" size="h3" className="mb-8">
-            {t.neighbourhood}
-          </Heading>
-          <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
-            <iframe
-              src={getMapEmbedUrl(project.mapUrl, lang)}
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+            </div>
+            <TabsList className="h-10! rounded-full border border-border bg-muted/60 p-1">
+              {[
+                { value: "overview", label: "Overview" },
+                { value: "specs", label: "Specs" },
+              ].map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="rounded-full px-5 text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
           </div>
         </Section>
-      ) : null}
 
-      <Suspense fallback={null}>
-        <RelatedProjects
-          excludeSlug={project.slug}
-          locale={lang}
-          title={t.others}
-        />
-      </Suspense>
+        <TabsContent value="overview" className="mt-0 outline-none">
+          <Section
+            spacing="none"
+            className="bg-background pb-12 sm:pb-20 lg:pb-24"
+          >
+            <Reveal delay={0.08}>
+              <ProjectShowcase
+                images={project.images}
+                alt={`${project.name}, ${project.area}`}
+              />
+            </Reveal>
 
-      <ContactCta tone="surface" />
+            <div className={`mt-12 grid gap-10 ${agent ? "lg:grid-cols-[1.6fr_1fr]" : "lg:grid-cols-1"}`}>
+              <div className="flex flex-col gap-10">
+                <ProjectFeatures features={project.features} locale={lang} />
+
+                <AreaFacts
+                  areaName={project.area}
+                  dict={{
+                    heading: t.neighbourhood,
+                    pricePerSqft: t.pricePerSqft,
+                    rentalYield: t.rentalYield,
+                    security: t.security,
+                    metro: t.metro,
+                    listingsHere: t.listingsHere,
+                  }}
+                />
+              </div>
+
+              {agent && (
+                <aside className="lg:sticky lg:top-28 lg:self-start">
+                  <ConsultantCard agent={agent} locale={lang} />
+                </aside>
+              )}
+            </div>
+          </Section>
+
+          <Section className="border-t border-border bg-footer pt-14 pb-14 sm:pt-16 sm:pb-16">
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <span className="font-heading text-xs font-bold tracking-wider text-footer-foreground/60 uppercase">
+                  {t.videoLabel}
+                </span>
+
+                <Heading as="h2" size="h3" className="text-footer-foreground">
+                  {lang === "bn" ? project.video.titleBn : project.video.title}
+                </Heading>
+
+                <Text className="max-w-2xl text-footer-foreground/70">{t.videoLead}</Text>
+              </div>
+
+              <VideoEmbed
+                url={project.video.youtubeUrl}
+                title={lang === "bn" ? project.video.titleBn : project.video.title}
+                poster={project.video.poster}
+                className="overflow-hidden rounded-lg"
+              />
+            </div>
+          </Section>
+
+          {project.mapUrl ? (
+            <Section className="border-t border-border">
+              <Heading as="h2" size="h3" className="mb-8">
+                {t.neighbourhood}
+              </Heading>
+              <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
+                <iframe
+                  src={getMapEmbedUrl(project.mapUrl, lang)}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen={true}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </Section>
+          ) : null}
+
+          <Suspense fallback={null}>
+            <RelatedProjects
+              excludeSlug={project.slug}
+              locale={lang}
+              title={t.others}
+            />
+          </Suspense>
+
+          <ContactCta tone="surface" />
+        </TabsContent>
+
+        <TabsContent value="specs" className="mt-0 outline-none">
+          <Section
+            spacing="none"
+            className="bg-background pb-12 sm:pb-20 lg:pb-24"
+          >
+            <ProjectSpecs
+              name={project.name}
+              image={project.specs?.heroImage}
+              html={project.specs?.description || undefined}
+            />
+          </Section>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }

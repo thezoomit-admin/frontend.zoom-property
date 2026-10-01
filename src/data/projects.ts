@@ -54,6 +54,11 @@ export interface Project {
   /** The long write-up on the project page, one string per paragraph. */
   description: string[];
   descriptionBn?: string[];
+  /** The "Specs" tab: its own hero and a rich-text (HTML) write-up. */
+  specs?: {
+    heroImage: string;
+    description: string;
+  };
   /**
    * The site walkthrough. Filmed on the visit that produced `lastInspected`,
    * so the footage and the percentages above it describe the same day.

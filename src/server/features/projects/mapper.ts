@@ -30,6 +30,10 @@ export const toProject = (p: ApiProject): Project => ({
   images: gallery(p.coverImage, p.images),
   description: paragraphs(p.description),
   descriptionBn: paragraphs(p.descriptionBn),
+  specs: {
+    heroImage: mediaUrl(p.specs?.heroImage),
+    description: p.specs?.description || "",
+  },
   video: {
     title: p.video?.title || "",
     titleBn: p.video?.titleBn || "",

@@ -55,8 +55,8 @@ export function ProjectCard({
         className={cn(
           "scroll-mt-24",
           "group relative flex h-full flex-col overflow-hidden rounded-lg border border-border/60 bg-card transition-all duration-300 ease-out",
-          "shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)]",
-          "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_2px_4px_rgba(27,35,24,0.06),0_20px_40px_-12px_rgba(75,128,45,0.3)]",
+          "shadow-md shadow-primary/10",
+          "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/25",
           className,
         )}
       >
@@ -64,7 +64,7 @@ export function ProjectCard({
         <ImageFrame
           src={project.image}
           alt={`${displayName}, ${project.area}`}
-          ratio="4/3"
+          ratio="square"
           rounded="none"
           sizes="third"
         >
@@ -118,62 +118,24 @@ export function ProjectCard({
 
         {/* ── Body ──────────────────────────────────────────────────── */}
         <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-4">
-          {/* Price + handover */}
-          <div className="flex items-end justify-between gap-3">
-            <div className="flex flex-col">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Starting from
-              </span>
-              <span className="font-heading text-h4 font-bold tracking-tight text-primary">
-                <FormatBdt value={project.startingPrice} />
-              </span>
-            </div>
-            <div className="flex flex-col items-end text-right">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Handover
-              </span>
-              <span className="flex items-center gap-1 text-sm font-bold text-foreground">
-                <Icon name="handover" size="xs" className="text-primary" />
-                {project.handover}
-              </span>
-            </div>
-          </div>
 
           {/* Sizes */}
-          <div className="mt-auto flex items-center gap-2 text-sm text-muted-foreground">
-            <Icon name="area" size="xs" className="text-primary" />
-            <span className="font-medium text-foreground">{project.sizeRange}</span>
-            <span className="text-xs">floor sizes</span>
-          </div>
-        </div>
+          <div className="mt-auto flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Icon name="area" size="xs" className="text-primary" />
+              <span className="font-medium text-foreground">{project.sizeRange}</span>
+              <span className="text-xs">floor sizes</span>
+            </div>
 
-        {/* ── Footer ────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between gap-2 border-t border-border/70 px-5 py-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <span
-              className={cn(
-                "flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold",
-                project.unitsLeft <= 5
-                  ? "bg-red-50 text-red-700"
-                  : "bg-secondary text-secondary-foreground",
-              )}
-            >
-              <Icon name="building" size="xs" className="size-3" />
-              {project.unitsLeft} of {project.units} left
-            </span>
-            <span className="truncate text-[11px] text-muted-foreground">
-              {soldPercent}% booked
+            <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
+              <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 group-hover:max-w-24 group-hover:opacity-100">
+                View project
+              </span>
+              <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary group-hover:text-white">
+                <Icon name="arrowRight" size="xs" />
+              </span>
             </span>
           </div>
-
-          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-primary">
-            <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 group-hover:max-w-24 group-hover:opacity-100">
-              View project
-            </span>
-            <span className="flex size-7 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary group-hover:text-white">
-              <Icon name="arrowRight" size="xs" />
-            </span>
-          </span>
         </div>
       </article>
     </Link>
