@@ -15,7 +15,6 @@ import { ProjectFilms } from "@/components/pages/landing/project-films";
 import { ProjectGallery } from "@/components/pages/landing/project-gallery";
 import { ProjectResidence } from "@/components/pages/landing/project-residence";
 import { ProjectReviews } from "@/components/pages/landing/project-reviews";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,

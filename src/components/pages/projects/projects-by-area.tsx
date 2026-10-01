@@ -112,9 +112,10 @@ export function ProjectsByArea({
         <TabsContent value={activeArea} className="flex flex-col gap-8">
           {/* ── Featured project for the selected area ─────────────────── */}
           {featured ? (
-            <div
+            <Link
               key={featured.id}
-              className="grid overflow-hidden rounded-2xl border border-border/60 bg-card shadow-xs sm:grid-cols-2"
+              href={localeHref(locale, `/projects/${featured.slug}`)}
+              className="grid overflow-hidden rounded-2xl border border-border/60 bg-card shadow-lg shadow-primary/10 sm:grid-cols-2 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/25"
             >
               <ImageFrame
                 src={featured.image}
@@ -131,15 +132,17 @@ export function ProjectsByArea({
                   {locale === "bn" && featured.nameBn ? featured.nameBn : featured.name}
                 </Heading>
                 {featured.description[0] ? (
-                  <p className="line-clamp-3 text-sm text-muted-foreground">
-                    {locale === "bn" && featured.descriptionBn?.[0]
-                      ? featured.descriptionBn[0]
-                      : featured.description[0]}
-                  </p>
+                  <div
+                    className="line-clamp-3 text-sm text-muted-foreground prose prose-sm prose-p:my-0"
+                    dangerouslySetInnerHTML={{
+                      __html: locale === "bn" && featured.descriptionBn?.[0]
+                        ? featured.descriptionBn[0]
+                        : featured.description[0]
+                    }}
+                  />
                 ) : null}
-                <Link
-                  href={localeHref(locale, `/projects/${featured.slug}`)}
-                  className="group mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                <div
+                  className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors group-hover:bg-primary/90"
                 >
                   {isBn ? "বিস্তারিত দেখুন" : "Learn More"}
                   <Icon
@@ -147,9 +150,9 @@ export function ProjectsByArea({
                     size="xs"
                     className="transition-transform duration-300 group-hover:translate-x-1"
                   />
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ) : (
             <div className="rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
               {isBn

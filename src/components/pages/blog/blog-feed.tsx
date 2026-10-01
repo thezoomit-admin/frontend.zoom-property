@@ -35,7 +35,7 @@ interface BlogFeedProps {
 }
 
 /** Articles per page — three rows of the three-up grid. */
-const PER_PAGE = 9;
+
 
 export function BlogFeed({ insights, backendCategories, totalPages, locale, t }: BlogFeedProps) {
   const router = useRouter();

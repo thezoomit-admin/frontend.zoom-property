@@ -34,6 +34,7 @@ const LOCALE_COOKIE = "locale";
  * an old "bn" cookie — reading it back would lock that visitor out of the
  * only language the site offers now.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function pickLocale(_request: NextRequest) {
   return DEFAULT_LOCALE;
 }

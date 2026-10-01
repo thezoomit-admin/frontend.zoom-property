@@ -30,6 +30,10 @@ export const toProject = (p: ApiProject): Project => ({
   images: gallery(p.coverImage, p.images),
   description: paragraphs(p.description),
   descriptionBn: paragraphs(p.descriptionBn),
+  specs: {
+    heroImage: mediaUrl(p.specs?.heroImage),
+    description: p.specs?.description || "",
+  },
   video: {
     title: p.video?.title || "",
     titleBn: p.video?.titleBn || "",
@@ -49,6 +53,15 @@ export const toProject = (p: ApiProject): Project => ({
     label: m.label,
     percent: m.percent,
     completed: m.completed,
+  })),
+  features: (p.features ?? []).map((f) => ({
+    eyebrow: f.eyebrow,
+    eyebrowBn: f.eyebrowBn,
+    title: f.title,
+    titleBn: f.titleBn,
+    description: f.description,
+    descriptionBn: f.descriptionBn,
+    image: mediaUrl(f.image),
   })),
   agent: p.agent
     ? {

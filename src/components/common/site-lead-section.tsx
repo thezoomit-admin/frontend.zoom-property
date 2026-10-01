@@ -23,16 +23,20 @@ const DEFAULT_MAP_EMBED =
 /**
  * Site-wide lead: left channels · middle form · right map.
  * Form stays mid-width so the block doesn't stretch too wide.
+ * Project detail pages pass `project`, which turns the form into a lead for
+ * that project instead of a general area enquiry.
  */
 export async function SiteLeadSection({
   source = "site-lead",
+  project,
 }: {
   source?: string;
+  project?: { name: string; slug: string };
 }) {
   const locale = await getLocale();
   const [dict, areaOptions] = await Promise.all([
     getDictionary(),
-    getLeadAreaOptions(locale, 60),
+    project ? Promise.resolve([]) : getLeadAreaOptions(locale, 60),
   ]);
 
   const c = dict.contact.channels;
@@ -191,12 +195,14 @@ export async function SiteLeadSection({
                   privacy: f.privacy,
                   successTitle: f.successTitle,
                   successBody: f.successBody,
+                  project: locale === "bn" ? "প্রকল্প" : "Project",
                 }}
                 areas={areaOptions}
-                source={source}
+                project={project?.name}
+                source={project ? `project-${project.slug}` : source}
                 subject="Website lead enquiry"
                 idPrefix="site-lead"
-                trackName="Site lead"
+                trackName={project ? project.name : "Site lead"}
                 formClassName="h-full shadow-sm sm:p-5"
               />
             </div>

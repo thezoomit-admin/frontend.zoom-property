@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "@/components/common/image";
 
 import { Icon } from "@/components/common/icon";
 import { ImageFrame } from "@/components/media/image-frame";
@@ -23,6 +24,10 @@ export interface VideoEmbedProps {
  * Lite YouTube / Vimeo embed. Renders a poster + play button and only injects
  * the provider iframe after a click — no third-party JS, cookies or ~1MB of
  * player payload on first load.
+ *
+ * When `ratio="auto"` the caller's `className` must supply the aspect/height
+ * (e.g. `className="aspect-[21/6]"`). The poster and iframe then fill that
+ * container edge-to-edge with `object-cover`.
  */
 export function VideoEmbed({
   url,
@@ -35,18 +40,22 @@ export function VideoEmbed({
   const [active, setActive] = useState(false);
   const id = parseVideoId(url, provider);
   const thumbnail = poster ?? (provider === "youtube" ? youtubeThumbnail(id) : undefined);
+  const isAuto = ratio === "auto";
 
   if (active) {
+    const src = embedUrl(id, provider);
     return (
       <div className={cn("relative overflow-hidden rounded-xl bg-black", className)}>
-        <div className="aspect-video">
-          <iframe
-            src={embedUrl(id, provider)}
-            title={title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="size-full"
-          />
+        <div className={isAuto ? "absolute inset-0" : "aspect-video"}>
+          {src ? (
+            <iframe
+              src={src}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="size-full"
+            />
+          ) : null}
         </div>
       </div>
     );
@@ -57,23 +66,40 @@ export function VideoEmbed({
       type="button"
       onClick={() => setActive(true)}
       aria-label={`Play video: ${title}`}
-      className={cn("group/video block w-full cursor-pointer", className)}
+      className={cn("group/video relative block w-full cursor-pointer overflow-hidden", className)}
     >
-      {thumbnail ? (
+      {isAuto ? (
+        // Caller's className supplies the aspect ratio / height.
+        // Fill the box with object-cover — no bg-muted bleed.
+        <>
+          {thumbnail && (
+            <Image
+              src={thumbnail}
+              alt={title}
+              fill
+              sizes="100vw"
+              className="object-cover object-center"
+              quality={90}
+            />
+          )}
+          {/* dark gradient overlay */}
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"
+          />
+          <PlayBadge />
+        </>
+      ) : (
         <ImageFrame
-          src={thumbnail}
+          src={thumbnail ?? ""}
           alt={title}
           ratio={ratio}
           sizes="full"
-          hover="zoom"
+          hover="none"
           overlay
         >
           <PlayBadge />
         </ImageFrame>
-      ) : (
-        <div className="relative aspect-video overflow-hidden rounded-xl bg-muted">
-          <PlayBadge />
-        </div>
       )}
     </button>
   );

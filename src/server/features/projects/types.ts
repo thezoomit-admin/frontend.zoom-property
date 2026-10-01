@@ -37,6 +37,10 @@ export interface ApiProject {
   images?: ApiMedia[];
   description?: string[];
   descriptionBn?: string[];
+  specs?: {
+    heroImage?: ApiMedia;
+    description?: string;
+  } | null;
   video?: {
     title?: string;
     titleBn?: string;
@@ -50,6 +54,15 @@ export interface ApiProject {
   isFooter?: boolean;
   rajukPermitNo?: string;
   milestones?: { label: string; percent: number; completed: boolean }[];
+  features?: {
+    eyebrow?: string;
+    eyebrowBn?: string;
+    title: string;
+    titleBn?: string;
+    description?: string;
+    descriptionBn?: string;
+    image?: ApiMedia;
+  }[];
   agent?: ApiAgent;
 }
 

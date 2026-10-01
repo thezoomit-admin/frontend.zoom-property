@@ -31,6 +31,9 @@ export interface ImageFrameProps
  * The standard image. Wraps `next/image` with a locked aspect-ratio scale, a
  * shimmer blur placeholder and the hover treatments used across the site, so
  * media never ships without a ratio, `sizes` or a placeholder.
+ *
+ * When `ratio="auto"` the container has no forced height — the image renders at
+ * its natural intrinsic size (no cropping, no distortion).
  */
 export function ImageFrame({
   ratio = "video",
@@ -48,6 +51,8 @@ export function ImageFrame({
   const resolvedSizes =
     sizes in IMAGE_SIZES ? IMAGE_SIZES[sizes as keyof typeof IMAGE_SIZES] : (sizes as string);
 
+  const isAuto = ratio === "auto";
+
   return (
     <figure
       className={cn(
@@ -60,21 +65,43 @@ export function ImageFrame({
         className,
       )}
     >
-      <Image
-        alt={alt}
-        fill
-        sizes={resolvedSizes}
-        placeholder="blur"
-        blurDataURL={blurDataURL ?? shimmerDataUrl()}
-        className={cn(
-          "object-cover object-center",
-          hover === "zoom" &&
-            "transition-transform duration-700 ease-out-expo group-hover/frame:scale-105",
-          imageClassName,
-        )}
-        {...props}
-        quality={90}
-      />
+      {isAuto ? (
+        // Natural rendering — image dictates height, no forced aspect ratio box.
+        // unoptimized lets CSS h-auto w-full render at the image's real dimensions.
+        <Image
+          alt={alt}
+          width={1920}
+          height={1080}
+          unoptimized
+          sizes={resolvedSizes}
+          placeholder="blur"
+          blurDataURL={blurDataURL ?? shimmerDataUrl()}
+          className={cn(
+            "h-auto w-full",
+            hover === "zoom" &&
+              "transition-transform duration-700 ease-out-expo group-hover/frame:scale-105",
+            imageClassName,
+          )}
+          {...props}
+          quality={90}
+        />
+      ) : (
+        <Image
+          alt={alt}
+          fill
+          sizes={resolvedSizes}
+          placeholder="blur"
+          blurDataURL={blurDataURL ?? shimmerDataUrl()}
+          className={cn(
+            "object-cover object-center",
+            hover === "zoom" &&
+              "transition-transform duration-700 ease-out-expo group-hover/frame:scale-105",
+            imageClassName,
+          )}
+          {...props}
+          quality={90}
+        />
+      )}
 
       {overlay ? (
         <div

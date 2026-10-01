@@ -30,3 +30,31 @@ export const cn = createCn({
     },
   },
 });
+
+/**
+ * Standardize Google Maps URLs to embeddable iframes.
+ * Extracts from pasted iframes, or converts share links to output=embed.
+ */
+export function getMapEmbedUrl(url: string, lang: string = "en"): string {
+  if (!url) return "";
+  
+  const iframeMatch = url.match(/src="([^"]+)"/);
+  if (iframeMatch) return iframeMatch[1];
+  
+  if (url.includes("output=embed") || url.includes("/embed")) return url;
+  
+  const llMatch = url.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (llMatch) return `https://maps.google.com/maps?q=${llMatch[1]},${llMatch[2]}&hl=${lang}&z=14&output=embed`;
+  
+  const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (atMatch) return `https://maps.google.com/maps?q=${atMatch[1]},${atMatch[2]}&hl=${lang}&z=14&output=embed`;
+  
+  const placeMatch = url.match(/\/place\/([^/]+)/);
+  if (placeMatch) return `https://maps.google.com/maps?q=${placeMatch[1]}&hl=${lang}&z=14&output=embed`;
+  
+  const qMatch = url.match(/[?&]q=([^&]+)/);
+  if (qMatch) return `https://maps.google.com/maps?q=${qMatch[1]}&hl=${lang}&z=14&output=embed`;
+
+  // Fallback: try appending output=embed
+  return url + (url.includes("?") ? "&" : "?") + "output=embed";
+}
