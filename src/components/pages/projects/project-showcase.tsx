@@ -44,7 +44,7 @@ export function ProjectShowcase({
     <>
       <Carousel
         opts={{ loop: images.length > 1, align: "start" }}
-        className={cn("mx-auto w-full max-w-7xl", className)}
+        className={cn("w-full", className)}
       >
         <CarouselContent>
           {images.map((src, position) => (

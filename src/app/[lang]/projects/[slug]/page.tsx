@@ -88,10 +88,7 @@ export default async function ProjectDetailPage({
 
   const { project } = found;
   const t = dict.projectDetail;
-  const neighbourhoodDescription =
-    lang === "bn" && project.descriptionBn?.length
-      ? project.descriptionBn
-      : project.description;
+  const neighbourhoodDescription = project.description;
 
   const agent = project.agent;
   const path = `/projects/${slug}`;
@@ -179,7 +176,7 @@ export default async function ProjectDetailPage({
           </Section>
 
           <Section className="border-t border-border bg-footer pt-8 pb-8 sm:pt-10 sm:pb-10">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 px-4 sm:px-6 lg:px-[90px]">
               <div className="flex flex-col gap-1">
                 <span className="font-heading text-xs font-bold tracking-wider text-footer-foreground/60 uppercase">
                   {t.videoLabel}
@@ -202,40 +199,42 @@ export default async function ProjectDetailPage({
 
           {project.mapUrl || project.description?.length || project.descriptionBn?.length ? (
             <Section className="border-t border-border">
-              <Heading as="h2" size="h3" className="mb-8">
-                {t.neighbourhood}
-              </Heading>
-              <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
-                {project.mapUrl ? (
-                  <div className="aspect-video w-full overflow-hidden rounded-2xl bg-muted/30">
-                    <iframe
-                      src={getMapEmbedUrl(project.mapUrl, lang)}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen={true}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`${project.area} ${t.neighbourhood}`}
-                    />
-                  </div>
-                ) : null}
-                {neighbourhoodDescription?.length ? (
-                  <div className="space-y-4 text-base leading-8 text-foreground/80 sm:text-lg">
-                    {neighbourhoodDescription.map((paragraph, index) =>
-                      paragraph.trim().startsWith("<") ? (
-                        <RichText
-                          key={`${index}-${paragraph.slice(0, 24)}`}
-                          html={paragraph}
-                        />
-                      ) : (
-                        <p key={`${index}-${paragraph.slice(0, 24)}`}>
-                          {paragraph}
-                        </p>
-                      ),
-                    )}
-                  </div>
-                ) : null}
+              <div className="px-4 sm:px-6 lg:px-[90px]">
+                <Heading as="h2" size="h3" className="mb-8">
+                  {t.neighbourhood}
+                </Heading>
+                <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
+                  {project.mapUrl ? (
+                    <div className="aspect-video w-full overflow-hidden rounded-2xl bg-muted/30">
+                      <iframe
+                        src={getMapEmbedUrl(project.mapUrl, lang)}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`${project.area} ${t.neighbourhood}`}
+                      />
+                    </div>
+                  ) : null}
+                  {neighbourhoodDescription?.length ? (
+                    <div className="space-y-4 text-base leading-8 text-foreground/80 sm:text-lg">
+                      {neighbourhoodDescription.map((paragraph, index) =>
+                        paragraph.trim().startsWith("<") ? (
+                          <RichText
+                            key={`${index}-${paragraph.slice(0, 24)}`}
+                            html={paragraph}
+                          />
+                        ) : (
+                          <p key={`${index}-${paragraph.slice(0, 24)}`}>
+                            {paragraph}
+                          </p>
+                        ),
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </Section>
           ) : null}
