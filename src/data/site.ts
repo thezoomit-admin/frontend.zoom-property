@@ -18,7 +18,7 @@ export const siteConfig = {
  * Header navigation. Four items, on purpose.
  *
  * Labels live in the dictionaries, not here — `key` indexes `dict.nav`. `href`
- * is locale-less; `localeHref()` prefixes it at render time.
+ * is locale-less; `localeHref()` normalizes legacy locale-prefixed paths.
  */
 export const mainNav = [
   { key: "properties", href: "/properties" },

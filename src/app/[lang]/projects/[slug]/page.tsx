@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { Heading } from "@/components/common/heading";
-import { type IconName } from "@/components/common/icon";
 import { JsonLd } from "@/components/common/json-ld";
+import { RichText } from "@/components/common/rich-text";
 import { Section } from "@/components/common/section";
-import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
 import { VideoEmbed } from "@/components/media/video-embed";
 import { ProjectShowcase } from "@/components/pages/projects/project-showcase";
@@ -25,7 +23,6 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { getProjectBySlug, getProjects } from "@/server/features/projects";
 import { formatBdt } from "@/lib/format";
-import { FormatBdt } from "@/components/ui/format-bdt";
 import { getMapEmbedUrl } from "@/lib/utils";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -92,31 +89,10 @@ export default async function ProjectDetailPage({
 
   const { project } = found;
   const t = dict.projectDetail;
+  const neighbourhoodDescription = project.description;
 
   const agent = project.agent;
-  const path = `/${lang}/projects/${slug}`;
-
-  const sold = project.units - project.unitsLeft;
-  const bookedPercent = Math.round((sold / project.units) * 100);
-
-  const facts: { icon: IconName; label: string; value: React.ReactNode }[] = [
-    { icon: "trend", label: t.startingFrom, value: <FormatBdt value={project.startingPrice} /> },
-    { icon: "area", label: t.sizes, value: project.sizeRange },
-    {
-      icon: "building",
-      label: t.units,
-      value: t.unitsLeft
-        .replace("{left}", String(project.unitsLeft))
-        .replace("{total}", String(project.units)),
-    },
-    {
-      icon: "check",
-      label: t.booked.replace("{percent}", String(bookedPercent)),
-      value: `${sold}/${project.units}`,
-    },
-    { icon: "construction", label: t.status, value: project.status },
-    { icon: "handover", label: t.handover, value: project.handover },
-  ];
+  const path = `/projects/${slug}`;
 
   const crumbs = [
     { name: t.home, href: localeHref(lang, "/") },
@@ -201,7 +177,7 @@ export default async function ProjectDetailPage({
           </Section>
 
           <Section className="border-t border-border bg-footer pt-8 pb-8 sm:pt-10 sm:pb-10">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 px-4 sm:px-6 lg:px-[90px]">
               <div className="flex flex-col gap-1">
                 <span className="font-heading text-xs font-bold tracking-wider text-footer-foreground/60 uppercase">
                   {t.videoLabel}
@@ -222,21 +198,44 @@ export default async function ProjectDetailPage({
             </div>
           </Section>
 
-          {project.mapUrl ? (
+          {project.mapUrl || project.description?.length || project.descriptionBn?.length ? (
             <Section className="border-t border-border">
-              <Heading as="h2" size="h3" className="mb-8">
-                {t.neighbourhood}
-              </Heading>
-              <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
-                <iframe
-                  src={getMapEmbedUrl(project.mapUrl, lang)}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={true}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
+              <div className="px-4 sm:px-6 lg:px-[90px]">
+                <Heading as="h2" size="h3" className="mb-8">
+                  {t.neighbourhood}
+                </Heading>
+                <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
+                  {project.mapUrl ? (
+                    <div className="aspect-video w-full overflow-hidden rounded-2xl bg-muted/30">
+                      <iframe
+                        src={getMapEmbedUrl(project.mapUrl, lang)}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`${project.area} ${t.neighbourhood}`}
+                      />
+                    </div>
+                  ) : null}
+                  {neighbourhoodDescription?.length ? (
+                    <div className="space-y-4 text-base leading-8 text-foreground/80 sm:text-lg">
+                      {neighbourhoodDescription.map((paragraph, index) =>
+                        paragraph.trim().startsWith("<") ? (
+                          <RichText
+                            key={`${index}-${paragraph.slice(0, 24)}`}
+                            html={paragraph}
+                          />
+                        ) : (
+                          <p key={`${index}-${paragraph.slice(0, 24)}`}>
+                            {paragraph}
+                          </p>
+                        ),
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </Section>
           ) : null}
@@ -259,8 +258,9 @@ export default async function ProjectDetailPage({
           >
             <ProjectSpecs
               name={project.name}
-              image={project.specs?.heroImage}
-              html={project.specs?.description || undefined}
+              sections={project.specs?.descriptions}
+              legacyHtml={project.specs?.description || undefined}
+              locale={lang}
             />
           </Section>
         </TabsContent>

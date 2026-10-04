@@ -32,6 +32,7 @@ export const toProject = (p: ApiProject): Project => ({
   descriptionBn: paragraphs(p.descriptionBn),
   specs: {
     heroImage: mediaUrl(p.specs?.heroImage),
+    descriptions: p.specs?.descriptions || [],
     description: p.specs?.description || "",
   },
   video: {
