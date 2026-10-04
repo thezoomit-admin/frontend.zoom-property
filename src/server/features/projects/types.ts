@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { IProjectDescription } from "@/data/projects";
+
 import type { ApiMedia } from "../../base-api";
 
 export interface ApiAgent {
@@ -39,6 +41,7 @@ export interface ApiProject {
   descriptionBn?: string[];
   specs?: {
     heroImage?: ApiMedia;
+    descriptions?: IProjectDescription[];
     description?: string;
   } | null;
   video?: {

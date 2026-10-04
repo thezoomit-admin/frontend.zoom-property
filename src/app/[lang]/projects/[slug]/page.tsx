@@ -259,7 +259,9 @@ export default async function ProjectDetailPage({
             <ProjectSpecs
               name={project.name}
               image={project.specs?.heroImage}
-              html={project.specs?.description || undefined}
+              sections={project.specs?.descriptions}
+              legacyHtml={project.specs?.description || undefined}
+              locale={lang}
             />
           </Section>
         </TabsContent>

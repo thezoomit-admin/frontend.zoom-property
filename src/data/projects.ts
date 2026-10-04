@@ -10,6 +10,13 @@ export interface ConstructionMilestone {
   completed: boolean;
 }
 
+export interface IProjectDescription {
+  title: string;
+  titleBn?: string;
+  description: string;
+  descriptionBn?: string;
+}
+
 export interface Agent {
   id: string;
   name: string;
@@ -54,10 +61,12 @@ export interface Project {
   /** The long write-up on the project page, one string per paragraph. */
   description: string[];
   descriptionBn?: string[];
-  /** The "Specs" tab: its own hero and a rich-text (HTML) write-up. */
+  /** The "Specs" tab: its own hero and titled rich-text sections. */
   specs?: {
     heroImage: string;
-    description: string;
+    descriptions?: IProjectDescription[];
+    /** Legacy rich-text write-up for projects created before sectioned specs. */
+    description?: string;
   };
   /**
    * The site walkthrough. Filmed on the visit that produced `lastInspected`,
