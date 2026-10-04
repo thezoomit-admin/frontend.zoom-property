@@ -103,7 +103,7 @@ export default async function PropertyDetailPage({
   const similar = similarProperties(property);
   const isSold = property.status === "sold";
   const isRent = property.purpose === "rent";
-  const path = `/${lang}/properties/${slug}`;
+  const path = `/properties/${slug}`;
 
   const facts: { icon: IconName; label: string; value: string }[] = [
     ...(property.beds > 0

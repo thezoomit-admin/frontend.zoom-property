@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: `${siteConfig.name} — ${dict.meta.tagline}`,
       description: dict.meta.description,
-      url: `/${locale}`,
+      url: "/",
       siteName: siteConfig.name,
       locale: LOCALE_TAGS[locale].replace("-", "_"),
       type: "website",
