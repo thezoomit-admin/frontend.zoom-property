@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { Heading } from "@/components/common/heading";
-import { Icon, type IconName } from "@/components/common/icon";
 import { JsonLd } from "@/components/common/json-ld";
+import { RichText } from "@/components/common/rich-text";
 import { Section } from "@/components/common/section";
 import { Reveal } from "@/components/motion/reveal";
 import { VideoEmbed } from "@/components/media/video-embed";
@@ -22,7 +22,6 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { localeHref } from "@/i18n/href";
 import { getProjectBySlug, getProjects } from "@/server/features/projects";
 import { formatBdt } from "@/lib/format";
-import { FormatBdt } from "@/components/ui/format-bdt";
 import { getMapEmbedUrl } from "@/lib/utils";
 import { absoluteUrl, breadcrumbSchema, projectSchema } from "@/lib/seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -89,31 +88,13 @@ export default async function ProjectDetailPage({
 
   const { project } = found;
   const t = dict.projectDetail;
+  const neighbourhoodDescription =
+    lang === "bn" && project.descriptionBn?.length
+      ? project.descriptionBn
+      : project.description;
 
   const agent = project.agent;
   const path = `/projects/${slug}`;
-
-  const sold = project.units - project.unitsLeft;
-  const bookedPercent = Math.round((sold / project.units) * 100);
-
-  const facts: { icon: IconName; label: string; value: React.ReactNode }[] = [
-    { icon: "trend", label: t.startingFrom, value: <FormatBdt value={project.startingPrice} /> },
-    { icon: "area", label: t.sizes, value: project.sizeRange },
-    {
-      icon: "building",
-      label: t.units,
-      value: t.unitsLeft
-        .replace("{left}", String(project.unitsLeft))
-        .replace("{total}", String(project.units)),
-    },
-    {
-      icon: "check",
-      label: t.booked.replace("{percent}", String(bookedPercent)),
-      value: `${sold}/${project.units}`,
-    },
-    { icon: "construction", label: t.status, value: project.status },
-    { icon: "handover", label: t.handover, value: project.handover },
-  ];
 
   const crumbs = [
     { name: t.home, href: localeHref(lang, "/") },
@@ -172,32 +153,6 @@ export default async function ProjectDetailPage({
               />
             </Reveal>
 
-            {project.description?.length ? (
-              <div className="mt-12">
-                <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:gap-12 xl:gap-16">
-                  <div className="space-y-5 text-lg leading-8 text-foreground/80">
-                    {project.description.slice(0, 3).map((paragraph, index) => (
-                      <p key={`${paragraph.slice(0, 24)}-${index}`}>{paragraph}</p>
-                    ))}
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-                    {facts.slice(0, 4).map(({ label, value, icon }) => (
-                      <div key={label} className="rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5">
-                        <div className="mb-2 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-background text-primary">
-                            <Icon name={icon} size="xs" />
-                          </span>
-                          {label}
-                        </div>
-                        <div className="text-base font-medium text-foreground">{value}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
             <div className={`mt-12 grid gap-10 ${agent ? "lg:grid-cols-[1.6fr_1fr]" : "lg:grid-cols-1"}`}>
               <div className="flex flex-col gap-10">
                 <ProjectFeatures features={project.features} locale={lang} />
@@ -245,21 +200,42 @@ export default async function ProjectDetailPage({
             </div>
           </Section>
 
-          {project.mapUrl ? (
+          {project.mapUrl || project.description?.length || project.descriptionBn?.length ? (
             <Section className="border-t border-border">
               <Heading as="h2" size="h3" className="mb-8">
                 {t.neighbourhood}
               </Heading>
-              <div className="aspect-video w-full overflow-hidden rounded-lg bg-muted/30">
-                <iframe
-                  src={getMapEmbedUrl(project.mapUrl, lang)}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={true}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
+              <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-16">
+                {project.mapUrl ? (
+                  <div className="aspect-video w-full overflow-hidden rounded-2xl bg-muted/30">
+                    <iframe
+                      src={getMapEmbedUrl(project.mapUrl, lang)}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen={true}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${project.area} ${t.neighbourhood}`}
+                    />
+                  </div>
+                ) : null}
+                {neighbourhoodDescription?.length ? (
+                  <div className="space-y-4 text-base leading-8 text-foreground/80 sm:text-lg">
+                    {neighbourhoodDescription.map((paragraph, index) =>
+                      paragraph.trim().startsWith("<") ? (
+                        <RichText
+                          key={`${index}-${paragraph.slice(0, 24)}`}
+                          html={paragraph}
+                        />
+                      ) : (
+                        <p key={`${index}-${paragraph.slice(0, 24)}`}>
+                          {paragraph}
+                        </p>
+                      ),
+                    )}
+                  </div>
+                ) : null}
               </div>
             </Section>
           ) : null}

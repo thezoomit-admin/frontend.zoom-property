@@ -22,7 +22,7 @@ export function ProjectFeatures({
   if (!features || features.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-12 py-6 md:gap-16 lg:gap-20">
+    <div className="flex flex-col gap-12 px-4 py-6 sm:px-6 md:gap-16 lg:gap-20 lg:px-[90px]">
       {features.map((feature, index) => {
         const title = locale === "bn" ? feature.titleBn || feature.title : feature.title;
         const description = locale === "bn" ? feature.descriptionBn || feature.description : feature.description;
