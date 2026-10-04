@@ -1,20 +1,17 @@
 import { RichText } from "@/components/common/rich-text";
-import { ImageFrame } from "@/components/media/image-frame";
 import type { IProjectDescription } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
 
 /**
- * The "Specs" tab: a wide hero followed by titled, localized specification rows.
+ * The "Specs" tab: titled, localized specification rows.
  */
 export function ProjectSpecs({
   name,
-  image,
   sections,
   legacyHtml,
   locale,
 }: {
   name: string;
-  image?: string;
   sections?: IProjectDescription[];
   legacyHtml?: string;
   locale: Locale;
@@ -23,20 +20,6 @@ export function ProjectSpecs({
 
   return (
     <div className="mt-4 flex flex-col gap-6 sm:gap-8">
-      {image ? (
-        <div className="overflow-hidden rounded-2xl border border-border/60 shadow-sm">
-          {/* Same banner shape as the Overview slider, filled edge to edge. */}
-          <ImageFrame
-            src={image}
-            alt={`${name} specifications`}
-            ratio="auto"
-            rounded="none"
-            sizes="100vw"
-            className="aspect-1344/527"
-          />
-        </div>
-      ) : null}
-
       {hasSections ? (
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           {sections?.map((section, index) => {

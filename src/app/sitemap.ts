@@ -8,13 +8,7 @@ import { getLandingChrome } from "@/server/features/project-landing";
 import { getProjects } from "@/server/features/projects";
 import { getProperties } from "@/server/features/properties";
 
-/**
- * Every route in every locale, each carrying the full hreflang alternate set —
- * that is what tells Google the two language versions are the same page rather
- * than duplicates.
- *
- * `changeFrequency` and `priority` are omitted because Google ignores both.
- */
+/** English-only public routes. `changeFrequency` and `priority` are omitted. */
 const ROUTES = [
   "",
   "/properties",
@@ -30,14 +24,9 @@ const ROUTES = [
   "/privacy",
 ] as const;
 
-const url = (locale: string, route: string) =>
-  `${siteConfig.url}/${locale}${route}`;
+const url = (_locale: string, route: string) => `${siteConfig.url}${route}`;
 
-/**
- * One entry per article per locale. `lastModified` is the publication date
- * rather than the build time — claiming every post changed on every deploy is
- * the fastest way to get a sitemap's dates ignored.
- */
+/** One entry per article. Use publication date rather than build time. */
 function articleEntries(insights: Awaited<ReturnType<typeof getInsights>>): MetadataRoute.Sitemap {
   return LOCALES.flatMap((locale) =>
     insights.map((insight) => {

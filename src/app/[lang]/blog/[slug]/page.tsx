@@ -120,7 +120,7 @@ export default async function BlogPostPage({
   const related = relatedInsights(insight, allInsights, 3);
 
   const blogHref = localeHref(lang, "/blog");
-  const articleUrl = absoluteUrl(`/${lang}/blog/${slug}`);
+  const articleUrl = absoluteUrl(`/blog/${slug}`);
 
   return (
     <>
@@ -138,8 +138,8 @@ export default async function BlogPostPage({
       />
       <JsonLd
         schema={breadcrumbSchema([
-          { name: a.breadcrumbHome, url: absoluteUrl(`/${lang}`) },
-          { name: t.title, url: absoluteUrl(`/${lang}/blog`) },
+          { name: a.breadcrumbHome, url: absoluteUrl("/") },
+          { name: t.title, url: absoluteUrl("/blog") },
           { name: title, url: articleUrl },
         ])}
       />

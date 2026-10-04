@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { Heading } from "@/components/common/heading";
-import { type IconName } from "@/components/common/icon";
+import { Icon, type IconName } from "@/components/common/icon";
 import { JsonLd } from "@/components/common/json-ld";
 import { Section } from "@/components/common/section";
-import { Text } from "@/components/common/text";
 import { Reveal } from "@/components/motion/reveal";
 import { VideoEmbed } from "@/components/media/video-embed";
 import { ProjectShowcase } from "@/components/pages/projects/project-showcase";
@@ -93,7 +91,7 @@ export default async function ProjectDetailPage({
   const t = dict.projectDetail;
 
   const agent = project.agent;
-  const path = `/${lang}/projects/${slug}`;
+  const path = `/projects/${slug}`;
 
   const sold = project.units - project.unitsLeft;
   const bookedPercent = Math.round((sold / project.units) * 100);
@@ -173,6 +171,32 @@ export default async function ProjectDetailPage({
                 alt={`${project.name}, ${project.area}`}
               />
             </Reveal>
+
+            {project.description?.length ? (
+              <div className="mt-12">
+                <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:gap-12 xl:gap-16">
+                  <div className="space-y-5 text-lg leading-8 text-foreground/80">
+                    {project.description.slice(0, 3).map((paragraph, index) => (
+                      <p key={`${paragraph.slice(0, 24)}-${index}`}>{paragraph}</p>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                    {facts.slice(0, 4).map(({ label, value, icon }) => (
+                      <div key={label} className="rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5">
+                        <div className="mb-2 flex items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-background text-primary">
+                            <Icon name={icon} size="xs" />
+                          </span>
+                          {label}
+                        </div>
+                        <div className="text-base font-medium text-foreground">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             <div className={`mt-12 grid gap-10 ${agent ? "lg:grid-cols-[1.6fr_1fr]" : "lg:grid-cols-1"}`}>
               <div className="flex flex-col gap-10">
@@ -258,7 +282,6 @@ export default async function ProjectDetailPage({
           >
             <ProjectSpecs
               name={project.name}
-              image={project.specs?.heroImage}
               sections={project.specs?.descriptions}
               legacyHtml={project.specs?.description || undefined}
               locale={lang}

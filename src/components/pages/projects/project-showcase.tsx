@@ -44,7 +44,7 @@ export function ProjectShowcase({
     <>
       <Carousel
         opts={{ loop: images.length > 1, align: "start" }}
-        className={cn(className)}
+        className={cn("mx-auto w-full max-w-7xl", className)}
       >
         <CarouselContent>
           {images.map((src, position) => (
@@ -61,8 +61,8 @@ export function ProjectShowcase({
                   src={src}
                   alt={position === 0 ? alt : `${alt} — ${position + 1}`}
                   ratio="auto"
-                  className="aspect-1344/527"
-                  rounded="lg"
+                  className="aspect-1344/527 overflow-hidden"
+                  rounded="2xl"
                   hover="none"
                   sizes="100vw"
                   priority={position === 0}

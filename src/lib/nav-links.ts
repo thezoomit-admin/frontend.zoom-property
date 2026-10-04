@@ -19,7 +19,7 @@ const RETIRED_NAV_PATHS = new Set([
 
 /**
  * True when a chrome link points at a retired section.
- * Paths may be absolute (`/blog`) or locale-prefixed (`/bn/blog`).
+ * Paths may be absolute (`/blog`) or carry a legacy locale prefix.
  */
 function isRetiredHref(href: string): boolean {
   const path = href.trim().split(/[?#]/)[0].replace(/\/+$/, "").toLowerCase();

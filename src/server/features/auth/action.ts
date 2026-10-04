@@ -25,8 +25,6 @@ export async function loginAction(
 ): Promise<{ error?: string }> {
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
-  const lang = String(formData.get("lang") || "en");
-
   if (!email || !password) {
     return { error: "Email and password are required" };
   }
@@ -46,12 +44,12 @@ export async function loginAction(
     maxAge: REFRESH_MAX_AGE,
   });
 
-  redirect(safeNext(formData.get("next"), `/${lang}`));
+  redirect(safeNext(formData.get("next"), "/"));
 }
 
-export async function logoutAction(lang: string) {
+export async function logoutAction() {
   const store = await cookies();
   store.delete(ACCESS_COOKIE);
   store.delete(REFRESH_COOKIE);
-  redirect(`/${lang}`);
+  redirect("/");
 }

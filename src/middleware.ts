@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config";
+import { DEFAULT_LOCALE } from "@/i18n/config";
 import { PATHNAME_HEADER } from "@/lib/not-found";
 import {
   ACCESS_COOKIE,
@@ -12,33 +12,16 @@ import {
 /**
  * Locale routing.
  *
- * `/properties` → redirect to `/en/properties` (or `/bn/…`), picked from a
- * previously chosen locale cookie first, then the site's default language.
- * Once a path already carries a locale it is left alone, so the redirect only
- * ever costs one hop on the first visit.
+ * Public paths are unprefixed and always render English. Legacy `/en/...` and
+ * `/bn/...` links redirect to their unprefixed equivalents; unprefixed paths
+ * are internally rewritten to the existing `[lang]` route tree.
  *
  * It also stamps the requested path onto `x-pathname`. The 404 pages need it:
  * a request that matches no route reaches them with no params, and
  * `usePathname()` prerenders as `/_not-found`, so the real URL can only come
  * from here.
  *
- * Hand-rolled rather than pulling in `negotiator` + `intl-localematcher`: two
- * locales do not need a full RFC 4647 matcher, and the dependency would run on
- * every request.
  */
-const LOCALE_COOKIE = "locale";
-
-/**
- * Always English. There is no switcher left to set the cookie to anything
- * else, but a browser that visited before this changed can still be carrying
- * an old "bn" cookie — reading it back would lock that visitor out of the
- * only language the site offers now.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function pickLocale(_request: NextRequest) {
-  return DEFAULT_LOCALE;
-}
-
 /** Refresh 5 minutes before actual expiry, not at the instant it lapses —
  * the point is that a page load never has to gamble on a token that's still
  * technically valid but might not survive the request. */
@@ -100,29 +83,20 @@ async function refreshSessionCookie(request: NextRequest, response: NextResponse
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const legacyLocale = pathname.match(/^\/(en|bn)(?=\/|$)/);
 
-  const hasLocale = LOCALES.some(
-    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
-  );
-  if (hasLocale) {
-    const headers = new Headers(request.headers);
-    headers.set(PATHNAME_HEADER, pathname);
-    const response = NextResponse.next({ request: { headers } });
-    await refreshSessionCookie(request, response);
-    return response;
+  if (legacyLocale) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.slice(legacyLocale[0].length) || "/";
+    return NextResponse.redirect(url, 308);
   }
 
-  const locale = pickLocale(request);
   const url = request.nextUrl.clone();
-  url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
-
-  const response = NextResponse.redirect(url);
-  // Remember the choice so the next visit skips negotiation entirely.
-  response.cookies.set(LOCALE_COOKIE, locale, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-  });
+  url.pathname = `/${DEFAULT_LOCALE}${pathname === "/" ? "" : pathname}`;
+  const headers = new Headers(request.headers);
+  headers.set(PATHNAME_HEADER, pathname);
+  const response = NextResponse.rewrite(url, { request: { headers } });
+  await refreshSessionCookie(request, response);
   return response;
 }
 

@@ -21,7 +21,7 @@ import { ALL_CACHE_TAGS, resolveTag } from "@/server/base-api";
  * Called as:
  *   POST /api/revalidate?secret=...&tag=projects
  *   POST /api/revalidate?secret=...            (no tag: refresh everything)
- *   POST /api/revalidate?secret=...&path=/en/properties/some-slug
+ *   POST /api/revalidate?secret=...&path=/properties/some-slug
  *
  * `secret` must match `REVALIDATE_SECRET`. Without one configured the route
  * refuses every request rather than defaulting to open — an unauthenticated
