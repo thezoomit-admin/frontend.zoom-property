@@ -99,7 +99,7 @@ export function ProjectsByArea({
               <TabsTrigger
                 key={area.name}
                 value={area.name}
-                className="rounded-none px-1 pb-3 text-sm font-semibold whitespace-nowrap text-muted-foreground after:bg-primary data-active:text-primary"
+                className="cursor-pointer rounded-none px-1 pb-3 text-sm font-semibold whitespace-nowrap text-muted-foreground after:bg-primary data-active:text-primary"
               >
                 {area.label}
               </TabsTrigger>
