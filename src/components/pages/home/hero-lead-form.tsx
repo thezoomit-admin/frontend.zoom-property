@@ -345,9 +345,9 @@ export function HeroLeadForm({
           type="submit"
           size="lg"
           disabled={submitting}
-          className="h-11 w-full bg-primary font-semibold"
+          className="h-11 w-full justify-center gap-2 bg-primary font-semibold"
         >
-          {submitting ? dict.submitting : dict.submit}
+          <span>{submitting ? dict.submitting : dict.submit}</span>
           <Icon name="arrowRight" size="xs" />
         </Button>
 

@@ -50,16 +50,15 @@ export async function TeamSection() {
                   className="w-full shadow-[0_1px_2px_rgba(27,35,24,0.04),0_8px_24px_-8px_rgba(75,128,45,0.16)]"
                 />
                 <div className="flex flex-col gap-1">
-                  <Heading as="h3" size="h6" weight="bold">
+                  <Heading as="h2" size="h4" weight="bold">
                     {name}
                   </Heading>
                   {member.phone ? (
                     <a
                       href={telHref(member.phone)}
-                      className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
+                      className="flex items-center text-primary justify-center gap-1.5 text-[12px]  font-semibold"
                     >
-                      <Icon name="phone" size="xs" />
-                      {member.phone}
+                    {member.phone}
                     </a>
                   ) : null}
                 </div>
