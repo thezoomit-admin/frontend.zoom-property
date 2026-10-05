@@ -1,45 +1,43 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/common/icon";
 import { ProjectCard } from "./project-card";
 import type { Project } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
-import { useDebounce } from "@/hooks/use-debounce";
 
-export type ProjectStageFilter = "all" | "Completed" | "Planning" | "Processing";
+export type ProjectStageFilter = "Upcoming" | "Running" | "Completed";
 const PAGE_SIZE = 6;
 
 function stageFromParam(val?: string | null): ProjectStageFilter {
-  if (!val) return "all";
+  if (!val) return "Running";
   const lower = val.toLowerCase();
   if (lower === "completed" || lower === "done" || lower === "complete") {
     return "Completed";
   }
-  if (lower === "planning") return "Planning";
+  if (lower === "upcoming" || lower === "planning") return "Upcoming";
   if (
+    lower === "running" ||
     lower === "processing" ||
     lower === "under construction" ||
     lower === "in progress"
   ) {
-    return "Processing";
+    return "Running";
   }
-  return "all";
+  return "Running";
 }
 
 export function InteractiveProjects({
   projects = [],
   locale = "en",
   initialStage,
-  initialSearch,
   initialPage,
 }: {
   projects: Project[];
   locale?: Locale;
   initialStage?: string;
-  initialSearch?: string;
   initialPage?: number;
 }) {
   const pathname = usePathname();
@@ -47,48 +45,37 @@ export function InteractiveProjects({
   const [selectedStage, setSelectedStage] = useState<ProjectStageFilter>(() =>
     stageFromParam(initialStage),
   );
-  const [searchQuery, setSearchQuery] = useState(initialSearch ?? "");
   const [page, setPage] = useState(
     initialPage && initialPage > 0 ? initialPage : 1,
   );
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  const syncUrl = (
-    stage: ProjectStageFilter,
-    search: string,
-    nextPage: number,
-  ) => {
+  const syncUrl = (stage: ProjectStageFilter, nextPage: number) => {
     const params = new URLSearchParams();
-    if (stage !== "all") params.set("stage", stage.toLowerCase());
-    if (search.trim()) params.set("q", search.trim());
+    params.set("stage", stage.toLowerCase());
     if (nextPage > 1) params.set("page", String(nextPage));
     const qs = params.toString();
     // Client-only — no RSC refetch, no loading shell.
     window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPage(1);
-    syncUrl(selectedStage, debouncedSearchQuery, 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchQuery]);
-
   const isBn = locale === "bn";
 
   const counts = useMemo(() => {
     return {
-      all: projects.length,
       Completed: projects.filter(
         (p) =>
           p.status?.toLowerCase() === "completed" ||
           p.status?.toLowerCase() === "done" ||
           p.status?.toLowerCase() === "complete",
       ).length,
-      Planning: projects.filter((p) => p.status?.toLowerCase() === "planning")
-        .length,
-      Processing: projects.filter(
+      Upcoming: projects.filter(
         (p) =>
+          p.status?.toLowerCase() === "upcoming" ||
+          p.status?.toLowerCase() === "planning",
+      ).length,
+      Running: projects.filter(
+        (p) =>
+          p.status?.toLowerCase() === "running" ||
           p.status?.toLowerCase() === "processing" ||
           p.status?.toLowerCase() === "under construction" ||
           p.status?.toLowerCase() === "in progress",
@@ -98,59 +85,45 @@ export function InteractiveProjects({
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {
-      if (selectedStage !== "all") {
-        const pStatus = (project.status || "").toLowerCase();
-        if (
-          selectedStage === "Completed" &&
-          pStatus !== "completed" &&
-          pStatus !== "done" &&
-          pStatus !== "complete"
-        ) {
-          return false;
-        }
-        if (selectedStage === "Planning" && pStatus !== "planning") return false;
-        if (
-          selectedStage === "Processing" &&
-          pStatus !== "processing" &&
-          pStatus !== "under construction" &&
-          pStatus !== "in progress"
-        ) {
-          return false;
-        }
+      const pStatus = (project.status || "").toLowerCase();
+      if (
+        selectedStage === "Completed" &&
+        pStatus !== "completed" &&
+        pStatus !== "done" &&
+        pStatus !== "complete"
+      ) {
+        return false;
       }
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const haystack =
-          `${project.name} ${project.area} ${project.city} ${project.status}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
+      if (
+        selectedStage === "Upcoming" &&
+        pStatus !== "upcoming" &&
+        pStatus !== "planning"
+      ) {
+        return false;
       }
-
+      if (
+        selectedStage === "Running" &&
+        pStatus !== "running" &&
+        pStatus !== "processing" &&
+        pStatus !== "under construction" &&
+        pStatus !== "in progress"
+      ) {
+        return false;
+      }
       return true;
     });
-  }, [projects, selectedStage, searchQuery]);
+  }, [projects, selectedStage]);
 
   const handleStageChange = (stage: ProjectStageFilter) => {
     setSelectedStage(stage);
     setPage(1);
-    syncUrl(stage, searchQuery, 1);
-  };
-
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val);
+    syncUrl(stage, 1);
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    syncUrl(selectedStage, searchQuery, newPage);
+    syncUrl(selectedStage, newPage);
     window.scrollTo({ top: 380, behavior: "smooth" });
-  };
-
-  const resetFilters = () => {
-    setSearchQuery("");
-    setSelectedStage("all");
-    setPage(1);
-    syncUrl("all", "", 1);
   };
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
@@ -168,12 +141,20 @@ export function InteractiveProjects({
     activeColor: string;
   }[] = [
     {
-      id: "all",
-      labelEn: "All Projects",
-      labelBn: "সব প্রজেক্ট",
-      count: counts.all,
-      icon: "building",
-      activeColor: "bg-primary text-primary-foreground",
+      id: "Upcoming",
+      labelEn: "Upcoming",
+      labelBn: "আসন্ন",
+      count: counts.Upcoming,
+      icon: "layers",
+      activeColor: "bg-primary text-white",
+    },
+    {
+      id: "Running",
+      labelEn: "Running",
+      labelBn: "চলমান",
+      count: counts.Running,
+      icon: "construction",
+      activeColor: "bg-primary text-white",
     },
     {
       id: "Completed",
@@ -183,28 +164,12 @@ export function InteractiveProjects({
       icon: "check",
       activeColor: "bg-primary text-white",
     },
-    {
-      id: "Planning",
-      labelEn: "Planning",
-      labelBn: "পরিকল্পনাধীন",
-      count: counts.Planning,
-      icon: "layers",
-      activeColor: "bg-primary text-white",
-    },
-    {
-      id: "Processing",
-      labelEn: "Under Construction",
-      labelBn: "চলমান নির্মাণ",
-      count: counts.Processing,
-      icon: "construction",
-      activeColor: "bg-primary text-white",
-    },
   ];
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border/80 bg-secondary-100/80 p-1.5 shadow-xs dark:bg-card">
+      <div className="flex justify-center">
+        <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-border/80 bg-secondary-100/80 p-1.5 shadow-xs dark:bg-card">
           {stagesTabs.map((tab) => {
             const isActive = selectedStage === tab.id;
             return (
@@ -235,49 +200,14 @@ export function InteractiveProjects({
             );
           })}
         </div>
-
-        <div className="relative w-full lg:w-72">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder={
-              isBn
-                ? "প্রজেক্টের নাম বা এলাকা খুঁজুন..."
-                : "Search project or area..."
-            }
-            className="w-full rounded-xl border border-border bg-card px-4 py-2.5 pl-10 text-xs text-foreground shadow-xs outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:text-sm"
-          />
-          <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-muted-foreground">
-            <Icon name="search" size="xs" />
-          </span>
-          {searchQuery ? (
-            <button
-              type="button"
-              onClick={() => handleSearchChange("")}
-              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-xs text-muted-foreground hover:text-foreground"
-            >
-              ✕
-            </button>
-          ) : null}
-        </div>
       </div>
 
-      <div className="flex items-center justify-between border-b border-border pb-3">
+      <div className="flex items-center border-b border-border pb-3">
         <span className="text-xs font-medium text-muted-foreground sm:text-sm">
           {isBn
             ? `মোট ${filtered.length}টি প্রজেক্ট পাওয়া গেছে`
             : `Showing ${filtered.length} ${filtered.length === 1 ? "project" : "projects"}`}
         </span>
-        {selectedStage !== "all" || searchQuery ? (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="flex cursor-pointer items-center gap-1 text-xs font-semibold text-primary hover:underline"
-          >
-            {isBn ? "ফিল্টার রিসেট করুন" : "Reset filters"}
-          </button>
-        ) : null}
       </div>
 
       {paginated.length > 0 ? (
@@ -299,16 +229,9 @@ export function InteractiveProjects({
           </h3>
           <p className="mt-1 max-w-sm text-xs text-muted-foreground">
             {isBn
-              ? "নির্বাচিত স্ট্যাটাস বা সার্চের সাথে মিলে এমন কোনো প্রজেক্ট এই মুহূর্তে নেই।"
-              : "No projects match the selected status filter or search query."}
+              ? "এই স্ট্যাটাসে কোনো প্রজেক্ট নেই।"
+              : "There are no projects in this status yet."}
           </p>
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition hover:bg-primary/90"
-          >
-            {isBn ? "সকল প্রজেক্ট দেখুন" : "View all projects"}
-          </button>
         </div>
       )}
 

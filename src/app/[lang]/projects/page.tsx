@@ -17,15 +17,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Projects catalogue — filters live on the client (URL only), so changing
- * stage/search does not re-block on a loading shell.
+ * Projects catalogue — status tabs live on the client (URL only), so changing
+ * status does not re-block on a loading shell.
  */
 export default async function ProjectsPage({
   searchParams,
 }: {
   searchParams: Promise<{
     stage?: string;
-    q?: string;
     page?: string;
   }>;
 }) {
@@ -46,7 +45,6 @@ export default async function ProjectsPage({
       <ProjectsSection
         variant="full"
         initialStage={query?.stage}
-        initialSearch={query?.q}
         initialPage={query?.page ? Number(query.page) : undefined}
       />
 

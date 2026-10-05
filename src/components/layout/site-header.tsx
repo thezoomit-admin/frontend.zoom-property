@@ -149,7 +149,7 @@ export function SiteHeader({
       {/* 44 / 56 — thinner than the 54 / 70 this used to be. Nothing offsets
           against these numbers — the hero and the page banners clear the bar
           with their own generous top padding — so this is a safe trim. */}
-      <AppContainer className="relative flex h-11 items-center justify-between gap-4 sm:h-14">
+      <AppContainer className="relative flex h-11 items-center justify-between gap-4 sm:h-14 lg:px-10 xl:px-16">
         {/* `flex items-center`, not just `shrink-0`: the lockup is an
             inline-flex box, so in a plain anchor it sat on the text baseline
             and the line box reserved descender space under it — which pushed

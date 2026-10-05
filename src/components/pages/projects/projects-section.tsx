@@ -9,13 +9,11 @@ export async function ProjectsSection({
   variant = "home",
   limit,
   initialStage,
-  initialSearch,
   initialPage,
 }: {
   variant?: "home" | "full";
   limit?: number;
   initialStage?: string;
-  initialSearch?: string;
   initialPage?: number;
 } = {}) {
   const isFull = variant === "full";
@@ -33,7 +31,6 @@ export async function ProjectsSection({
           projects={projects}
           locale={locale}
           initialStage={initialStage}
-          initialSearch={initialSearch}
           initialPage={initialPage}
         />
       ) : (
