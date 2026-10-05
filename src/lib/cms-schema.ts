@@ -762,6 +762,23 @@ export const cmsPages: CmsPageDef[] = [
             maxLength: 350,
           },
           {
+            key: "contact.formTitle",
+            label: "Enquiry Form Title",
+            type: "text",
+            groupHeader: "Enquiry Form Heading",
+            en: "Send an enquiry",
+            bn: "বার্তা পাঠান",
+            maxLength: 100,
+          },
+          {
+            key: "contact.formLead",
+            label: "Enquiry Form Description",
+            type: "textarea",
+            en: "One form, no account needed. An advisor picks it up, not an autoresponder.",
+            bn: "একটি ফর্ম, অ্যাকাউন্ট লাগবে না। অটো-রিপ্লাই নয়, একজন পরামর্শদাতা দেখবেন।",
+            maxLength: 350,
+          },
+          {
             key: "contact.details.phone",
             label: "Primary Phone Number",
             type: "text",

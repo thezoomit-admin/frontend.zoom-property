@@ -46,11 +46,12 @@ export default async function AboutPage() {
       />
 
       <StorySection />
-      <FiguresBand />
+      {/* <FiguresBand /> */}
       <TeamSection />
 
-      <div className="mt-8 md:mt-12 lg:mt-20">
-        <ContactCta tone="surface" className="bg-muted/40" />
+      <div className="">
+              <ContactCta />
+
       </div>
     </>
   );
