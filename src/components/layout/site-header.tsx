@@ -33,6 +33,8 @@ import { cn } from "@/lib/utils";
  * unassignable the moment one of its entries stopped being a string.
  */
 type NavDict = {
+  home: string;
+  projects: string;
   contact: string;
   bookViewing: string;
   openMenu: string;
@@ -107,7 +109,13 @@ export function SiteHeader({
   const campaign = campaigns?.find((item) => pathname.includes(item.path));
   const campaignActive = Boolean(campaign);
   const home = localeHref(locale, campaignActive ? campaign!.path : "/");
-  const navItems = campaignActive ? [] : menu;
+  const navItems = campaignActive
+    ? []
+    : [
+        { label: dict.home, href: "/" },
+        { label: dict.projects, href: "/projects" },
+        ...menu.filter((item) => !["/", "/projects"].includes(localeHref(locale, item.href))),
+      ];
   const ctaHref = campaignActive ? campaign!.ctaHref : localeHref(locale, "/contact");
   const ctaLabel = campaignActive ? campaign!.ctaLabel : dict.bookViewing;
   const hideOnScroll = campaignActive ? false : hidden;
@@ -177,16 +185,19 @@ export function SiteHeader({
           <nav className="hidden items-center gap-1.5 lg:flex">
             {navItems.map((item) => {
               const href = localeHref(locale, item.href);
-              const active = pathname === href || pathname.startsWith(`${href}/`);
+              const active =
+                href === "/"
+                  ? pathname === href
+                  : pathname === href || pathname.startsWith(`${href}/`);
               return (
                 <Link
                   key={`${item.href}-${item.label}`}
                   href={href}
                   className={cn(
-                    "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm transition-all duration-200",
+                    "relative flex items-center justify-center rounded-lg px-3.5 py-2 text-sm font-semibold transition-all duration-200",
                     active
-                      ? "bg-primary/[0.08] font-semibold text-primary"
-                      : "font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                      ? "bg-primary/[0.08] text-primary"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                   )}
                 >
                   <span>{item.label}</span>
@@ -258,12 +269,15 @@ export function SiteHeader({
                 {navItems.map((item) => {
                   const href = campaignActive ? item.href : localeHref(locale, item.href);
                   const active =
-                    !campaignActive && (pathname === href || pathname.startsWith(`${href}/`));
+                    !campaignActive &&
+                    (href === "/"
+                      ? pathname === href
+                      : pathname === href || pathname.startsWith(`${href}/`));
                   const className = cn(
-                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all",
+                    "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all",
                     active
-                      ? "bg-primary/[0.08] font-semibold text-primary border-l-4 border-primary pl-3"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium",
+                      ? "bg-primary/[0.08] text-primary border-l-4 border-primary pl-3"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   );
                   return campaignActive ? (
                     <a

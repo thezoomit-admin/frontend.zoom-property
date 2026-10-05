@@ -5,6 +5,8 @@
   },
   "nav": {
     "menu": [],
+    "home": "Home",
+    "allProjects": "Projects",
     "properties": "Properties",
     "projects": "Projects",
     "areas": "Areas",

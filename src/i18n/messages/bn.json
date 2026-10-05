@@ -5,6 +5,8 @@
   },
   "nav": {
     "menu": [],
+    "home": "হোম",
+    "allProjects": "প্রজেক্ট",
     "properties": "সম্পত্তি",
     "projects": "প্রকল্প",
     "areas": "এলাকা",
