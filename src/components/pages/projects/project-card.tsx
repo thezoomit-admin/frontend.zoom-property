@@ -1,9 +1,8 @@
 import Link from "next/link";
 
 import { Heading } from "@/components/common/heading";
-import { Icon, type IconName } from "@/components/common/icon";
+import { Icon } from "@/components/common/icon";
 import { ImageFrame } from "@/components/media/image-frame";
-import { FormatBdt } from "@/components/ui/format-bdt";
 import type { Project } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
 import { localeHref } from "@/i18n/href";
@@ -30,16 +29,6 @@ export function ProjectCard({
 }) {
   const displayName =
     locale === "bn" && project.nameBn ? project.nameBn : project.name;
-  const sold = project.units - project.unitsLeft;
-  const soldPercent = project.units ? Math.round((sold / project.units) * 100) : 0;
-
-  const status = project.status?.toLowerCase();
-  const statusTone: { icon: IconName; className: string } =
-    status === "completed" || status === "done"
-      ? { icon: "check", className: "bg-primary text-white" }
-      : status === "processing" || status === "under construction"
-        ? { icon: "construction", className: "bg-white text-primary" }
-        : { icon: "building", className: "bg-white/90 text-foreground" };
 
   return (
     <Link
@@ -62,30 +51,15 @@ export function ProjectCard({
       >
         {/* ── Photo with name overlay ───────────────────────────────── */}
         <ImageFrame
-          src={project.image}
+          src={project.thumbnailImage || project.image}
           alt={`${displayName}, ${project.area}`}
-          ratio="square"
+          ratio="portrait"
           rounded="none"
           sizes="third"
+          imageClassName="object-contain"
         >
-          {/* Deep foot gradient: the title sits on it. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/10"
-          />
-
-          {/* Top row: build stage, live feed. */}
-          <div className="absolute inset-x-3 top-3 z-10 flex items-start justify-between gap-2">
-            <span
-              className={cn(
-                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider shadow-sm",
-                statusTone.className,
-              )}
-            >
-              <Icon name={statusTone.icon} size="xs" className="size-3" />
-              {project.status}
-            </span>
-
+          {/* Live feed indicator. */}
+          <div className="absolute inset-x-3 top-3 z-10 flex justify-end">
             {project.cctvStreamActive ? (
               <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
                 <span className="relative flex size-2">
@@ -98,21 +72,23 @@ export function ProjectCard({
           </div>
 
           {/* Foot: name + address on the photo. */}
-          <div className="absolute inset-x-5 bottom-4 z-10 flex flex-col gap-1">
-            <Heading
-              as="h3"
-              size="h5"
-              weight="bold"
-              className="line-clamp-2 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]"
-            >
-              {displayName}
-            </Heading>
-            <span className="flex items-center gap-1.5 text-sm text-white/85">
-              <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
-              <span className="truncate">
-                {project.area}, {project.city}
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-black/45 px-5 py-4">
+            <div className="flex flex-col gap-1">
+              <Heading
+                as="h3"
+                size="h5"
+                weight="bold"
+                className="line-clamp-2 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]"
+              >
+                {displayName}
+              </Heading>
+              <span className="flex items-center gap-1.5 text-sm text-white/85">
+                <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
+                <span className="truncate">
+                  {project.area}, {project.city}
+                </span>
               </span>
-            </span>
+            </div>
           </div>
         </ImageFrame>
 

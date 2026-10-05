@@ -27,6 +27,7 @@ export const toProject = (p: ApiProject): Project => ({
   sizeRange: p.sizeRange || "",
   startingPrice: p.startingPrice ?? 0,
   image: mediaUrl(p.coverImage),
+  thumbnailImage: mediaUrl(p.thumbnailImage) || undefined,
   images: gallery(p.coverImage, p.images),
   description: paragraphs(p.description),
   descriptionBn: paragraphs(p.descriptionBn),
