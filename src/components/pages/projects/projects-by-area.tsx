@@ -63,15 +63,13 @@ export function ProjectsByArea({
 
   const [activeArea, setActiveArea] = useState(tabAreas[0]?.name ?? "");
 
-  // The feature is area-specific — the first project in whichever tab is
-  // active. The grid underneath is every active project, full stop — the
-  // featured one included, not filtered out of it.
-  const featured = useMemo(
-    () => projects.find((project) => project.area === activeArea),
+  // Keep both the feature and the cards underneath in step with the selected
+  // area, so changing tabs never leaves projects from another area visible.
+  const areaProjects = useMemo(
+    () => projects.filter((project) => project.area === activeArea),
     [projects, activeArea],
   );
-
-  const rest = projects;
+  const featured = areaProjects[0];
 
   if (tabAreas.length === 0) return null;
 
@@ -95,7 +93,7 @@ export function ProjectsByArea({
         {/* Scrolls on its own on narrow screens — twenty areas do not fit a
             phone width, and wrapping them would push the content below the
             fold before anyone gets to it. */}
-        <div className="-mx-4 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:flex sm:justify-center sm:px-0">
+        <div className="-mx-4 overflow-x-auto border-b border-border px-4 scrollbar-none sm:mx-0 sm:flex sm:justify-center sm:px-0">
           <TabsList variant="line" className="h-auto w-max gap-6">
             {tabAreas.map((area) => (
               <TabsTrigger
@@ -109,7 +107,8 @@ export function ProjectsByArea({
           </TabsList>
         </div>
 
-        <TabsContent value={activeArea} className="flex flex-col gap-8">
+        <TabsContent value={activeArea}>
+          <div className="flex flex-col gap-8 lg:px-[60px]">
           {/* ── Featured project for the selected area ─────────────────── */}
           {featured ? (
             <Link
@@ -118,7 +117,7 @@ export function ProjectsByArea({
               className="grid overflow-hidden rounded-2xl border border-border/60 bg-card shadow-lg shadow-primary/10 sm:grid-cols-2 group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/25"
             >
               <ImageFrame
-                src={featured.image}
+                src={featured.images[0] || featured.image}
                 alt={`${featured.name}, ${featured.area}`}
                 ratio="4/3"
                 rounded="none"
@@ -154,10 +153,21 @@ export function ProjectsByArea({
               </div>
             </Link>
           ) : (
-            <div className="rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
-              {isBn
-                ? `${activeArea}-এ এখনো কোনো প্রজেক্ট যোগ করা হয়নি।`
-                : `No projects in ${activeArea} yet.`}
+            <div className="mx-auto flex min-h-64 w-full max-w-2xl flex-col items-center justify-center rounded-2xl border border-primary/15 bg-linear-to-br from-primary/[0.06] via-background to-muted/40 px-6 py-12 text-center shadow-sm">
+              <span className="mb-5 flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                <Icon name="upcoming" size="lg" />
+              </span>
+              <span className="rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                {isBn ? "শীঘ্রই আসছে" : "Upcoming"}
+              </span>
+              <Heading as="h3" size="h5" className="mt-4">
+                {isBn ? "নতুন প্রজেক্ট আসছে" : "Projects coming soon"}
+              </Heading>
+              <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                {isBn
+                  ? `${activeArea}-এ নতুন প্রজেক্টের আপডেট শিগগিরই এখানে জানানো হবে।`
+                  : `We're preparing new projects in ${activeArea}. Check back soon for updates.`}
+              </p>
             </div>
           )}
 
@@ -166,13 +176,14 @@ export function ProjectsByArea({
               into view, and a tab switch mounts this without a scroll event,
               so the cards could end up stuck at their pre-animation
               opacity: 0 instead of ever appearing. */}
-          {rest.length > 0 ? (
+          {areaProjects.length > 0 ? (
             <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {rest.map((project) => (
+              {areaProjects.map((project) => (
                 <ProjectCard key={project.id} project={project} locale={locale} />
               ))}
             </div>
           ) : null}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

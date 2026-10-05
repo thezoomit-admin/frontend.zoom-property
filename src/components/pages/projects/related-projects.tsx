@@ -20,7 +20,10 @@ export async function RelatedProjects({
   if (others.length === 0) return null;
 
   return (
-    <Section className="border-t border-border bg-muted/30">
+    <Section
+      spacing="none"
+      className="border-t border-border bg-muted/30 pt-12 pb-0 sm:pt-20 lg:pt-24"
+    >
       <Heading as="h2" size="h3">
         {title}
       </Heading>

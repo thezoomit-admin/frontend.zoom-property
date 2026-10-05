@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { ContactCta } from "@/components/common/contact-cta";
 import { pageBanners } from "@/data/page-banners";
-import { ConstructionStagesSection } from "@/components/pages/projects/construction-stages-section";
 import { ProjectsSection } from "@/components/pages/projects/projects-section";
-import { ShowcaseVideoGrid } from "@/components/pages/home/showcase-video-grid";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
 import { localeAlternates } from "@/i18n/alternates";
-import { getVideosPage } from "@/server/features/videos";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
@@ -18,30 +14,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: dict.projects.metaDescription,
     alternates: localeAlternates(locale, "/projects"),
   };
-}
-
-/** Video strip — streamed so the project grid paints without waiting. */
-async function ProjectsVideos({ videoPage }: { videoPage?: string }) {
-  const [dict, locale, showcaseVideos] = await Promise.all([
-    getDictionary(),
-    getLocale(),
-    getVideosPage(Number.parseInt(videoPage ?? "1", 10) || 1, 8),
-  ]);
-
-  return (
-    <ShowcaseVideoGrid
-      videos={showcaseVideos.videos}
-      locale={locale}
-      page={showcaseVideos.meta.page}
-      totalPage={showcaseVideos.meta.totalPage}
-      basePath="/projects"
-      pageParam="videoPage"
-      title={dict.videoSection.title}
-      description={dict.videoSection.description}
-      playLabel={dict.videoSection.play}
-      closeLabel={dict.videoSection.close}
-    />
-  );
 }
 
 /**
@@ -55,7 +27,6 @@ export default async function ProjectsPage({
     stage?: string;
     q?: string;
     page?: string;
-    videoPage?: string;
   }>;
 }) {
   const query = await searchParams;
@@ -79,11 +50,7 @@ export default async function ProjectsPage({
         initialPage={query?.page ? Number(query.page) : undefined}
       />
 
-      <ConstructionStagesSection />
       <ContactCta />
-      <Suspense fallback={null}>
-        <ProjectsVideos videoPage={query.videoPage} />
-      </Suspense>
     </>
   );
 }

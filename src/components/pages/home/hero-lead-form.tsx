@@ -61,6 +61,8 @@ export interface HeroLeadFormDict {
   namePlaceholder: string;
   phone: string;
   email: string;
+  location: string;
+  locationPlaceholder: string;
   area?: string;
   areaAny?: string;
   subArea?: string;
@@ -142,51 +144,57 @@ export function HeroLeadForm({
 
     setSubmitting(true);
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    formData.set("phone", phone);
-    formData.set("source", source);
-    formData.set("subject", project ? `${project} enquiry` : subject);
-    formData.set("enquiry", "buy");
-    // Home + site CTA lead forms → Bond CRM lead (contact page does not).
-    formData.set("createLead", "1");
-    if (project) {
-      // Bond CRM files the lead under `budget` when no area is sent.
-      const note = String(formData.get("message") ?? "").trim();
-      const projectLine = `Project: ${project}`;
-      formData.set("budget", project);
-      formData.set("message", note ? `${projectLine}\n${note}` : projectLine);
-    }
-    if (area) {
-      formData.set("area", area);
-    } else {
-      formData.delete("area");
-    }
-    if (subArea) {
-      formData.set("subArea", subArea);
-    } else {
-      formData.delete("subArea");
-    }
+    try {
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      formData.set("phone", phone);
+      formData.set("source", source);
+      formData.set("subject", project ? `${project} enquiry` : subject);
+      formData.set("enquiry", "buy");
+      // Home + site CTA lead forms → Bond CRM lead (contact page does not).
+      formData.set("createLead", "1");
+      if (project) {
+        // Bond CRM files the lead under `budget` when no area is sent.
+        const note = String(formData.get("message") ?? "").trim();
+        const projectLine = `Project: ${project}`;
+        formData.set("budget", project);
+        formData.set("message", note ? `${projectLine}\n${note}` : projectLine);
+      }
+      if (area) {
+        formData.set("area", area);
+      } else {
+        formData.delete("area");
+      }
+      if (subArea) {
+        formData.set("subArea", subArea);
+      } else {
+        formData.delete("subArea");
+      }
 
-    const res = await submitContactForm(formData);
+      const res = await submitContactForm(formData);
 
-    if (res.success) {
-      setLastSubmitAt(Date.now());
-      trackMeta("Lead", { content_name: project || trackName });
-      toast.success(dict.successTitle, { description: dict.successBody });
-      form.reset();
-      setPhone("");
-      setCombinedArea(AREA_ANY);
-    } else {
-      const msg = res.error || "Failed to submit enquiry";
+      if (res.success) {
+        setLastSubmitAt(Date.now());
+        trackMeta("Lead", { content_name: project || trackName });
+        toast.success(dict.successTitle, { description: dict.successBody });
+        form.reset();
+        setPhone("");
+        setCombinedArea(AREA_ANY);
+      } else {
+        const msg = res.error || "Failed to submit enquiry";
+        toast.error(
+          /too many|wait an hour|rate|try again/i.test(msg)
+            ? "Too many enquiries from this device. Please wait about an hour and try again."
+            : msg,
+        );
+      }
+    } catch (error) {
       toast.error(
-        /too many|wait an hour|rate|try again/i.test(msg)
-          ? "Too many enquiries from this device. Please wait about an hour and try again."
-          : msg,
+        error instanceof Error ? error.message : "Failed to submit enquiry",
       );
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   }
 
   const fieldClass = glass
@@ -222,92 +230,106 @@ export function HeroLeadForm({
           </span>
         )}
 
-        <Field id={`${idPrefix}-name`} label={dict.name} required glass={glass}>
-          <Input
-            id={`${idPrefix}-name`}
-            name="name"
-            required
-            autoComplete="name"
-            placeholder={dict.namePlaceholder}
-            className={cn("h-11", fieldClass)}
-          />
-        </Field>
-
-        <Field id={`${idPrefix}-phone`} label={dict.phone} required glass={glass}>
-          <PhoneNumberInput
-            id={`${idPrefix}-phone`}
-            name="phone"
-            value={phone}
-            onChange={setPhone}
-            required
-            placeholder="01712-345678"
-            className={glass ? "PhoneNumberInput--glass" : undefined}
-          />
-        </Field>
-
-        <Field id={`${idPrefix}-email`} label={dict.email} glass={glass}>
-          <Input
-            id={`${idPrefix}-email`}
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@domain.com"
-            className={cn("h-11", fieldClass)}
-          />
-        </Field>
-
-        {project ? (
-          <Field
-            id={`${idPrefix}-project`}
-            label={dict.project || "Project"}
-            glass={glass}
-          >
-            <div className="relative">
-              <Input
-                id={`${idPrefix}-project`}
-                value={project}
-                readOnly
-                tabIndex={-1}
-                className={cn(
-                  "h-11 pr-10 font-medium",
-                  glass
-                    ? "border-white/20 bg-white/15 text-white"
-                    : "bg-muted/40 text-foreground",
-                )}
-              />
-              <Icon
-                name="building"
-                size="sm"
-                className={cn(
-                  "pointer-events-none absolute top-1/2 right-3 -translate-y-1/2",
-                  glass ? "text-white/80" : "text-primary",
-                )}
-              />
-            </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field id={`${idPrefix}-name`} label={dict.name} required glass={glass}>
+            <Input
+              id={`${idPrefix}-name`}
+              name="name"
+              required
+              autoComplete="name"
+              placeholder={dict.namePlaceholder}
+              className={cn("h-11", fieldClass)}
+            />
           </Field>
-        ) : (
-          <Field
-            id={`${idPrefix}-area`}
-            label={dict.area || "Area"}
-            glass={glass}
-          >
-            <Select value={combinedArea} onValueChange={setCombinedArea}>
-              <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
-                <SelectValue placeholder={dict.areaAny || "Select area"} />
-              </SelectTrigger>
-              <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
-                <SelectItem value={AREA_ANY}>
-                  {dict.areaAny || "Any area"}
-                </SelectItem>
-                {combinedAreaOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+
+          <Field id={`${idPrefix}-phone`} label={dict.phone} required glass={glass}>
+            <PhoneNumberInput
+              id={`${idPrefix}-phone`}
+              name="phone"
+              value={phone}
+              onChange={setPhone}
+              required
+              placeholder="01712-345678"
+              className={glass ? "PhoneNumberInput--glass" : undefined}
+            />
+          </Field>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field id={`${idPrefix}-email`} label={dict.email} glass={glass}>
+            <Input
+              id={`${idPrefix}-email`}
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@domain.com"
+              className={cn("h-11", fieldClass)}
+            />
+          </Field>
+
+          {project ? (
+            <Field
+              id={`${idPrefix}-project`}
+              label={dict.project || "Project"}
+              glass={glass}
+            >
+              <div className="relative">
+                <Input
+                  id={`${idPrefix}-project`}
+                  value={project}
+                  readOnly
+                  tabIndex={-1}
+                  className={cn(
+                    "h-11 pr-10 font-medium",
+                    glass
+                      ? "border-white/20 bg-white/15 text-white"
+                      : "bg-muted/40 text-foreground",
+                  )}
+                />
+                <Icon
+                  name="building"
+                  size="sm"
+                  className={cn(
+                    "pointer-events-none absolute top-1/2 right-3 -translate-y-1/2",
+                    glass ? "text-white/80" : "text-primary",
+                  )}
+                />
+              </div>
+            </Field>
+          ) : (
+            <Field
+              id={`${idPrefix}-area`}
+              label={dict.area || "Area"}
+              glass={glass}
+            >
+              <Select value={combinedArea} onValueChange={setCombinedArea}>
+                <SelectTrigger id={`${idPrefix}-area`} className={selectTriggerClass}>
+                  <SelectValue placeholder={dict.areaAny || "Select area"} />
+                </SelectTrigger>
+                <SelectContent className="max-h-[min(22rem,var(--radix-select-content-available-height))]">
+                  <SelectItem value={AREA_ANY}>
+                    {dict.areaAny || "Any area"}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        )}
+                  {combinedAreaOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
+        </div>
+
+        <Field id={`${idPrefix}-location`} label={dict.location} glass={glass}>
+          <Input
+            id={`${idPrefix}-location`}
+            name="location"
+            autoComplete="address-level2"
+            placeholder={dict.locationPlaceholder}
+            className={cn("h-11", fieldClass)}
+          />
+        </Field>
 
         <Field id={`${idPrefix}-message`} label={dict.message} glass={glass}>
           <Textarea

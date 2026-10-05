@@ -2,6 +2,7 @@
 export const ASPECT_RATIOS = {
   square: "aspect-square",
   "4/3": "aspect-[4/3]",
+  "4/5": "aspect-[4/5]",
   "3/2": "aspect-[3/2]",
   video: "aspect-video",
   ultrawide: "aspect-[21/9]",

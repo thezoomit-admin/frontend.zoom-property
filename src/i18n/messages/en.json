@@ -5,6 +5,8 @@
   },
   "nav": {
     "menu": [],
+    "home": "Home",
+    "allProjects": "Projects",
     "properties": "Properties",
     "projects": "Projects",
     "areas": "Areas",
@@ -352,12 +354,12 @@
       "whatsapp": "+880 1958 253301",
       "email": "concierge@zoomproperty.com",
       "dhakaAddress": "House 42, Road 11, Block D, Banani & Gulshan Avenue, Dhaka",
-      "chattogramAddress": "CDA Avenue, GEC Circle & Khulshi"
+      "chattogramAddress": ""
     },
     "social": [],
     "offices": "Offices",
     "dhaka": "Dhaka",
-    "chattogram": "Chattogram",
+    "chattogram": "",
     "formTitle": "Send an enquiry",
     "formLead": "One form, no account needed. An advisor picks it up, not an autoresponder.",
     "form": {
@@ -365,6 +367,8 @@
       "namePlaceholder": "Your name",
       "phone": "Phone",
       "email": "Email",
+      "location": "Your location (optional)",
+      "locationPlaceholder": "e.g. Gulshan, Dhaka",
       "enquiry": "What is this about?",
       "area": "Which area?",
       "areaAny": "Any area — not decided yet",
@@ -585,33 +589,6 @@
         {
           "title": "Registration and keys",
           "body": "Sub-registry, stamp duty, mutation in your name. You leave with a folder holding every document."
-        }
-      ]
-    },
-    "construction": {
-      "eyebrow": "How we verify",
-      "title": "What a completion percentage actually means",
-      "description": "Every project passes the same five audited stages. The number only moves after our engineer has signed that stage off on site.",
-      "stages": [
-        {
-          "title": "Piling",
-          "body": "Soil test, pile load test, and the RAJUK permit posted on the boundary wall."
-        },
-        {
-          "title": "Structure",
-          "body": "Column and slab casting, with cube tests filed for every pour."
-        },
-        {
-          "title": "MEP",
-          "body": "Electrical, plumbing and lift shafts, checked before plaster closes the walls."
-        },
-        {
-          "title": "Finishing",
-          "body": "Flooring, joinery, sanitary and paint. The stage where timelines usually slip."
-        },
-        {
-          "title": "Handover",
-          "body": "Occupancy certificate, utility connections, snag list cleared with you present."
         }
       ]
     },

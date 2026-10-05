@@ -16,7 +16,6 @@ export * from "./properties/property-search";
 
 // Projects
 export * from "./projects/projects-section";
-export * from "./projects/construction-stages-section";
 export * from "./projects/project-card";
 
 // Areas

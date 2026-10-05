@@ -1,9 +1,8 @@
 import Link from "next/link";
 
 import { Heading } from "@/components/common/heading";
-import { Icon, type IconName } from "@/components/common/icon";
+import { Icon } from "@/components/common/icon";
 import { ImageFrame } from "@/components/media/image-frame";
-import { FormatBdt } from "@/components/ui/format-bdt";
 import type { Project } from "@/data/projects";
 import type { Locale } from "@/i18n/config";
 import { localeHref } from "@/i18n/href";
@@ -12,11 +11,8 @@ import { cn } from "@/lib/utils";
 /**
  * One development, as a card.
  *
- * The photograph carries the name and the address so the picture and the
- * place are read as one thing; everything under it is the two questions a
- * buyer asks next — how far along is it, and what does it start at. Units
- * left sits in the footer beside the arrow because scarcity is the nudge
- * that makes someone click through.
+ * The photograph leads the card, followed by the project name and address.
+ * Unit sizes and the project link sit in the footer.
  */
 export function ProjectCard({
   project,
@@ -30,16 +26,6 @@ export function ProjectCard({
 }) {
   const displayName =
     locale === "bn" && project.nameBn ? project.nameBn : project.name;
-  const sold = project.units - project.unitsLeft;
-  const soldPercent = project.units ? Math.round((sold / project.units) * 100) : 0;
-
-  const status = project.status?.toLowerCase();
-  const statusTone: { icon: IconName; className: string } =
-    status === "completed" || status === "done"
-      ? { icon: "check", className: "bg-primary text-white" }
-      : status === "processing" || status === "under construction"
-        ? { icon: "construction", className: "bg-white text-primary" }
-        : { icon: "building", className: "bg-white/90 text-foreground" };
 
   return (
     <Link
@@ -54,38 +40,23 @@ export function ProjectCard({
         id={project.id}
         className={cn(
           "scroll-mt-24",
-          "group relative flex h-full flex-col overflow-hidden rounded-lg border border-border/60 bg-card transition-all duration-300 ease-out",
+          "group relative flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card transition-all duration-300 ease-out",
           "shadow-md shadow-primary/10",
           "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/25",
           className,
         )}
       >
-        {/* ── Photo with name overlay ───────────────────────────────── */}
+        {/* ── Photo ─────────────────────────────────────────────────── */}
         <ImageFrame
-          src={project.image}
+          src={project.thumbnailImage || project.image}
           alt={`${displayName}, ${project.area}`}
           ratio="square"
           rounded="none"
           sizes="third"
+          imageClassName="object-contain"
         >
-          {/* Deep foot gradient: the title sits on it. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/10"
-          />
-
-          {/* Top row: build stage, live feed. */}
-          <div className="absolute inset-x-3 top-3 z-10 flex items-start justify-between gap-2">
-            <span
-              className={cn(
-                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider shadow-sm",
-                statusTone.className,
-              )}
-            >
-              <Icon name={statusTone.icon} size="xs" className="size-3" />
-              {project.status}
-            </span>
-
+          {/* Live feed indicator. */}
+          <div className="absolute inset-x-3 top-3 z-10 flex justify-end">
             {project.cctvStreamActive ? (
               <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
                 <span className="relative flex size-2">
@@ -97,27 +68,26 @@ export function ProjectCard({
             ) : null}
           </div>
 
-          {/* Foot: name + address on the photo. */}
-          <div className="absolute inset-x-5 bottom-4 z-10 flex flex-col gap-1">
+        </ImageFrame>
+
+        {/* ── Body ──────────────────────────────────────────────────── */}
+        <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-4">
+          <div className="flex flex-col gap-1">
             <Heading
               as="h3"
               size="h5"
               weight="bold"
-              className="line-clamp-2 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]"
+              className="line-clamp-2 text-foreground transition-colors group-hover:text-primary"
             >
               {displayName}
             </Heading>
-            <span className="flex items-center gap-1.5 text-sm text-white/85">
-              <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Icon name="location" size="xs" className="shrink-0 text-primary" />
               <span className="truncate">
                 {project.area}, {project.city}
               </span>
             </span>
           </div>
-        </ImageFrame>
-
-        {/* ── Body ──────────────────────────────────────────────────── */}
-        <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-4">
 
           {/* Sizes */}
           <div className="mt-auto flex items-center justify-between gap-2">

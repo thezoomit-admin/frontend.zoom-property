@@ -35,6 +35,7 @@ export interface ApiProject {
   unitsLeft?: number;
   sizeRange?: string;
   startingPrice?: number;
+  thumbnailImage?: ApiMedia;
   coverImage?: ApiMedia;
   images?: ApiMedia[];
   description?: string[];

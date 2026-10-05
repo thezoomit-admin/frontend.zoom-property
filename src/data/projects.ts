@@ -50,8 +50,10 @@ export interface Project {
   unitsLeft: number;
   sizeRange: string;
   startingPrice: number;
-  /** Card image, and the first frame of the detail page's banner. */
+  /** Main cover image; used when no portrait card thumbnail is set. */
   image: string;
+  /** Optional portrait image chosen specifically for project cards. */
+  thumbnailImage?: string;
   /**
    * The rest of the set: site photographs and the developer's renders, in the
    * order the banner shows them. `image` is repeated as the first entry so the

@@ -50,7 +50,7 @@ export default async function AboutPage() {
       <TeamSection />
 
       <div className="mt-8 md:mt-12 lg:mt-20">
-        <ContactCta tone="surface" />
+        <ContactCta tone="surface" className="bg-muted/40" />
       </div>
     </>
   );

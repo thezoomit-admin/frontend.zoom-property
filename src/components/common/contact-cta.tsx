@@ -21,9 +21,9 @@ export async function ContactCta({
 
   return (
     <section
-      className={`${noBackground ? "" : isSurface ? "bg-primary/5 " : "bg-primary "}py-6 sm:py-16 lg:py-20 ${className}`}
+      className={`pt-0 pb-8 sm:pb-12 lg:pb-16 ${className}`}
     >
-      <AppContainer>
+      <AppContainer className="lg:px-[100px] xl:px-[100px]">
         <div
           className={
             isSurface
