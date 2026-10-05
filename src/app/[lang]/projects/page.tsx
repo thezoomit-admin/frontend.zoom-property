@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { ContactCta } from "@/components/common/contact-cta";
 import { pageBanners } from "@/data/page-banners";
-import { ConstructionStagesSection } from "@/components/pages/projects/construction-stages-section";
 import { ProjectsSection } from "@/components/pages/projects/projects-section";
 import { ShowcaseVideoGrid } from "@/components/pages/home/showcase-video-grid";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
@@ -79,7 +78,6 @@ export default async function ProjectsPage({
         initialPage={query?.page ? Number(query.page) : undefined}
       />
 
-      <ConstructionStagesSection />
       <ContactCta />
       <Suspense fallback={null}>
         <ProjectsVideos videoPage={query.videoPage} />
