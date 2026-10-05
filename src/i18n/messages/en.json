@@ -384,9 +384,9 @@
         "5to10": "৳5 – 10 Cr",
         "over10": "৳10 Cr and above"
       },
-      "message": "Anything we should know?",
+      "message": "Notes",
       "messagePlaceholder": "How many bedrooms, when you need to move, anything else…",
-      "submit": "Send enquiry",
+      "submit": "Submit",
       "submitting": "Sending…",
       "privacy": "We reply within one business hour. Your details are not shared with developers or third parties.",
       "successTitle": "Enquiry received",
