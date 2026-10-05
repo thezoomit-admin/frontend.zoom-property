@@ -354,12 +354,12 @@
       "whatsapp": "+880 1958 253301",
       "email": "concierge@zoomproperty.com",
       "dhakaAddress": "হাউস ৪২, রোড ১১, ব্লক ডি, বনানী ও গুলশান অ্যাভিনিউ, ঢাকা",
-      "chattogramAddress": "সিডিএ অ্যাভিনিউ, জিইসি মোড় ও খুলশী"
+      "chattogramAddress": ""
     },
     "social": [],
     "offices": "অফিস",
     "dhaka": "ঢাকা",
-    "chattogram": "চট্টগ্রাম",
+    "chattogram": "",
     "formTitle": "বার্তা পাঠান",
     "formLead": "একটি ফর্ম, অ্যাকাউন্ট লাগবে না। অটো-রিপ্লাই নয়, একজন পরামর্শদাতা দেখবেন।",
     "form": {

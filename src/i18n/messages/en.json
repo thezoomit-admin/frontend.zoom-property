@@ -354,12 +354,12 @@
       "whatsapp": "+880 1958 253301",
       "email": "concierge@zoomproperty.com",
       "dhakaAddress": "House 42, Road 11, Block D, Banani & Gulshan Avenue, Dhaka",
-      "chattogramAddress": "CDA Avenue, GEC Circle & Khulshi"
+      "chattogramAddress": ""
     },
     "social": [],
     "offices": "Offices",
     "dhaka": "Dhaka",
-    "chattogram": "Chattogram",
+    "chattogram": "",
     "formTitle": "Send an enquiry",
     "formLead": "One form, no account needed. An advisor picks it up, not an autoresponder.",
     "form": {

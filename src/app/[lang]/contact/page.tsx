@@ -133,12 +133,16 @@ export default async function ContactPage() {
                       {d.dhakaAddress}
                     </a>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">
-                      {dict.contact.chattogram}
-                    </span>
-                    <span>{d.chattogramAddress}</span>
-                  </div>
+                  {d.chattogramAddress ? (
+                    <div className="flex flex-col">
+                      {dict.contact.chattogram ? (
+                        <span className="font-medium text-foreground">
+                          {dict.contact.chattogram}
+                        </span>
+                      ) : null}
+                      <span>{d.chattogramAddress}</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-1">

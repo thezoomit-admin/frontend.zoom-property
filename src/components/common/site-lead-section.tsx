@@ -128,12 +128,16 @@ export async function SiteLeadSection({
                       {d.dhakaAddress}
                     </a>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">
-                      {dict.contact.chattogram}
-                    </span>
-                    <span>{d.chattogramAddress}</span>
-                  </div>
+                  {d.chattogramAddress ? (
+                    <div className="flex flex-col">
+                      {dict.contact.chattogram ? (
+                        <span className="font-medium text-foreground">
+                          {dict.contact.chattogram}
+                        </span>
+                      ) : null}
+                      <span>{d.chattogramAddress}</span>
+                    </div>
+                  ) : null}
                 </div>
 
                 {socials.length > 0 ? (
