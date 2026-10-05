@@ -90,10 +90,16 @@ export default async function ContactPage() {
         cmsSectionId="contact"
       />
 
-      <Section
-        className="bg-background"
-        containerClassName="lg:px-[100px] xl:px-[100px]"
-      >
+      <Section className="bg-background">
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <Heading as="h2" size="h4" align="center">
+            {dict.contact.formTitle}
+          </Heading>
+          <Text size="sm" align="center" className="mt-3">
+            {dict.contact.formLead}
+          </Text>
+        </div>
+
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <div className="flex flex-col gap-6">
@@ -168,10 +174,6 @@ export default async function ContactPage() {
 
           <Reveal delay={0.1}>
             <div className="flex flex-col gap-4">
-              <Heading as="h2" size="h4">
-                {dict.contact.formTitle}
-              </Heading>
-              <Text size="sm">{dict.contact.formLead}</Text>
               <ContactForm
                 dict={dict.contact.form}
                 areas={areaOptions}
@@ -198,7 +200,7 @@ export default async function ContactPage() {
         </section>
       </Reveal>
 
-      <FaqSection containerClassName="lg:px-[100px] xl:px-[100px]" />
+      <FaqSection />
     </>
   );
 }

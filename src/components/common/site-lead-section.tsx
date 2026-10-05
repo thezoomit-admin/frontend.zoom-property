@@ -82,7 +82,15 @@ export async function SiteLeadSection({
         label="Contact Details"
         position="top-4 right-4 sm:top-6 sm:right-6"
       />
-      <AppContainer className="relative lg:px-[100px] xl:px-[100px]">
+      <AppContainer className="relative">
+        <div className="mx-auto mb-8 max-w-3xl text-center">
+          <Heading as="h2" size="h4" align="center">
+            {dict.contact.formTitle}
+          </Heading>
+          <Text size="sm" align="center" className="mt-2 text-muted-foreground">
+            {dict.contact.formLead}
+          </Text>
+        </div>
         <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-20">
           {/* Left — contact channels */}
           <Reveal>
@@ -163,14 +171,6 @@ export async function SiteLeadSection({
           {/* Middle — lead form */}
           <Reveal delay={0.06}>
             <div className="flex h-full flex-col gap-3">
-              <div>
-                <Heading as="h2" size="h5">
-                  {dict.contact.formTitle}
-                </Heading>
-                <Text size="xs" className="mt-1 text-muted-foreground">
-                  {dict.contact.formLead}
-                </Text>
-              </div>
               <HeroLeadForm
                 dict={{
                   name: f.name,

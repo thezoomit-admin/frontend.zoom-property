@@ -45,7 +45,7 @@ export const toProject = (p: ApiProject): Project => ({
     poster: mediaUrl(p.video?.poster) || mediaUrl(p.coverImage),
     duration: p.video?.duration || "",
   },
-  status: (p.stage as Project["status"]) || "Planning",
+  status: (p.stage as Project["status"]) || "Upcoming",
   lastInspected: isoDate(p.lastInspected),
   cctvStreamActive: Boolean(p.cctvStreamActive),
   mapUrl: p.mapUrl || "",

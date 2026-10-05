@@ -23,7 +23,7 @@ export async function ContactCta({
     <section
       className={`pt-0 pb-8 sm:pb-12 lg:pb-16 ${className}`}
     >
-      <AppContainer className="lg:px-[100px] xl:px-[100px]">
+      <AppContainer>
         <div
           className={
             isSurface

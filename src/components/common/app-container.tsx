@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * Also attaches .app-container and .main-container classes for global styling & overrides.
  */
 const containerVariants = cva(
-  "app-container main-container mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-10 xl:max-w-[1440px] xl:px-16 2xl:max-w-[1600px]",
+  "app-container main-container mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-[100px] xl:max-w-[1440px] xl:px-[100px] 2xl:max-w-[1600px]",
   {
   variants: {
     size: {

@@ -108,7 +108,7 @@ export function ProjectsByArea({
         </div>
 
         <TabsContent value={activeArea}>
-          <div className="flex flex-col gap-8 lg:px-[60px]">
+          <div className="flex flex-col gap-8">
           {/* ── Featured project for the selected area ─────────────────── */}
           {featured ? (
             <Link
