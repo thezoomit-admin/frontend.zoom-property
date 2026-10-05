@@ -82,8 +82,8 @@ export async function SiteLeadSection({
         label="Contact Details"
         position="top-4 right-4 sm:top-6 sm:right-6"
       />
-      <AppContainer className="relative lg:px-[90px] xl:px-[90px]">
-        <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:gap-8">
+      <AppContainer className="relative lg:px-[120px] xl:px-[120px]">
+        <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-20">
           {/* Left — contact channels */}
           <Reveal>
             <div className="flex h-full flex-col gap-3">
@@ -149,7 +149,7 @@ export async function SiteLeadSection({
                         target="_blank"
                         rel="noreferrer"
                         aria-label={social.label}
-                        className="flex size-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                        className="flex size-9 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary transition-all hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
                         <Icon name={social.icon} size="xs" />
                       </a>

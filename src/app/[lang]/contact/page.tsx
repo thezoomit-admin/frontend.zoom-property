@@ -90,7 +90,10 @@ export default async function ContactPage() {
         cmsSectionId="contact"
       />
 
-      <Section className="bg-background">
+      <Section
+        className="bg-background"
+        containerClassName="lg:px-[100px] xl:px-[100px]"
+      >
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <Reveal>
             <div className="flex flex-col gap-6">
@@ -153,7 +156,7 @@ export default async function ContactPage() {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={social.label}
-                      className="flex size-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                      className="flex size-10 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary transition-all hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
                       <Icon name={social.icon} size="xs" />
                     </a>
@@ -195,7 +198,7 @@ export default async function ContactPage() {
         </section>
       </Reveal>
 
-      <FaqSection />
+      <FaqSection containerClassName="lg:px-[100px] xl:px-[100px]" />
     </>
   );
 }

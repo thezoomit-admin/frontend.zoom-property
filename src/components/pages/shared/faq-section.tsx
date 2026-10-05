@@ -10,11 +10,19 @@ import {
 } from "@/components/ui/accordion";
 import { getDictionary } from "@/i18n/dictionaries";
 
-export async function FaqSection() {
+export async function FaqSection({
+  containerClassName,
+}: {
+  containerClassName?: string;
+} = {}) {
   const dict = await getDictionary();
 
   return (
-    <Section id="faq" className="border-t border-border bg-background">
+    <Section
+      id="faq"
+      className="border-t border-border bg-background"
+      containerClassName={containerClassName}
+    >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
         <SectionHeading
           title={dict.faq.title}
