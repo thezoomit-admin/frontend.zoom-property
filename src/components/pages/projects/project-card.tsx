@@ -11,11 +11,8 @@ import { cn } from "@/lib/utils";
 /**
  * One development, as a card.
  *
- * The photograph carries the name and the address so the picture and the
- * place are read as one thing; everything under it is the two questions a
- * buyer asks next — how far along is it, and what does it start at. Units
- * left sits in the footer beside the arrow because scarcity is the nudge
- * that makes someone click through.
+ * The photograph leads the card, followed by the project name and address.
+ * Unit sizes and the project link sit in the footer.
  */
 export function ProjectCard({
   project,
@@ -43,17 +40,17 @@ export function ProjectCard({
         id={project.id}
         className={cn(
           "scroll-mt-24",
-          "group relative flex h-full flex-col overflow-hidden rounded-lg border border-border/60 bg-card transition-all duration-300 ease-out",
+          "group relative flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card transition-all duration-300 ease-out",
           "shadow-md shadow-primary/10",
           "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/25",
           className,
         )}
       >
-        {/* ── Photo with name overlay ───────────────────────────────── */}
+        {/* ── Photo ─────────────────────────────────────────────────── */}
         <ImageFrame
           src={project.thumbnailImage || project.image}
           alt={`${displayName}, ${project.area}`}
-          ratio="portrait"
+          ratio="square"
           rounded="none"
           sizes="third"
           imageClassName="object-contain"
@@ -71,29 +68,26 @@ export function ProjectCard({
             ) : null}
           </div>
 
-          {/* Foot: name + address on the photo. */}
-          <div className="absolute inset-x-0 bottom-0 z-10 bg-black/45 px-5 py-4">
-            <div className="flex flex-col gap-1">
-              <Heading
-                as="h3"
-                size="h5"
-                weight="bold"
-                className="line-clamp-2 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]"
-              >
-                {displayName}
-              </Heading>
-              <span className="flex items-center gap-1.5 text-sm text-white/85">
-                <Icon name="location" size="xs" className="shrink-0 text-brand-green-light" />
-                <span className="truncate">
-                  {project.area}, {project.city}
-                </span>
-              </span>
-            </div>
-          </div>
         </ImageFrame>
 
         {/* ── Body ──────────────────────────────────────────────────── */}
         <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-4">
+          <div className="flex flex-col gap-1">
+            <Heading
+              as="h3"
+              size="h5"
+              weight="bold"
+              className="line-clamp-2 text-foreground transition-colors group-hover:text-primary"
+            >
+              {displayName}
+            </Heading>
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Icon name="location" size="xs" className="shrink-0 text-primary" />
+              <span className="truncate">
+                {project.area}, {project.city}
+              </span>
+            </span>
+          </div>
 
           {/* Sizes */}
           <div className="mt-auto flex items-center justify-between gap-2">
