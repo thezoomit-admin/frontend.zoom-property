@@ -17,14 +17,8 @@ import {
 const DHAKA_OFFICE_MAP_URL =
   "https://www.google.com/maps/place/ZOOM+IT+Work+Station/@23.7453343,90.3469321,17z";
 
-const DEFAULT_MAP_EMBED =
-  "https://www.google.com/maps?q=ZOOM+IT+Work+Station&output=embed";
-
 /**
- * Site-wide lead: left channels · middle form · right map.
- * Form stays mid-width so the block doesn't stretch too wide.
- * Project detail pages pass `project`, which turns the form into a lead for
- * that project instead of a general area enquiry.
+ * Site-wide lead section with contact channels and an enquiry form.
  */
 export async function SiteLeadSection({
   source = "site-lead",
@@ -43,10 +37,6 @@ export async function SiteLeadSection({
   const d = dict.contact.details;
   const socials = socialProfiles(dict.contact.social);
   const f = dict.contact.form;
-  const mapEmbed =
-    (dict.contact as Record<string, unknown>).mapUrl as string ||
-    DEFAULT_MAP_EMBED;
-
   const channels: {
     icon: IconName;
     label: string;
@@ -92,8 +82,8 @@ export async function SiteLeadSection({
         label="Contact Details"
         position="top-4 right-4 sm:top-6 sm:right-6"
       />
-      <AppContainer className="relative">
-        <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,22rem)_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,18rem)_minmax(0,24rem)_minmax(0,1fr)] xl:gap-8">
+      <AppContainer className="relative lg:px-[90px] xl:px-[90px]">
+        <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:gap-8">
           {/* Left — contact channels */}
           <Reveal>
             <div className="flex h-full flex-col gap-3">
@@ -183,6 +173,8 @@ export async function SiteLeadSection({
                   namePlaceholder: f.namePlaceholder,
                   phone: f.phone,
                   email: f.email,
+                  location: f.location,
+                  locationPlaceholder: f.locationPlaceholder,
                   area: f.area,
                   areaAny: f.areaAny,
                   subArea: f.subArea,
@@ -203,21 +195,7 @@ export async function SiteLeadSection({
                 subject="Website lead enquiry"
                 idPrefix="site-lead"
                 trackName={project ? project.name : "Site lead"}
-                formClassName="h-full shadow-sm sm:p-5"
-              />
-            </div>
-          </Reveal>
-
-          {/* Right — map */}
-          <Reveal delay={0.1}>
-            <div className="flex h-full min-h-72 flex-col overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs lg:min-h-0">
-              <iframe
-                src={mapEmbed}
-                title="Office location"
-                className="h-full min-h-72 w-full flex-1 lg:min-h-full"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
+                formClassName="h-full gap-4 rounded-2xl border-border/70 p-5 shadow-sm transition-shadow duration-200 focus-within:shadow-md sm:p-7"
               />
             </div>
           </Reveal>

@@ -367,6 +367,8 @@
       "namePlaceholder": "Your name",
       "phone": "Phone",
       "email": "Email",
+      "location": "Your location (optional)",
+      "locationPlaceholder": "e.g. Gulshan, Dhaka",
       "enquiry": "What is this about?",
       "area": "Which area?",
       "areaAny": "Any area — not decided yet",

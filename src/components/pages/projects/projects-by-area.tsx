@@ -93,7 +93,7 @@ export function ProjectsByArea({
         {/* Scrolls on its own on narrow screens — twenty areas do not fit a
             phone width, and wrapping them would push the content below the
             fold before anyone gets to it. */}
-        <div className="-mx-4 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:flex sm:justify-center sm:px-0">
+        <div className="-mx-4 overflow-x-auto border-b border-border px-4 scrollbar-none sm:mx-0 sm:flex sm:justify-center sm:px-0">
           <TabsList variant="line" className="h-auto w-max gap-6">
             {tabAreas.map((area) => (
               <TabsTrigger
@@ -107,7 +107,8 @@ export function ProjectsByArea({
           </TabsList>
         </div>
 
-        <TabsContent value={activeArea} className="flex flex-col gap-8">
+        <TabsContent value={activeArea}>
+          <div className="flex flex-col gap-8 lg:px-[60px]">
           {/* ── Featured project for the selected area ─────────────────── */}
           {featured ? (
             <Link
@@ -152,7 +153,7 @@ export function ProjectsByArea({
               </div>
             </Link>
           ) : (
-            <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-primary/15 bg-linear-to-br from-primary/[0.06] via-background to-muted/40 px-6 py-12 text-center shadow-sm">
+            <div className="mx-auto flex min-h-64 w-full max-w-2xl flex-col items-center justify-center rounded-2xl border border-primary/15 bg-linear-to-br from-primary/[0.06] via-background to-muted/40 px-6 py-12 text-center shadow-sm">
               <span className="mb-5 flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
                 <Icon name="upcoming" size="lg" />
               </span>
@@ -182,6 +183,7 @@ export function ProjectsByArea({
               ))}
             </div>
           ) : null}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

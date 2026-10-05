@@ -367,6 +367,8 @@
       "namePlaceholder": "আপনার নাম",
       "phone": "ফোন",
       "email": "ইমেইল",
+      "location": "আপনার লোকেশন (ঐচ্ছিক)",
+      "locationPlaceholder": "যেমন: গুলশান, ঢাকা",
       "enquiry": "কী বিষয়ে?",
       "area": "কোন এলাকায়?",
       "areaAny": "যেকোনো এলাকা — এখনও ঠিক করিনি",

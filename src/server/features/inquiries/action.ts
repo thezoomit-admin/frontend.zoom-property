@@ -15,6 +15,7 @@ export async function submitContactForm(formData: FormData) {
     name: data.name,
     phone: data.phone,
     email: data.email,
+    location: data.location,
     message: data.message,
     subject: data.subject || "Website Enquiry",
     type: createLead ? "Lead" : "General",
