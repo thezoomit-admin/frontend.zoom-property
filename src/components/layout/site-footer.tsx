@@ -49,7 +49,7 @@ export async function SiteFooter() {
     .slice(0, 6);
   const t = dict.footer;
   /**
-   * One link column: About and Contact. The panel's Explore/Services lists
+   * One link column: About, Projects and Contact. The panel's Explore/Services lists
    * used to feed two columns here, but most of what they pointed at
    * (Projects, Areas, Landowners, Blog...) was retired from the site — kept
    * to a fixed pair instead of a CMS list so a stale row in the panel can't
@@ -60,6 +60,7 @@ export async function SiteFooter() {
       heading: t.explore,
       links: [
         { href: "/about", label: dict.nav.about },
+        { href: "/projects", label: dict.nav.projects },
         { href: "/contact", label: dict.nav.contact },
       ],
     },
@@ -87,15 +88,13 @@ export async function SiteFooter() {
               {dict.meta.description}
             </Text>
 
-            {/* Contact rows. Each icon sits in a small brand-green tile so
-                the three ways to reach the desk read as one clear block —
-                the icons are the anchor, not a faded decoration. */}
-            <div className="flex flex-col gap-3 border-t border-footer-foreground/10 pt-5">
+            {/* Contact rows use standalone icons to keep the footer light. */}
+            <div className="flex flex-col gap-1.5 border-t border-footer-foreground/10 pt-5">
               <a
                 href={telHref(d.phone)}
                 className="group flex w-fit items-center gap-3 whitespace-nowrap text-sm text-footer-foreground transition-colors hover:text-brand-green-light"
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-white shadow-[0_4px_10px_-4px_rgba(75,128,45,0.6)] transition-colors group-hover:bg-brand-green">
+                <span className="flex size-9 shrink-0 items-center justify-center text-white">
                   <Icon name={t.phoneIcon} size="sm" />
                 </span>
                 {d.phone}
@@ -104,23 +103,20 @@ export async function SiteFooter() {
                 href={mailHref(d.email)}
                 className="group flex w-fit items-center gap-3 break-all text-sm text-footer-foreground transition-colors hover:text-brand-green-light"
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-white shadow-[0_4px_10px_-4px_rgba(75,128,45,0.6)] transition-colors group-hover:bg-brand-green">
+                <span className="flex size-9 shrink-0 items-center justify-center text-white">
                   <Icon name={t.emailIcon} size="sm" />
                 </span>
                 {d.email}
               </a>
               <span className="flex items-start gap-3 text-sm text-footer-foreground/90">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-white shadow-[0_4px_10px_-4px_rgba(75,128,45,0.6)]">
+                <span className="flex size-9 shrink-0 items-center justify-center text-white">
                   <Icon name={t.addressIcon} size="sm" />
                 </span>
                 <span className="pt-2">{d.dhakaAddress}</span>
               </span>
             </div>
 
-            {/* Social row. Same tile language as the contact icons above —
-                filled, rounded, white glyph — so the whole block reads as
-                one set. Resting tile is a quiet white wash on the charcoal;
-                hover fills it primary and lifts it a touch. */}
+            {/* Social row. */}
             <div className="flex flex-wrap gap-2.5 pt-1">
               {socials.map((social) => (
                 <a

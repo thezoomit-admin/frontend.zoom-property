@@ -82,7 +82,7 @@ export async function SiteLeadSection({
         label="Contact Details"
         position="top-4 right-4 sm:top-6 sm:right-6"
       />
-      <AppContainer className="relative lg:px-[120px] xl:px-[120px]">
+      <AppContainer className="relative lg:px-[100px] xl:px-[100px]">
         <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 xl:gap-20">
           {/* Left — contact channels */}
           <Reveal>
