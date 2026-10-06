@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 
 import { baseApi } from "../../base-api";
 import type { ApiEnvelope } from "../../base-api/types";
+import { visitorHeaders } from "../../base-api/visitor";
 import type { LoginResult, Session, SessionUser } from "./types";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "./cookies";
 
@@ -23,6 +24,7 @@ async function authedFetch<T>(
       cache: "no-store",
       headers: {
         ...init?.headers,
+        ...(await visitorHeaders()),
         Authorization: `Bearer ${token}`,
       },
     });
@@ -85,7 +87,10 @@ export async function login(
   try {
     const res = await fetch(baseApi.url("auth/login"), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(await visitorHeaders()),
+      },
       body: JSON.stringify({ email, password }),
       cache: "no-store",
     });

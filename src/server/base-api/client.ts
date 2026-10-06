@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ApiEnvelope, ApiMeta, QueryParams } from "./types";
+import { internalHeaders, visitorHeaders } from "./visitor";
 
 /**
  * The transport. The only place in the site that calls `fetch`.
@@ -65,6 +66,7 @@ export async function get<T>(
 
   try {
     const res = await fetch(url, {
+      headers: internalHeaders(),
       signal: AbortSignal.timeout(TIMEOUT_MS),
       next: {
         revalidate: options?.revalidate ?? REVALIDATE,
@@ -86,7 +88,8 @@ export async function get<T>(
 }
 
 /**
- * POST to a public endpoint.
+ * POST to a public endpoint. Only ever called from server actions, so the
+ * visitor's IP is forwarded for the API's per-visitor rate limits.
  */
 export async function post<T>(
   path: string,
@@ -99,6 +102,7 @@ export async function post<T>(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(await visitorHeaders()),
       },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(TIMEOUT_MS),
