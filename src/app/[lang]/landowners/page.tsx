@@ -75,7 +75,7 @@ export default async function LandownersPage({
         </Stagger>
       </Section>
         <div >
-          <ContactCta tone="surface" />
+          <ContactCta />
         </div>
 
 

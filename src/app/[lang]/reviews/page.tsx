@@ -40,7 +40,7 @@ export default async function ReviewsRoute({
     <>
       <ReviewsPage locale={locale} t={dict.reviews} page={page} videoPage={videoPage} />
       <div className="mb-8 md:mb-12 lg:mb-20">
-        <ContactCta  tone="surface"/>
+        <ContactCta />
       </div>
     </>
   );

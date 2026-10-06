@@ -62,7 +62,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         />
       </Section>
       <div className="-mt-8 md:-mt-16">
-        <ContactCta  tone="surface" noBackground/>
+        <ContactCta />
       </div>
     </>
   );

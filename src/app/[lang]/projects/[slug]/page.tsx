@@ -248,7 +248,7 @@ export default async function ProjectDetailPage({
             />
           </Suspense>
 
-          <ContactCta tone="surface" className="lg:-translate-y-9" />
+          <ContactCta className="lg:-translate-y-9" />
         </TabsContent>
 
         <TabsContent value="specs" className="mt-0 outline-none">

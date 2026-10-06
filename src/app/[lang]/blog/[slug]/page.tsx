@@ -270,7 +270,7 @@ export default async function BlogPostPage({
       </section>
 
       <div className="">
-        <ContactCta tone="surface" noBackground />
+        <ContactCta />
       </div>
     </>
   );
