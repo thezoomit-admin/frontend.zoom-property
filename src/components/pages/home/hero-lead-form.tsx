@@ -63,6 +63,8 @@ export interface HeroLeadFormDict {
   email: string;
   location: string;
   locationPlaceholder: string;
+  occupation?: string;
+  occupationPlaceholder?: string;
   area?: string;
   areaAny?: string;
   subArea?: string;
@@ -325,15 +327,32 @@ export function HeroLeadForm({
           )}
         </div>
 
-        <Field id={`${idPrefix}-location`} label={dict.location} glass={glass}>
-          <Input
-            id={`${idPrefix}-location`}
-            name="location"
-            autoComplete="address-level2"
-            placeholder={dict.locationPlaceholder}
-            className={cn("h-11", fieldClass)}
-          />
-        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field id={`${idPrefix}-location`} label={dict.location} glass={glass}>
+            <Input
+              id={`${idPrefix}-location`}
+              name="location"
+              autoComplete="address-level2"
+              placeholder={dict.locationPlaceholder}
+              className={cn("h-11", fieldClass)}
+            />
+          </Field>
+
+          <Field
+            id={`${idPrefix}-occupation`}
+            label={dict.occupation || "Occupation"}
+            glass={glass}
+          >
+            <Input
+              id={`${idPrefix}-occupation`}
+              name="occupation"
+              autoComplete="organization-title"
+              maxLength={100}
+              placeholder={dict.occupationPlaceholder || "e.g. Banker, Doctor, Business"}
+              className={cn("h-11", fieldClass)}
+            />
+          </Field>
+        </div>
 
         <Field id={`${idPrefix}-message`} label={dict.message} glass={glass}>
           <Textarea

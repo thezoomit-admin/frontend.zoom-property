@@ -61,6 +61,11 @@ export async function ContactCta({
               email: f.email,
               location: locale === "bn" ? "ঠিকানা/শহর" : "Address/City",
               locationPlaceholder: f.locationPlaceholder,
+              occupation: locale === "bn" ? "পেশা" : "Occupation",
+              occupationPlaceholder:
+                locale === "bn"
+                  ? "যেমন: ব্যাংকার, ডাক্তার, ব্যবসা"
+                  : "e.g. Banker, Doctor, Business",
               area: f.area,
               areaAny: f.areaAny,
               subArea: f.subArea,
