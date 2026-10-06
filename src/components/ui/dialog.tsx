@@ -4,8 +4,37 @@ import * as React from "react"
 import { cn } from "cn"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
+import { useLenis } from "lenis/react"
+
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
+
+/** Open dialogs — Lenis restarts only when the last one closes. */
+let openDialogs = 0
+
+/**
+ * Radix locks the page with `overflow: hidden`, but Lenis drives the scroll
+ * itself and ignores it, so the page kept scrolling behind an open dialog.
+ *
+ * Rendered *inside* `DialogPrimitive.Content`, which Radix mounts only while
+ * open — so mount/unmount is open/close. (Our `DialogContent` wrapper renders
+ * even when closed; a hook there would stop Lenis on page load.)
+ */
+function LenisLock() {
+  const lenis = useLenis()
+
+  React.useEffect(() => {
+    if (!lenis) return
+    openDialogs += 1
+    lenis.stop()
+    return () => {
+      openDialogs -= 1
+      if (openDialogs === 0) lenis.start()
+    }
+  }, [lenis])
+
+  return null
+}
 
 function Dialog({
   ...props
@@ -63,12 +92,14 @@ function DialogContent({
       <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        data-lenis-prevent
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none max-w-lg data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
       >
+        <LenisLock />
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
