@@ -96,6 +96,7 @@ export function HeroLeadForm({
   trackName = "Home hero",
   variant = "default",
   project,
+  onSuccess,
 }: {
   dict: HeroLeadFormDict;
   title?: string;
@@ -110,6 +111,8 @@ export function HeroLeadForm({
   variant?: "default" | "glass";
   /** Project this lead is about — replaces the area picker. */
   project?: string;
+  /** Runs after a lead is filed — e.g. the CTA modal closes and redirects. */
+  onSuccess?: () => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [phone, setPhone] = useState("");
@@ -180,6 +183,7 @@ export function HeroLeadForm({
         form.reset();
         setPhone("");
         setCombinedArea(AREA_ANY);
+        onSuccess?.();
       } else {
         const msg = res.error || "Failed to submit enquiry";
         toast.error(
