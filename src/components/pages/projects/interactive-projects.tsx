@@ -150,7 +150,7 @@ export function InteractiveProjects({
     },
     {
       id: "Running",
-      labelEn: "Running",
+      labelEn: "Ongoing",
       labelBn: "চলমান",
       count: counts.Running,
       icon: "construction",

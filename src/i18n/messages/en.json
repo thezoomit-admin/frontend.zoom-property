@@ -436,10 +436,12 @@
     "submit": "Search"
   },
   "cta": {
-    "eyebrow": "Uncompromising transparency",
     "title": "Ready to see the shortlist?",
     "description": "Send us your criteria. We compile the title deed records, schedule the visits and put every statutory cost on one page before you decide.",
-    "contact": "Contact the team"
+    "contact": "Contact the team",
+    "link": "",
+    "modalTitle": "Tell us what you are looking for",
+    "modalDescription": "Leave your details and the team will call you back with a focused shortlist."
   },
   "footer": {
     "companyName": "Zoom Property Limited",

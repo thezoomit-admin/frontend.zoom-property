@@ -1,9 +1,7 @@
-import Link from "next/link";
-
 import { AppContainer } from "@/components/common/app-container";
-import { Icon } from "@/components/common/icon";
+import { ContactCtaModal } from "@/components/common/contact-cta-modal";
 import { getDictionary, getLocale } from "@/i18n/dictionaries";
-import { localeHref } from "@/i18n/href";
+import { getLeadAreaOptions } from "@/server/features/areas";
 
 export async function ContactCta({
   tone = "primary",
@@ -14,8 +12,13 @@ export async function ContactCta({
   noBackground?: boolean;
   className?: string;
 }) {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const locale = await getLocale();
+  const [dict, areaOptions] = await Promise.all([
+    getDictionary(),
+    getLeadAreaOptions(locale, 60),
+  ]);
   const cta = dict.cta;
+  const f = dict.contact.form;
 
   const isSurface = tone === "surface";
 
@@ -27,21 +30,12 @@ export async function ContactCta({
         <div
           className={
             isSurface
-              ? `flex flex-col gap-6 rounded-lg border border-primary/20 ${noBackground ? "bg-primary/5" : "bg-card"} px-5 py-7 text-foreground sm:rounded-2xl sm:px-10 sm:py-10 sm:flex-row sm:items-center sm:justify-between`
-              : "flex flex-col gap-6 rounded-lg border border-white/20 bg-primary px-5 py-7 text-primary-foreground sm:rounded-2xl sm:px-10 sm:py-10 sm:flex-row sm:items-center sm:justify-between"
+              ? `flex flex-col items-center gap-6 rounded-lg border border-primary/20 ${noBackground ? "bg-primary/5" : "bg-card"} px-5 py-7 text-center text-foreground sm:rounded-2xl sm:px-10 sm:py-10`
+              : "flex flex-col items-center gap-6 rounded-lg border border-white/20 bg-primary px-5 py-7 text-center text-primary-foreground sm:rounded-2xl sm:px-10 sm:py-10"
           }
         >
-          <div className="max-w-2xl">
-            <p
-              className={
-                isSurface
-                  ? "mb-3 font-heading text-xs font-bold uppercase tracking-[0.18em] text-primary"
-                  : "mb-3 font-heading text-xs font-bold uppercase tracking-[0.18em] text-primary-foreground/75"
-              }
-            >
-              {cta.eyebrow}
-            </p>
-            <h2 className="font-heading text-3xl font-bold leading-tight sm:text-4xl">
+          <div className="flex flex-col items-center">
+            <h2 className="max-w-lg font-heading text-3xl font-bold leading-tight sm:text-4xl">
               {cta.title}
             </h2>
             <p
@@ -54,17 +48,38 @@ export async function ContactCta({
               {cta.description}
             </p>
           </div>
-          <Link
-            href={localeHref(locale, "/contact")}
-            className={
+          <ContactCtaModal
+            label={cta.contact}
+            title={cta.modalTitle}
+            description={cta.modalDescription}
+            href={cta.link}
+            areas={areaOptions}
+            leadDict={{
+              name: f.name,
+              namePlaceholder: f.namePlaceholder,
+              phone: f.phone,
+              email: f.email,
+              location: locale === "bn" ? "ঠিকানা/শহর" : "Address/City",
+              locationPlaceholder: f.locationPlaceholder,
+              area: f.area,
+              areaAny: f.areaAny,
+              subArea: f.subArea,
+              subAreaAny: f.subAreaAny,
+              subAreaPickArea: f.subAreaPickArea,
+              message: locale === "bn" ? "নোট" : "Notes",
+              messagePlaceholder: f.messagePlaceholder,
+              submit: locale === "bn" ? "জমা দিন" : "Submit",
+              submitting: f.submitting,
+              privacy: f.privacy,
+              successTitle: f.successTitle,
+              successBody: f.successBody,
+            }}
+            buttonClassName={
               isSurface
-                ? "inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-heading text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 sm:w-auto"
-                : "inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-primary-foreground px-5 py-3 font-heading text-sm font-semibold text-primary transition-transform hover:-translate-y-0.5 sm:w-auto"
+                ? "inline-flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-heading text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 sm:w-auto"
+                : "inline-flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary-foreground px-5 py-3 font-heading text-sm font-semibold text-primary transition-transform hover:-translate-y-0.5 sm:w-auto"
             }
-          >
-            <Icon name="phone" size="xs" />
-            {cta.contact}
-          </Link>
+          />
         </div>
       </AppContainer>
     </section>
