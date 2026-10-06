@@ -115,7 +115,7 @@ export default async function ProjectDetailPage({
       {/* Specs shows only its own hero and write-up; everything else on the page belongs to Overview. */}
       <Tabs defaultValue="overview" className="w-full gap-0">
         <Section spacing="none" className="bg-background pt-3 sm:pt-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3 mt-4">
             <div>
               <h3 className="text-xl text-primary font-bold tracking-tight ">
                 {project.name}
