@@ -59,7 +59,7 @@ export default async function AreasPage({
       />
 
       <AreaComparisonSection areas={allAreas} />
-      <ContactCta tone="surface" noBackground />
+      <ContactCta />
     </>
   );
 }

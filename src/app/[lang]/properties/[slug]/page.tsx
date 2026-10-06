@@ -337,7 +337,7 @@ export default async function PropertyDetailPage({
         </Section>
       ) : null}
        <div className="mb-8 md:mb-12 lg:mb-20">
-        <ContactCta  tone="surface"/>
+        <ContactCta />
       </div>
 
     </>

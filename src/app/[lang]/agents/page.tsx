@@ -53,7 +53,7 @@ export default async function AgentsPage() {
       </Reveal>
       </AppContainer>
        <div className="mt-8 md:mt-12 lg:mt-20">
-              <ContactCta  tone="surface"/>
+              <ContactCta />
             </div>
     </>
   );
